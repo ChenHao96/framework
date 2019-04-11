@@ -25,6 +25,10 @@ import java.util.Arrays;
 
 public final class CommonsMessage {
 
+    public static final String DATA_NAME = "data";
+    public static final String SLAVE_CODE_NAME = "slaveCode";
+    public static final String MASTER_CODE_NAME = "masterCode";
+
     private static final Short BODY_HEAD = 9962;
     public static final int MIN_DATA_LENGTH = Short.BYTES + Byte.BYTES * 2 + Integer.BYTES;
 

@@ -15,6 +15,12 @@
 
     <dependencies>
 
+        <dependency>
+            <groupId>org.springframework</groupId>
+            <artifactId>spring-beans</artifactId>
+            <version>${spring.version}</version>
+        </dependency>
+
         <!--log记录-->
         <dependency>
             <groupId>org.slf4j</groupId>

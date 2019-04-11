@@ -1,5 +1,5 @@
 /**
- * Copyright 2018 ChenHao96
+ * Copyright 2019 ChenHao96
  * <p>
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,33 +14,22 @@
  * limitations under the License.
  */
 
-package org.steven.chen.web.websocket;
+package org.steven.chen.utils.mapper;
 
-import javax.websocket.*;
+import java.util.Map;
 
-public abstract class AbstractWebSocket {
+/**
+ * TODO:
+ */
+public class JsonNode2FlatMapper implements Object2FlatMapper{
 
-    public abstract int getSessionPort(Session session);
-
-    public abstract String getSessionIP(Session session);
-
-    @OnOpen
-    public void onOpen(Session session) {
-
+    @Override
+    public Map<String, Object> toFlatMapper(Object object) {
+        return null;
     }
 
-    @OnMessage
-    public void onMessage(String message, Session session) {
-
-    }
-
-    @OnClose
-    public void onClose(Session session) {
-
-    }
-
-    @OnError
-    public void onError(Session session, Throwable error) {
-
+    @Override
+    public <T> T fromFlatMapper(Map<String, Object> target, Class<T> clazz) {
+        return null;
     }
 }

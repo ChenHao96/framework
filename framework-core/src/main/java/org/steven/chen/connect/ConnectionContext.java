@@ -39,4 +39,8 @@ public interface ConnectionContext extends Closeable {
     Object removeAttribute(String name);
 
     void clearAttribute();
+
+    String getConnectionIp();
+
+    int getConnectionPort();
 }

@@ -23,9 +23,5 @@ import java.io.IOException;
 
 public interface SocketConnectionContext extends ConnectionContext {
 
-    String getConnectionIp();
-
-    int getConnectionPort();
-
     CommonsMessage receiveMessage() throws IOException;
 }

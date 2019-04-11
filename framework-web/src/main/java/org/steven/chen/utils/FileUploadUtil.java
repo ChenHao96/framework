@@ -1,6 +1,9 @@
 package org.steven.chen.utils;
 
+import com.aliyun.oss.ClientConfiguration;
 import com.aliyun.oss.OSSClient;
+import com.aliyun.oss.common.auth.CredentialsProvider;
+import com.aliyun.oss.common.auth.DefaultCredentialProvider;
 import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -137,14 +140,18 @@ public class FileUploadUtil {
         //获取文件流
         InputStream inputStream = file.getInputStream();
         return uploadFileOSS(fileName, inputStream);
-
     }
 
     public String uploadFileOSS(String fileName, InputStream inputStream) {
 
         //创建OSS连接实例
-        OSSClient ossClient = new OSSClient(properties.getEndpoint(),
-                properties.getAccessKeyId(), properties.getAccessKeySecret());
+        ClientConfiguration config = new ClientConfiguration();
+        config.setMaxErrorRetry(properties.getMaxErrorRetry());
+        config.setSocketTimeout(properties.getSocketTimeout());
+        config.setMaxConnections(properties.getMaxConnections());
+        config.setConnectionTimeout(properties.getConnectionTimeout());
+        CredentialsProvider credsProvider = new DefaultCredentialProvider(properties.getAccessKeyId(), properties.getAccessKeySecret());
+        OSSClient ossClient = new OSSClient(properties.getEndpoint(), credsProvider, config);
 
         //写数据
         ossClient.putObject(properties.getBucketName(), fileName, inputStream);

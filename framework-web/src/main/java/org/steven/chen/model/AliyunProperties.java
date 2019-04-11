@@ -7,6 +7,10 @@ public class AliyunProperties {
     private String accessKeyId;
     private String accessKeySecret;
     private String securityToken;
+    private int maxErrorRetry = 3;
+    private int maxConnections = 10;
+    private int socketTimeout = 2000;
+    private int connectionTimeout = 5000;
 
     public String getEndpoint() {
         return endpoint;
@@ -48,6 +52,38 @@ public class AliyunProperties {
         this.securityToken = securityToken;
     }
 
+    public int getMaxConnections() {
+        return maxConnections;
+    }
+
+    public void setMaxConnections(int maxConnections) {
+        this.maxConnections = maxConnections;
+    }
+
+    public int getConnectionTimeout() {
+        return connectionTimeout;
+    }
+
+    public void setConnectionTimeout(int connectionTimeout) {
+        this.connectionTimeout = connectionTimeout;
+    }
+
+    public int getMaxErrorRetry() {
+        return maxErrorRetry;
+    }
+
+    public void setMaxErrorRetry(int maxErrorRetry) {
+        this.maxErrorRetry = maxErrorRetry;
+    }
+
+    public int getSocketTimeout() {
+        return socketTimeout;
+    }
+
+    public void setSocketTimeout(int socketTimeout) {
+        this.socketTimeout = socketTimeout;
+    }
+
     @Override
     public String toString() {
         final StringBuilder sb = new StringBuilder("AliyunProperties{");
@@ -56,6 +92,10 @@ public class AliyunProperties {
         sb.append(", accessKeyId='").append(accessKeyId).append('\'');
         sb.append(", accessKeySecret='").append(accessKeySecret).append('\'');
         sb.append(", securityToken='").append(securityToken).append('\'');
+        sb.append(", maxConnections=").append(maxConnections);
+        sb.append(", connectionTimeout=").append(connectionTimeout);
+        sb.append(", maxErrorRetry=").append(maxErrorRetry);
+        sb.append(", socketTimeout=").append(socketTimeout);
         sb.append('}');
         return sb.toString();
     }
