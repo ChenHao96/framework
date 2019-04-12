@@ -22,7 +22,6 @@ import org.steven.chen.connect.CommonsMessage;
 import org.steven.chen.connect.DefaultMessageConvertToHandlerArgs;
 import org.steven.chen.utils.JsonUtils;
 import org.steven.chen.utils.StringUtil;
-import org.steven.chen.utils.mapper.JsonNode2FlatMapper;
 
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
@@ -32,10 +31,8 @@ public class WebSocketMessageConvertToHandlerArgs extends DefaultMessageConvertT
 
     @Override
     public Map<String, Object> convertArgs() {
-
         CommonsMessage message = getCommonsMessage();
         String requestBody = new String(message.getData(), StandardCharsets.UTF_8);
-        object2FlatMapper = object2FlatMapper == null ? new JsonNode2FlatMapper() : object2FlatMapper;
         try {
             JsonNode jsonNode = JsonUtils.jsonStr2JsonNode(requestBody);
             return object2FlatMapper.toFlatMapper(jsonNode);
