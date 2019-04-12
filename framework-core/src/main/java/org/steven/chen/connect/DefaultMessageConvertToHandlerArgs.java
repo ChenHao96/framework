@@ -16,21 +16,21 @@
 
 package org.steven.chen.connect;
 
-import org.steven.chen.utils.mapper.Object2FlatMapper;
+import org.steven.chen.utils.mapper.HashMapper;
 
 import java.util.Map;
 
-public class DefaultMessageConvertToHandlerArgs implements MessageConvertToHandlerArgs {
+public class DefaultMessageConvertToHandlerArgs<D> implements MessageConvertToHandlerArgs {
 
     private static final ThreadLocal<CommonsMessage> holder = new ThreadLocal<>();
 
-    protected Object2FlatMapper object2FlatMapper;
+    protected HashMapper<D> object2FlatMapper;
 
     public static ThreadLocal<CommonsMessage> getHolder() {
         return holder;
     }
 
-    public void setObject2FlatMapper(Object2FlatMapper object2FlatMapper) {
+    public void setObject2FlatMapper(HashMapper<D> object2FlatMapper) {
         this.object2FlatMapper = object2FlatMapper;
     }
 

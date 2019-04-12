@@ -18,9 +18,9 @@ package org.steven.chen.utils.mapper;
 
 import java.util.Map;
 
-public interface Object2FlatMapper {
+public interface HashMapper<D> {
 
-    Map<String, Object> toFlatMapper(Object object);
+    Map<String, Object> toFlatMapper(D object);
 
-    <T> T fromFlatMapper(Map<String, Object> target, Class<T> clazz);
+    <T> T fromFlatMapper(Map<String, Object> target,Class<T> clazz);
 }

@@ -16,7 +16,6 @@
 
 package org.steven.chen.utils.mapper;
 
-import org.springframework.beans.BeanUtils;
 import org.steven.chen.utils.CommonsUtil;
 import org.steven.chen.utils.StringUtil;
 
@@ -27,15 +26,9 @@ import java.lang.reflect.Array;
 import java.lang.reflect.Method;
 import java.util.*;
 
-public class Object2FlatMapperBean implements Object2FlatMapper {
+public class Object2FlatMapperBean extends DefaultObject2FlatMapper<Object> {
 
-    private Set<Map.Entry<String, Object>> entrySet;
     private Set<Object> currentSource = new HashSet<>();
-
-    private static final String MAP_PREFIX = "#";
-    private static final String ARRAY_PREFIX = "[";
-    private static final String ARRAY_SUFFIX = "]";
-
 
     @Override
     public Map<String, Object> toFlatMapper(Object object) {
@@ -49,7 +42,7 @@ public class Object2FlatMapperBean implements Object2FlatMapper {
 
     private Map<String, Object> flattenMap(Object source) {
         if (source == null) return null;
-        Map<String, Object> resultMap = new HashMap<>();
+        Map<String, Object> resultMap = new LinkedHashMap<>();
         try {
             this.doFlatten("", ".", source, resultMap);
         } catch (Exception e) {
@@ -105,6 +98,8 @@ public class Object2FlatMapperBean implements Object2FlatMapper {
             putMapBean(propertyPrefix, (Map<String, Object>) bean, resultMap);
         } else if (CommonsUtil.isSimpleProperty(bean)) {
             resultMap.put(propertyPrefix, bean);
+        } else if (bean instanceof Class) {
+            resultMap.put(propertyPrefix, bean);
         } else {
             return false;
         }
@@ -139,70 +134,5 @@ public class Object2FlatMapperBean implements Object2FlatMapper {
 
     private void putCollectionBean(String propertyPrefix, Collection<Object> collection, Map<String, Object> resultMap) throws Exception {
         putArrayBean(propertyPrefix, collection.toArray(), resultMap);
-    }
-
-    @Override
-    public <T> T fromFlatMapper(Map<String, Object> target, Class<T> clazz) {
-        try {
-            T result = BeanUtils.instantiateClass(clazz);
-            mapFlatten(target, result);
-            return result;
-        } catch (Exception e) {
-            throw new RuntimeException(e);
-        }
-    }
-
-    private void mapFlatten(Map<String, Object> target, Object resultBean) throws Exception {
-        if (target == null) return;
-        this.entrySet = target.entrySet();
-        for (Map.Entry<String, Object> entry : entrySet) {
-            doUnFlatten("", resultBean, entry);
-        }
-    }
-
-    private void doUnFlatten(String propertyPrefix, Object resultBean, Map.Entry<String, Object> entry) throws Exception {
-
-        if (StringUtil.isNotBlank(propertyPrefix)) {
-            propertyPrefix = propertyPrefix + ".";
-        }
-
-        String key = entry.getKey();
-        if (StringUtil.isNotBlank(key)) {
-            BeanInfo beanInfo = Introspector.getBeanInfo(resultBean.getClass());
-            PropertyDescriptor[] propertyDescriptors = beanInfo.getPropertyDescriptors();
-            String tmpKey = key.substring(propertyPrefix == null ? 0 : propertyPrefix.length());
-
-            if (tmpKey.contains(".")) {
-                String mapName = tmpKey.substring(0, tmpKey.indexOf("."));
-                for (PropertyDescriptor property : propertyDescriptors) {
-                    String propertyName = property.getName();
-                    if (propertyName.equals(mapName)) {
-                        Method getter = property.getReadMethod();
-                        Object childBean = getter.invoke(resultBean);
-                        childBean = childBean == null ? BeanUtils.instantiateClass(property.getPropertyType()) : childBean;
-                        Method setter = property.getWriteMethod();
-                        setter.invoke(resultBean, childBean);
-                        doUnFlatten(propertyPrefix + mapName, childBean, entry);
-                        break;
-                    }
-                }
-            } else if (key.startsWith(propertyPrefix)) {
-                for (PropertyDescriptor property : propertyDescriptors) {
-                    String propertyName = property.getName();
-                    Method setter = property.getWriteMethod();
-                    if (propertyName.equals(tmpKey)) {
-                        setter.invoke(resultBean, entry.getValue());
-                        break;
-                    } else if (tmpKey.contains(ARRAY_PREFIX)) {
-                        //tmpKey = propertyPrefix + tmpKey.substring(0, tmpKey.indexOf("["));
-                        //setter.invoke(resultBean, map2ArrayValue(tmpKey, property.getPropertyType()));
-                        break;
-                    } else if (tmpKey.contains(MAP_PREFIX)) {
-                        setter.invoke(resultBean, entry.getValue());
-                        break;
-                    }
-                }
-            }
-        }
     }
 }
