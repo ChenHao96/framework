@@ -44,7 +44,7 @@ public class Object2FlatMapperBean extends DefaultObject2FlatMapper<Object> {
         if (source == null) return null;
         Map<String, Object> resultMap = new LinkedHashMap<>();
         try {
-            this.doFlatten("", ".", source, resultMap);
+            this.doFlatten("", PARTING, source, resultMap);
         } catch (Exception e) {
             throw new RuntimeException(e);
         }
@@ -73,7 +73,7 @@ public class Object2FlatMapperBean extends DefaultObject2FlatMapper<Object> {
             String tmpPropertyPrefix = propertyPrefix;
             int index = tmpPropertyPrefix.lastIndexOf(ARRAY_SUFFIX);
             if (index > 0 && index == tmpPropertyPrefix.length() - 1) {
-                tmpPropertyPrefix = tmpPropertyPrefix + ".";
+                tmpPropertyPrefix = tmpPropertyPrefix + PARTING;
             }
             tmpPropertyPrefix = tmpPropertyPrefix + propertyName;
             if (!putNormalBean(tmpPropertyPrefix, value, resultMap)) {
@@ -120,7 +120,7 @@ public class Object2FlatMapperBean extends DefaultObject2FlatMapper<Object> {
     private void putMapBean(String propertyPrefix, Map<String, Object> map, Map<String, Object> resultMap) throws Exception {
 
         if (StringUtil.isNotBlank(propertyPrefix)) {
-            propertyPrefix = propertyPrefix + "." + MAP_PREFIX;
+            propertyPrefix = propertyPrefix + PARTING;
         }
 
         Set<Map.Entry<String, Object>> entries = map.entrySet();
