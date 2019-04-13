@@ -108,7 +108,7 @@ public class TestObject2FlatMapper {
         caches.put("code", 1);
         caches.put("name", "Steven");
         Set<TestObject2FlatMapper> cards = new HashSet<>();
-        //caches.put("node", cards);
+        caches.put("node", cards);
         test.setNode(test2);
         test.setCaches(caches);
         test.setCards(cards);
