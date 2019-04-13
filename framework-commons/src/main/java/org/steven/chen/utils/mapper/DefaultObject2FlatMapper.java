@@ -16,32 +16,46 @@
 
 package org.steven.chen.utils.mapper;
 
-import org.steven.chen.utils.JsonUtils;
+import com.fasterxml.jackson.annotation.JsonInclude;
+import com.fasterxml.jackson.core.JsonParser;
+import com.fasterxml.jackson.databind.DeserializationFeature;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import org.springframework.beans.BeanUtils;
 
-import java.util.LinkedHashMap;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 
 public abstract class DefaultObject2FlatMapper<D> implements HashMapper<D> {
 
     protected static final String PARTING = ".";
     protected static final String ARRAY_PREFIX = "[";
     protected static final String ARRAY_SUFFIX = "]";
+    private static final ObjectMapper mapper;
+
+    static {
+        mapper = new ObjectMapper();
+        mapper.configure(JsonParser.Feature.ALLOW_SINGLE_QUOTES, true);
+        mapper.setSerializationInclusion(JsonInclude.Include.NON_NULL);
+        mapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
+    }
 
     @Override
     public <T> T fromFlatMapper(Map<String, Object> target, Class<T> clazz) {
-        Map<String, Object> cacheMap = new LinkedHashMap<>();
         try {
-            mapFlatten(target, cacheMap);
-            return JsonUtils.jsonStr2Object(JsonUtils.object2Json(cacheMap), clazz);
+            Map<String, Object> cacheMap = mapFlatten(target);
+            if (cacheMap == null) {
+                return BeanUtils.instantiateClass(clazz);
+            }
+            return mapper.readValue(mapper.writeValueAsString(cacheMap), clazz);
         } catch (Exception e) {
             throw new RuntimeException(e);
         }
     }
 
-    private void mapFlatten(Map<String, Object> target, Map<String, Object> cacheMap) throws Exception {
-        if (target == null) return;
-        doUnFlatten("", cacheMap, target);
+    private Map<String, Object> mapFlatten(Map<String, Object> target) throws Exception {
+        if (target == null) return null;
+        Map<String, Object> resultMap = new LinkedHashMap<>();
+        doUnFlatten("", resultMap, target);
+        return resultMap;
     }
 
     @SuppressWarnings("unchecked")
@@ -51,16 +65,40 @@ public abstract class DefaultObject2FlatMapper<D> implements HashMapper<D> {
             String key = entry.getKey();
             Object value = entry.getValue();
             if (key.startsWith(propertyPrefix)) {
-                key = key.substring(0, propertyPrefix.length());
-                if (key.contains(PARTING)) {
-                    key = key.substring(0, key.indexOf(PARTING) + 1);
-                    Map<String, Object> childMap = value == null ? new LinkedHashMap<>() : (Map<String, Object>) value;
-                    doUnFlatten(key, childMap, target);
-                } else if (key.contains(ARRAY_PREFIX)) {
+                key = key.substring(propertyPrefix.length());
+                int arrayIndex = key.indexOf(ARRAY_PREFIX);
+                int partingIndex = key.indexOf(PARTING);
 
-                } else {
-                    cacheMap.put(key, value);
+                if (0 <= arrayIndex && arrayIndex < partingIndex) {
+                    String index = key.substring(key.indexOf(ARRAY_PREFIX), key.indexOf(ARRAY_SUFFIX));
+                    List<Object> childList = (List<Object>) cacheMap.get(key);
+                    if (childList == null) {
+                        childList = new LinkedList<>();
+                        cacheMap.put(key, childList);
+                    }
+
+                    if (key.indexOf(PARTING) > 0) {
+                        Map<String, Object> childMap = new LinkedHashMap<>();
+                        childList.add(childMap);
+                        doUnFlatten(propertyPrefix + key + PARTING, childMap, target);
+                    } else {
+                        childList.add(value);
+                    }
+                    continue;
                 }
+
+                if (0 < partingIndex && partingIndex < arrayIndex) {
+                    key = key.substring(0, key.indexOf(PARTING));
+                    Map<String, Object> childMap = (Map<String, Object>) cacheMap.get(key);
+                    if (childMap == null) {
+                        childMap = new LinkedHashMap<>();
+                        cacheMap.put(key, childMap);
+                    }
+                    doUnFlatten(propertyPrefix + key + PARTING, childMap, target);
+                    continue;
+                }
+
+                cacheMap.put(key, value);
             }
         }
     }
