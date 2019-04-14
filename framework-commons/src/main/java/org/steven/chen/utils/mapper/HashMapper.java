@@ -23,4 +23,6 @@ public interface HashMapper<D> {
     Map<String, Object> toFlatMapper(D object);
 
     <T> T fromFlatMapper(Map<String, Object> target,Class<T> clazz);
+
+    Map<String,Object> fromFlatMapper(Map<String, Object> target);
 }

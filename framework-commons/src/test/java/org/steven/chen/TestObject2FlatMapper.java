@@ -16,7 +16,6 @@
 
 package org.steven.chen;
 
-import org.steven.chen.utils.JsonUtils;
 import org.steven.chen.utils.mapper.HashMapper;
 import org.steven.chen.utils.mapper.Object2FlatMapperBean;
 
@@ -27,7 +26,7 @@ public class TestObject2FlatMapper {
     private int code;
     private String name;
     private int[] numbers;
-    private Set<TestObject2FlatMapper> cards;
+    private Set<Object> cards;
     private Map<String, Object> caches;
     private TestObject2FlatMapper node;
 
@@ -63,11 +62,11 @@ public class TestObject2FlatMapper {
         this.numbers = numbers;
     }
 
-    public Set<TestObject2FlatMapper> getCards() {
+    public Set<Object> getCards() {
         return cards;
     }
 
-    public void setCards(Set<TestObject2FlatMapper> cards) {
+    public void setCards(Set<Object> cards) {
         this.cards = cards;
     }
 
@@ -96,7 +95,7 @@ public class TestObject2FlatMapper {
         sb.append(", cards=").append(cards);
         sb.append(", caches=").append(caches);
         sb.append(", node=").append(node);
-        sb.append('}');
+        sb.append('}').append("\n");
         return sb.toString();
     }
 
@@ -105,14 +104,15 @@ public class TestObject2FlatMapper {
         TestObject2FlatMapper test = new TestObject2FlatMapper();
         TestObject2FlatMapper test2 = new TestObject2FlatMapper();
         Map<String, Object> caches = new HashMap<>();
-        caches.put("code", 1);
-        caches.put("name", "Steven");
-        Set<TestObject2FlatMapper> cards = new HashSet<>();
-        caches.put("node", cards);
+        caches.put("a", 1);
+        caches.put("b", "Steven");
+        Set<Object> cards = new HashSet<>(caches.keySet());
+        caches.put("c", cards);
         test.setNode(test2);
         test.setCaches(caches);
         test.setCards(cards);
-        cards.add(new TestObject2FlatMapper(2, "world"));
+        cards.add(5);
+        cards.add(new TestObject2FlatMapper(3, "hello"));
         test2.setCode(2);
         test2.setName("Chen");
         //String json = JsonUtils.object2Json(test);
@@ -121,6 +121,6 @@ public class TestObject2FlatMapper {
         HashMapper<Object> object2FlatMapper = new Object2FlatMapperBean();
         Map<String, Object> hash = object2FlatMapper.toFlatMapper(test);
         System.out.println(hash);
-        System.out.println(object2FlatMapper.fromFlatMapper(hash, TestObject2FlatMapper.class));
+        System.out.println(object2FlatMapper.fromFlatMapper(hash));
     }
 }
