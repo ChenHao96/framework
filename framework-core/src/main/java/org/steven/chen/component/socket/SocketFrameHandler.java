@@ -17,9 +17,9 @@
 package org.steven.chen.component.socket;
 
 import org.springframework.util.Assert;
-import org.steven.chen.connect.CommonsMessage;
-import org.steven.chen.connect.DefaultConnectionContext;
-import org.steven.chen.connect.MessageConvertToHandlerArgs;
+import org.steven.chen.component.socket.connect.CommonsMessage;
+import org.steven.chen.component.socket.connect.DefaultConnectionContext;
+import org.steven.chen.component.socket.connect.MessageConvertToHandlerArgs;
 import org.steven.chen.utils.CommonsUtil;
 
 import java.io.DataInputStream;

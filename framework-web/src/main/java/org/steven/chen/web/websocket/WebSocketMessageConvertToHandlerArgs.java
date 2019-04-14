@@ -18,8 +18,8 @@ package org.steven.chen.web.websocket;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
-import org.steven.chen.connect.CommonsMessage;
-import org.steven.chen.connect.DefaultMessageConvertToHandlerArgs;
+import org.steven.chen.component.socket.connect.CommonsMessage;
+import org.steven.chen.component.socket.connect.DefaultMessageConvertToHandlerArgs;
 import org.steven.chen.utils.JsonUtils;
 import org.steven.chen.utils.StringUtil;
 

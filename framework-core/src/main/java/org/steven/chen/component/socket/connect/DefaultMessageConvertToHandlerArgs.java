@@ -14,9 +14,10 @@
  * limitations under the License.
  */
 
-package org.steven.chen.connect;
+package org.steven.chen.component.socket.connect;
 
 import org.steven.chen.utils.mapper.HashMapper;
+import org.steven.chen.utils.mapper.Jackson2FlatMapper;
 
 import java.util.Map;
 
@@ -24,14 +25,10 @@ public class DefaultMessageConvertToHandlerArgs implements MessageConvertToHandl
 
     private static final ThreadLocal<CommonsMessage> holder = new ThreadLocal<>();
 
-    protected HashMapper object2FlatMapper;
+    protected HashMapper object2FlatMapper = new Jackson2FlatMapper();
 
     public static ThreadLocal<CommonsMessage> getHolder() {
         return holder;
-    }
-
-    public void setObject2FlatMapper(HashMapper object2FlatMapper) {
-        this.object2FlatMapper = object2FlatMapper;
     }
 
     protected CommonsMessage getCommonsMessage() {

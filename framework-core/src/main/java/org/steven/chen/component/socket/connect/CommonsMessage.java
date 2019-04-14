@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package org.steven.chen.connect;
+package org.steven.chen.component.socket.connect;
 
 import org.springframework.util.Assert;
 

@@ -19,9 +19,9 @@ package org.steven.chen.web.websocket;
 import org.springframework.util.Assert;
 import org.springframework.web.socket.TextMessage;
 import org.springframework.web.socket.WebSocketSession;
-import org.steven.chen.connect.CommonsMessage;
-import org.steven.chen.connect.ConnectionContext;
-import org.steven.chen.connect.MessageConvertToHandlerArgs;
+import org.steven.chen.component.socket.connect.CommonsMessage;
+import org.steven.chen.component.socket.connect.ConnectionContext;
+import org.steven.chen.component.socket.connect.MessageConvertToHandlerArgs;
 import org.steven.chen.utils.JsonUtils;
 
 import java.io.IOException;

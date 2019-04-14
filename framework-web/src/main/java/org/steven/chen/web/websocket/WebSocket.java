@@ -23,9 +23,9 @@ import org.springframework.web.socket.handler.TextWebSocketHandler;
 import org.steven.chen.component.executor.TaskExecutorComponent;
 import org.steven.chen.component.process.ProcessInvokeService;
 import org.steven.chen.component.process.handler.HandlerFactory;
-import org.steven.chen.connect.CommonsMessage;
-import org.steven.chen.connect.MessageConvertToHandlerArgs;
-import org.steven.chen.connect.SocketHandlerTask;
+import org.steven.chen.component.socket.connect.CommonsMessage;
+import org.steven.chen.component.socket.connect.MessageConvertToHandlerArgs;
+import org.steven.chen.component.socket.connect.SocketHandlerTask;
 import org.steven.chen.utils.JsonUtils;
 import org.steven.chen.utils.StringUtil;
 
@@ -62,11 +62,12 @@ public class WebSocket extends TextWebSocketHandler {
                 }
             }
 
-            ProcessInvokeService invokeService = handlerFactory.getProcessMethod(
-                    request.getMasterCode(), request.getSlaveCode());
+            ProcessInvokeService invokeService = handlerFactory.getProcessMethod(request.getMasterCode(), request.getSlaveCode());
             if (invokeService != null) {
                 SocketHandlerTask task = new SocketHandlerTask(request);
-                task.setConnectionContext(new WebSocketFrameHandler(session));
+                WebSocketFrameHandler frameHandler = new WebSocketFrameHandler(session);
+                frameHandler.setMessageConvertToHandlerArgs(messageConvertToHandlerArgs);
+                task.setConnectionContext(frameHandler);
                 task.setInvokeService(invokeService);
                 task.setMessageConvertToHandlerArgs(messageConvertToHandlerArgs);
                 executorComponent.addHandler(task);

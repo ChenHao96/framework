@@ -14,24 +14,17 @@
  * limitations under the License.
  */
 
-package org.steven.chen.connect;
+package org.steven.chen.component.socket.connect;
 
-public final class SocketConnectionUtil {
+import java.util.Map;
 
-    private static final ThreadLocal<ConnectionContext> holder = new ThreadLocal<>();
+public interface MessageConvertToHandlerArgs {
 
-    private SocketConnectionUtil() {
-    }
+    void setCommonsMessage(CommonsMessage message);
 
-    public static ConnectionContext getChannelHandlerContext() {
-        return holder.get();
-    }
+    void removeCommonsMessage();
 
-    protected static void setChannelHandlerContext(ConnectionContext context) {
-        holder.set(context);
-    }
+    Map<String, Object> convertArgs();
 
-    protected static void removeChannelHandlerContext() {
-        holder.remove();
-    }
+    CommonsMessage convertMessageReturn(Object obj);
 }

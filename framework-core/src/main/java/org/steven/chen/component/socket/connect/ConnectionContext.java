@@ -14,14 +14,33 @@
  * limitations under the License.
  */
 
-package org.steven.chen.component.socket;
+package org.steven.chen.component.socket.connect;
 
-import org.steven.chen.component.socket.connect.CommonsMessage;
-import org.steven.chen.component.socket.connect.ConnectionContext;
-
+import java.io.Closeable;
 import java.io.IOException;
+import java.util.Set;
 
-public interface SocketConnectionContext extends ConnectionContext {
+public interface ConnectionContext extends Closeable {
 
-    CommonsMessage receiveMessage() throws IOException;
+    boolean isClose();
+
+    void close() throws IOException;
+
+    void sendMessage(CommonsMessage message) throws IOException;
+
+    void sendMessage(Object message) throws IOException;
+
+    void setAttribute(String name, Object obj);
+
+    Object getAttribute(String name);
+
+    Set<String> getAttributeNames();
+
+    Object removeAttribute(String name);
+
+    void clearAttribute();
+
+    String getConnectionIp();
+
+    int getConnectionPort();
 }

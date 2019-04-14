@@ -14,33 +14,24 @@
  * limitations under the License.
  */
 
-package org.steven.chen.connect;
+package org.steven.chen.component.socket.connect;
 
-import java.io.Closeable;
-import java.io.IOException;
-import java.util.Set;
+public final class SocketConnectionUtil {
 
-public interface ConnectionContext extends Closeable {
+    private static final ThreadLocal<ConnectionContext> holder = new ThreadLocal<>();
 
-    boolean isClose();
+    private SocketConnectionUtil() {
+    }
 
-    void close() throws IOException;
+    public static ConnectionContext getChannelHandlerContext() {
+        return holder.get();
+    }
 
-    void sendMessage(CommonsMessage message) throws IOException;
+    protected static void setChannelHandlerContext(ConnectionContext context) {
+        holder.set(context);
+    }
 
-    void sendMessage(Object message) throws IOException;
-
-    void setAttribute(String name, Object obj);
-
-    Object getAttribute(String name);
-
-    Set<String> getAttributeNames();
-
-    Object removeAttribute(String name);
-
-    void clearAttribute();
-
-    String getConnectionIp();
-
-    int getConnectionPort();
+    protected static void removeChannelHandlerContext() {
+        holder.remove();
+    }
 }
