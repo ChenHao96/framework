@@ -19,12 +19,14 @@ package org.steven.chen.utils.mapper;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.core.JsonParser;
 import com.fasterxml.jackson.databind.DeserializationFeature;
+import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.springframework.beans.BeanUtils;
+import org.steven.chen.utils.StringUtil;
 
 import java.util.*;
 
-public abstract class DefaultObject2FlatMapper<D> implements HashMapper<D> {
+public class Jackson2FlatMapper implements HashMapper {
 
     protected static final String PARTING = ".";
     protected static final String ARRAY_PREFIX = "[";
@@ -57,6 +59,47 @@ public abstract class DefaultObject2FlatMapper<D> implements HashMapper<D> {
             return mapper.readValue(mapper.writeValueAsString(cacheMap), clazz);
         } catch (Exception e) {
             throw new RuntimeException(e);
+        }
+    }
+
+    @Override
+    public Map<String, Object> toFlatMapper(Object object) {
+        Map<String, Object> resultMap = new LinkedHashMap<>();
+        try {
+            JsonNode source;
+            if (object instanceof JsonNode) {
+                source = (JsonNode) object;
+            } else {
+                source = mapper.valueToTree(object);
+            }
+            doFlatten("", source, resultMap);
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
+        return resultMap;
+    }
+
+    private void doFlatten(String propertyPrefix, JsonNode source, Map<String, Object> resultMap) throws Exception {
+        if (source.isArray()) {
+            int index = 0;
+            Iterator<JsonNode> arrays = source.elements();
+            while (arrays.hasNext()) {
+                JsonNode array = arrays.next();
+                doFlatten(propertyPrefix + ARRAY_PREFIX + index++ + ARRAY_SUFFIX, array, resultMap);
+            }
+        } else if (source.isObject()) {
+            if (StringUtil.isNotBlank(propertyPrefix)) {
+                propertyPrefix = propertyPrefix + PARTING;
+            }
+            Iterator<Map.Entry<String, JsonNode>> iterator = source.fields();
+            while (iterator.hasNext()) {
+                Map.Entry<String, JsonNode> entry = iterator.next();
+                doFlatten(propertyPrefix + entry.getKey(), entry.getValue(), resultMap);
+            }
+        } else if (source.isNumber()) {
+            resultMap.put(propertyPrefix, source.numberValue());
+        } else if (source.isTextual()) {
+            resultMap.put(propertyPrefix, source.asText());
         }
     }
 

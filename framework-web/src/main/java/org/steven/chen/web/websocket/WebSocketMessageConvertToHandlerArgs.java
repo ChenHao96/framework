@@ -27,7 +27,7 @@ import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.util.Map;
 
-public class WebSocketMessageConvertToHandlerArgs extends DefaultMessageConvertToHandlerArgs<JsonNode> {
+public class WebSocketMessageConvertToHandlerArgs extends DefaultMessageConvertToHandlerArgs {
 
     @Override
     public Map<String, Object> convertArgs() {

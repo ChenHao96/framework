@@ -18,11 +18,11 @@ package org.steven.chen.utils.mapper;
 
 import java.util.Map;
 
-public interface HashMapper<D> {
+public interface HashMapper {
 
-    Map<String, Object> toFlatMapper(D object);
+    Map<String, Object> toFlatMapper(Object object);
 
-    <T> T fromFlatMapper(Map<String, Object> target,Class<T> clazz);
+    <T> T fromFlatMapper(Map<String, Object> target, Class<T> clazz);
 
-    Map<String,Object> fromFlatMapper(Map<String, Object> target);
+    Map<String, Object> fromFlatMapper(Map<String, Object> target);
 }

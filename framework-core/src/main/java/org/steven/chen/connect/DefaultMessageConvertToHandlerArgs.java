@@ -20,17 +20,17 @@ import org.steven.chen.utils.mapper.HashMapper;
 
 import java.util.Map;
 
-public class DefaultMessageConvertToHandlerArgs<D> implements MessageConvertToHandlerArgs {
+public class DefaultMessageConvertToHandlerArgs implements MessageConvertToHandlerArgs {
 
     private static final ThreadLocal<CommonsMessage> holder = new ThreadLocal<>();
 
-    protected HashMapper<D> object2FlatMapper;
+    protected HashMapper object2FlatMapper;
 
     public static ThreadLocal<CommonsMessage> getHolder() {
         return holder;
     }
 
-    public void setObject2FlatMapper(HashMapper<D> object2FlatMapper) {
+    public void setObject2FlatMapper(HashMapper object2FlatMapper) {
         this.object2FlatMapper = object2FlatMapper;
     }
 
