@@ -26,11 +26,11 @@ import org.steven.chen.utils.StringUtil;
 
 import java.util.*;
 
-public class Jackson2FlatMapper implements HashMapper {
+public final class Jackson2FlatMapper implements HashMapper {
 
-    protected static final String PARTING = ".";
-    protected static final String ARRAY_PREFIX = "[";
-    protected static final String ARRAY_SUFFIX = "]";
+    private static final String PARTING = ".";
+    private static final String ARRAY_PREFIX = "[";
+    private static final String ARRAY_SUFFIX = "]";
     private static final ObjectMapper mapper;
 
     static {
