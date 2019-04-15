@@ -124,34 +124,20 @@ public abstract class AbstractController implements ProcessHandlerService {
         }
     }
 
-    protected String getRequestBody() {
-        if (RequestInterceptor.isHttpRequest()) {
-            try {
-                return receiveRequestInput();
-            } catch (IOException e) {
-                throw new RuntimeException(e);
-            }
-        }
-        return "";
+    protected String getRequestBody() throws IOException {
+        if (!RequestInterceptor.isHttpRequest()) return "";
+        return receiveRequestInput();
     }
 
-    protected void requestDispatcherForward(String path) {
+    protected void requestDispatcherForward(String path) throws ServletException, IOException {
         if (RequestInterceptor.isHttpRequest()) {
-            try {
-                getRequest().getRequestDispatcher(path).forward(getRequest(), getResponse());
-            } catch (ServletException | IOException e) {
-                throw new RuntimeException(e);
-            }
+            getRequest().getRequestDispatcher(path).forward(getRequest(), getResponse());
         }
     }
 
-    protected void sendRedirect(String path) {
+    protected void sendRedirect(String path) throws IOException {
         if (RequestInterceptor.isHttpRequest()) {
-            try {
-                getResponse().sendRedirect(path);
-            } catch (IOException e) {
-                throw new RuntimeException(e);
-            }
+            getResponse().sendRedirect(path);
         }
     }
 
@@ -175,6 +161,23 @@ public abstract class AbstractController implements ProcessHandlerService {
         } else {
             return SocketConnectionUtil.getChannelHandlerContext().getConnectionPort();
         }
+    }
+
+    protected String createCurrentContextUrl(String url) {
+        if (!RequestInterceptor.isHttpRequest()) return url;
+        HttpServletRequest request = getRequest();
+        int port = request.getServerPort();
+        String protocol = request.getScheme();
+        String serverName = request.getServerName();
+        String contextPath = request.getContextPath();
+        StringBuilder sb = URLUtils.newUrl4Param(port, protocol, serverName, contextPath);
+        if (StringUtil.isNotBlank(url)) {
+            if (!url.startsWith("/")) {
+                sb.append("/");
+            }
+            sb.append(url);
+        }
+        return sb.toString();
     }
 
     private String receiveRequestInput() throws IOException {
@@ -219,22 +222,5 @@ public abstract class AbstractController implements ProcessHandlerService {
         } catch (IOException e) {
             response.setStatus(500);
         }
-    }
-
-    protected String createCurrentContextUrl(String url) {
-        if (!RequestInterceptor.isHttpRequest()) return url;
-        HttpServletRequest request = getRequest();
-        int port = request.getServerPort();
-        String protocol = request.getScheme();
-        String serverName = request.getServerName();
-        String contextPath = request.getContextPath();
-        StringBuilder sb = URLUtils.newUrl4Param(port, protocol, serverName, contextPath);
-        if (StringUtil.isNotBlank(url)) {
-            if (!url.startsWith("/")) {
-                sb.append("/");
-            }
-            sb.append(url);
-        }
-        return sb.toString();
     }
 }
