@@ -46,7 +46,12 @@ public class WebSocketMessageConvertToHandlerArgs extends DefaultMessageConvertT
         CommonsMessage message = getCommonsMessage();
         message.setData(null);
         try {
-            String responseBody = JsonUtils.object2Json(obj);
+            String responseBody;
+            if (obj instanceof String) {
+                responseBody = obj.toString();
+            } else {
+                responseBody = JsonUtils.object2Json(obj);
+            }
             if (StringUtil.isNotEmpty(responseBody)) {
                 message.setData(responseBody.getBytes(StandardCharsets.UTF_8));
             }

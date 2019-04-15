@@ -60,7 +60,6 @@ public class SocketHandlerTask implements Runnable {
         Assert.notNull(messageConvertToHandlerArgs, "MessageConvertToHandlerArgs is required!");
         messageConvertToHandlerArgs.setCommonsMessage(request);
         SocketConnectionUtil.setChannelHandlerContext(connectionContext);
-
         final Map<String, Object> param = messageConvertToHandlerArgs.convertArgs();
         LOGGER.info("request masterCode:{},slaveCode:{},param:{}", request.getMasterCode(), request.getSlaveCode(), param);
         try {

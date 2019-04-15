@@ -19,8 +19,11 @@ package org.steven.chen.component.socket.connect;
 import java.io.Closeable;
 import java.io.IOException;
 import java.util.Set;
+import java.util.UUID;
 
 public interface ConnectionContext extends Closeable {
+
+    String Id();
 
     boolean isClose();
 

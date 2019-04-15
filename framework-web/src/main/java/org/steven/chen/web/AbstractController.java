@@ -3,6 +3,8 @@ package org.steven.chen.web;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.steven.chen.component.process.ProcessHandlerService;
+import org.steven.chen.component.process.handler.InvocableHandlerMethod;
+import org.steven.chen.component.socket.connect.SocketConnectionUtil;
 import org.steven.chen.utils.JsonUtils;
 import org.steven.chen.utils.StringUtil;
 
@@ -17,7 +19,6 @@ public abstract class AbstractController implements ProcessHandlerService {
 
     public static final String DATA_JSON_PROPERTY = "data";
     private static final String LOG_ID_JSON_PROPERTY = "logId";
-
     private static final String URL_JSON_PROPERTY = "url";
     public static final String STATUS_JSON_PROPERTY = "result";
     public static final String MESSAGE_JSON_PROPERTY = "message";
@@ -26,7 +27,6 @@ public abstract class AbstractController implements ProcessHandlerService {
     public static final String CALLBACK_HTTP_PARAMETER_NAME = "callback";
     public static final String CONTENT_TYPE_HTTP_HEADER = "application/json;charset=utf-8";
     public static final String CALLBACK_RESPONSE_CONTENT_FMT = "%s(%s);";
-
     private static final ThreadLocal<HttpServletRequest> thread_request = new ThreadLocal<>();
     private static final ThreadLocal<HttpServletResponse> thread_response = new ThreadLocal<>();
 
@@ -172,7 +172,7 @@ public abstract class AbstractController implements ProcessHandlerService {
 
     private Map<String, Object> generateJsonParamsMap(boolean result, int responseCode, String message, Object returnData, String logId, String url, String template) {
 
-        HashMap<String, Object> jsonParamsMap = new HashMap<String, Object>(7);
+        HashMap<String, Object> jsonParamsMap = new HashMap<>(7);
 
         jsonParamsMap.put(STATUS_JSON_PROPERTY, result);
         jsonParamsMap.put(MESSAGE_JSON_PROPERTY, message);
@@ -194,26 +194,93 @@ public abstract class AbstractController implements ProcessHandlerService {
         return jsonParamsMap;
     }
 
-    private void renderResponseForJson(String responseContent) throws IOException {
-        HttpServletResponse response = this.getResponse();
-        response.setContentType(CONTENT_TYPE_HTTP_HEADER);
-        response.getWriter().write(responseContent);
-        response.getWriter().flush();
+    public static String getCallbackHttpParameterName() {
+        return CALLBACK_HTTP_PARAMETER_NAME;
     }
 
-    protected HttpServletRequest getRequest() {
+    protected void renderResponseForJson(String responseContent) throws IOException {
+        renderResponseForJson(CONTENT_TYPE_HTTP_HEADER, responseContent);
+    }
+
+    private HttpServletRequest getRequest() {
         return thread_request.get();
     }
 
-    protected HttpServletResponse getResponse() {
+    private HttpServletResponse getResponse() {
         return thread_response.get();
     }
 
-    protected HttpSession getSession() {
+    private HttpSession getSession() {
         return getRequest().getSession();
     }
 
-    public static String getCallbackHttpParameterName() {
-        return CALLBACK_HTTP_PARAMETER_NAME;
+    protected void renderResponseForJson(String contentType, String responseContent) throws IOException {
+        if (RequestInterceptor.isHttpRequest()) {
+            HttpServletResponse response = this.getResponse();
+            response.setContentType(contentType);
+            response.getWriter().write(responseContent);
+            response.getWriter().flush();
+        } else {
+            SocketConnectionUtil.getChannelHandlerContext().sendMessage(responseContent);
+        }
+    }
+
+    protected Map<String, ?> getRequestParam() {
+        if (RequestInterceptor.isHttpRequest()) {
+            return getRequest().getParameterMap();
+        } else {
+            return InvocableHandlerMethod.getProcessParam();
+        }
+    }
+
+    protected void setRequestAttribute(String key, Object obj) {
+        if (RequestInterceptor.isHttpRequest()) {
+            getRequest().setAttribute(key, obj);
+        }
+    }
+
+    protected void setSessionAttribute(String key, Object obj) {
+        if (RequestInterceptor.isHttpRequest()) {
+            getSession().setAttribute(key, obj);
+        } else {
+            SocketConnectionUtil.getChannelHandlerContext().setAttribute(key, obj);
+        }
+    }
+
+    protected void removeRequestAttribute(String key) {
+        if (RequestInterceptor.isHttpRequest()) {
+            getRequest().removeAttribute(key);
+        }
+    }
+
+    protected void removeSessionAttribute(String key) {
+        if (RequestInterceptor.isHttpRequest()) {
+            getSession().removeAttribute(key);
+        } else {
+            SocketConnectionUtil.getChannelHandlerContext().removeAttribute(key);
+        }
+    }
+
+    protected Object getRequestAttribute(String key) {
+        if (RequestInterceptor.isHttpRequest()) {
+            return getRequest().getAttribute(key);
+        }
+        return null;
+    }
+
+    protected Object getSessionAttribute(String key) {
+        if (RequestInterceptor.isHttpRequest()) {
+            return getSession().getAttribute(key);
+        } else {
+            return SocketConnectionUtil.getChannelHandlerContext().getAttribute(key);
+        }
+    }
+
+    protected String getSessionId() {
+        if (RequestInterceptor.isHttpRequest()) {
+            return getSession().getId();
+        } else {
+            return SocketConnectionUtil.getChannelHandlerContext().Id();
+        }
     }
 }

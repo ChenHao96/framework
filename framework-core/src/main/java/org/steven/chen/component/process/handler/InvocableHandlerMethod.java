@@ -20,8 +20,14 @@ public class InvocableHandlerMethod extends HandlerMethod implements ProcessInvo
 
     private ParameterNameDiscoverer parameterNameDiscoverer = new DefaultParameterNameDiscoverer();
 
+    private static final ThreadLocal<Map<String, Object>> processParam = new ThreadLocal<>();
+
     public InvocableHandlerMethod(ProcessHandlerService bean, Method method) {
         super(bean, method);
+    }
+
+    public static Map<String, Object> getProcessParam() {
+        return processParam.get();
     }
 
     @Override
@@ -32,7 +38,12 @@ public class InvocableHandlerMethod extends HandlerMethod implements ProcessInvo
     @Override
     public Object invokeProcess(Map<String, Object> args) throws Exception {
         ReflectionUtils.makeAccessible(getBridgedMethod());
-        return getBridgedMethod().invoke(getBean(), getMethodArgumentValues(args));
+        processParam.set(args);
+        try {
+            return getBridgedMethod().invoke(getBean(), getMethodArgumentValues(args));
+        } finally {
+            processParam.remove();
+        }
     }
 
     /**
