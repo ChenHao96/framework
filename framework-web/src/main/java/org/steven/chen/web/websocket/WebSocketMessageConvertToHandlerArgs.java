@@ -45,18 +45,20 @@ public class WebSocketMessageConvertToHandlerArgs extends DefaultMessageConvertT
     public CommonsMessage convertMessageReturn(Object obj) {
         CommonsMessage message = getCommonsMessage();
         message.setData(null);
-        try {
-            String responseBody;
-            if (obj instanceof String) {
-                responseBody = obj.toString();
-            } else {
-                responseBody = JsonUtils.object2Json(obj);
+        if (obj != null) {
+            try {
+                String responseBody;
+                if (obj instanceof String) {
+                    responseBody = obj.toString();
+                } else {
+                    responseBody = JsonUtils.object2Json(obj);
+                }
+                if (StringUtil.isNotEmpty(responseBody)) {
+                    message.setData(responseBody.getBytes(StandardCharsets.UTF_8));
+                }
+            } catch (JsonProcessingException e) {
+                throw new RuntimeException(e);
             }
-            if (StringUtil.isNotEmpty(responseBody)) {
-                message.setData(responseBody.getBytes(StandardCharsets.UTF_8));
-            }
-        } catch (JsonProcessingException e) {
-            throw new RuntimeException(e);
         }
         return message;
     }

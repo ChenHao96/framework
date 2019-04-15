@@ -48,7 +48,6 @@
             <version>${spring.version}</version>
         </dependency>
 
-
         <dependency>
             <groupId>org.apache.httpcomponents</groupId>
             <artifactId>httpclient</artifactId>

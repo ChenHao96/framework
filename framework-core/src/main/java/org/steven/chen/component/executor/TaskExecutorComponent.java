@@ -123,7 +123,7 @@ public class TaskExecutorComponent implements ComponentService {
                 if (task != null) {
                     handlerExecutor.submit(task);
                 }
-            } while (true);
+            } while (runnable);
         }
     }
 }

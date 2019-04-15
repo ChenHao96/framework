@@ -96,9 +96,7 @@ public final class Jackson2FlatMapper implements HashMapper {
                 Map.Entry<String, JsonNode> entry = iterator.next();
                 doFlatten(propertyPrefix + entry.getKey(), entry.getValue(), resultMap);
             }
-        } else if (source.isNumber()) {
-            resultMap.put(propertyPrefix, source.numberValue());
-        } else if (source.isTextual()) {
+        } else if (source.isNumber() || source.isTextual()) {
             resultMap.put(propertyPrefix, source.asText());
         }
     }

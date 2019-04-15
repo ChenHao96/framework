@@ -16,6 +16,7 @@
 
 package org.steven.chen.component.socket.connect;
 
+import com.sun.istack.internal.NotNull;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.util.Assert;
@@ -29,28 +30,35 @@ public class SocketHandlerTask implements Runnable {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(SocketHandlerTask.class);
 
+    @NotNull
     private CommonsMessage request;
+
+    @NotNull
     private ProcessInvokeService invokeService;
+
+    @NotNull
     private ConnectionContext connectionContext;
+
+    @NotNull
     private MessageConvertToHandlerArgs messageConvertToHandlerArgs;
 
-    public SocketHandlerTask(CommonsMessage request) {
+    public SocketHandlerTask(@NotNull CommonsMessage request) {
         this.request = request;
     }
 
-    public void setRequest(CommonsMessage request) {
+    public void setRequest(@NotNull CommonsMessage request) {
         this.request = request;
     }
 
-    public void setInvokeService(ProcessInvokeService invokeService) {
+    public void setInvokeService(@NotNull ProcessInvokeService invokeService) {
         this.invokeService = invokeService;
     }
 
-    public void setConnectionContext(ConnectionContext connectionContext) {
+    public void setConnectionContext(@NotNull ConnectionContext connectionContext) {
         this.connectionContext = connectionContext;
     }
 
-    public void setMessageConvertToHandlerArgs(MessageConvertToHandlerArgs messageConvertToHandlerArgs) {
+    public void setMessageConvertToHandlerArgs(@NotNull MessageConvertToHandlerArgs messageConvertToHandlerArgs) {
         this.messageConvertToHandlerArgs = messageConvertToHandlerArgs;
     }
 

@@ -4,7 +4,9 @@ import org.springframework.web.bind.annotation.ModelAttribute;
 import org.steven.chen.component.process.ProcessHandlerService;
 import org.steven.chen.component.process.handler.InvocableHandlerMethod;
 import org.steven.chen.component.socket.connect.SocketConnectionUtil;
+import org.steven.chen.utils.Utils;
 
+import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
@@ -113,5 +115,40 @@ public abstract class AbstractController implements ProcessHandlerService {
         }
     }
 
-    //TODO:
+    protected void setResponseStatus(int code) {
+        if (RequestInterceptor.isHttpRequest()) {
+            getResponse().setStatus(code);
+        }
+    }
+
+    protected String getRequestBody() {
+        if (RequestInterceptor.isHttpRequest()) {
+            try {
+                return Utils.receiveRequestInput(getRequest());
+            } catch (IOException e) {
+                throw new RuntimeException(e);
+            }
+        }
+        return "";
+    }
+
+    protected void requestDispatcherForward(String path) {
+        if (RequestInterceptor.isHttpRequest()) {
+            try {
+                getRequest().getRequestDispatcher(path).forward(getRequest(), getResponse());
+            } catch (ServletException | IOException e) {
+                throw new RuntimeException(e);
+            }
+        }
+    }
+
+    protected void sendRedirect(String path) {
+        if (RequestInterceptor.isHttpRequest()) {
+            try {
+                getResponse().sendRedirect(path);
+            } catch (IOException e) {
+                throw new RuntimeException(e);
+            }
+        }
+    }
 }
