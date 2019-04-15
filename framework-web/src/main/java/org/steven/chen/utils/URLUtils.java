@@ -25,7 +25,7 @@ public final class URLUtils {
         String serverName = request.getServerName();
         String contextPath = request.getContextPath();
 
-        return URLUtils.newUrl4Param(port, protocol, serverName, contextPath).toString();
+        return newUrl4Param(port, protocol, serverName, contextPath).toString();
     }
 
     private static StringBuilder newUrl4Param(int port, String protocol, String serverName, String contextPath) {
@@ -49,7 +49,7 @@ public final class URLUtils {
             sb.append(contextPath);
         }
 
-        LOGGER.info("newUrl4Param:{}",sb);
+        LOGGER.info("newUrl4Param:{}", sb);
         return sb;
     }
 
@@ -90,7 +90,7 @@ public final class URLUtils {
             sb.append("#").append(fragment);
         }
 
-        LOGGER.info("updateUrl:{}",sb);
+        LOGGER.info("updateUrl:{}", sb);
         return sb.toString();
     }
 
@@ -113,5 +113,20 @@ public final class URLUtils {
         }
 
         return "";
+    }
+
+    public static String createCurrentContextUrl(HttpServletRequest request, String url) {
+
+        if (request == null) return null;
+
+        StringBuilder sb = new StringBuilder(currentServerUrl(request));
+        if (StringUtil.isNotBlank(url)) {
+            if (!url.startsWith("/")) {
+                sb.append("/");
+            }
+            sb.append(url);
+        }
+
+        return sb.toString();
     }
 }

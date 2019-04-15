@@ -10,9 +10,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.web.multipart.MultipartFile;
 import org.steven.chen.model.AliyunProperties;
 
-import java.io.File;
-import java.io.IOException;
-import java.io.InputStream;
+import java.io.*;
 import java.net.URL;
 import java.text.SimpleDateFormat;
 import java.util.Date;
@@ -22,9 +20,10 @@ import java.util.UUID;
  * Created by ChenHao on 2016/8/2.
  * 文件上传工具
  */
-public class FileUploadUtil {
+public class FileUtil {
 
-    private static final Logger logger = LoggerFactory.getLogger(FileUploadUtil.class);
+    private static final Logger logger = LoggerFactory.getLogger(FileUtil.class);
+    public static final String SYSTEM_ENCODING = System.getProperty("file.encoding");
     public static final String FILE_PATH_STATIC = System.getProperty("user.home") + "/file_upload";
 
     private String filePath;
@@ -34,11 +33,11 @@ public class FileUploadUtil {
         init();
     }
 
-    public FileUploadUtil(AliyunProperties properties) {
+    public FileUtil(AliyunProperties properties) {
         this.properties = properties;
     }
 
-    private FileUploadUtil(String filePath) {
+    private FileUtil(String filePath) {
         this.filePath = filePath;
     }
 
@@ -76,7 +75,7 @@ public class FileUploadUtil {
      * @return 存放后的完整文件路径
      */
     public static String uploadFileLocal(MultipartFile file, String filePath, String fileName) {
-        return new FileUploadUtil(filePath).uploadFileOutPath(file, fileName);
+        return new FileUtil(filePath).uploadFileOutPath(file, fileName);
     }
 
     /**
@@ -165,5 +164,25 @@ public class FileUploadUtil {
         String resultUrl = url.toString();
         //将多余参数去除
         return resultUrl.substring(0, resultUrl.indexOf("?"));
+    }
+
+    public static String file2String(File backList) throws IOException {
+
+        int cnt;
+        char[] buffer = new char[1024];
+        StringBuilder sb = new StringBuilder();
+
+        FileInputStream fis = new FileInputStream(backList);
+        InputStreamReader bis = new InputStreamReader(fis, SYSTEM_ENCODING);
+        BufferedReader br = new BufferedReader(bis);
+        while ((cnt = br.read(buffer)) != -1) {
+            sb.append(new String(buffer, 0, cnt));
+        }
+
+        br.close();
+        bis.close();
+        fis.close();
+
+        return sb.toString();
     }
 }

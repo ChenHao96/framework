@@ -1,11 +1,11 @@
 package org.steven.chen.web;
 
+import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.lang.Nullable;
 import org.springframework.web.servlet.HandlerInterceptor;
 import org.springframework.web.servlet.ModelAndView;
-import org.steven.chen.utils.Utils;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -30,12 +30,14 @@ public class RequestInterceptor implements HandlerInterceptor {
 
     @Override
     public boolean preHandle(HttpServletRequest request, HttpServletResponse response, Object handler) throws Exception {
-
         httpRequest.set(true);
+        String ip = getIp(request);
+        int port = request.getRemotePort();
         String requestUrl = request.getRequestURI();
-        String address = Utils.getIPAndPort(request);
+        request.setAttribute(AbstractController.CLIENT_IP_KEY, ip);
+        request.setAttribute(AbstractController.CLIENT_PORT_KEY, port);
         String param = catalinaMap2String(request.getParameterMap());
-        LOGGER.info("request address:{},requestUrl:{},param:{}", address, requestUrl, param);
+        LOGGER.info("request address:{}:{},requestUrl:{},param:{}", ip, port, requestUrl, param);
         return true;
     }
 
@@ -63,5 +65,33 @@ public class RequestInterceptor implements HandlerInterceptor {
         }
         msg.append("}");
         return msg.toString();
+    }
+
+    public String getIp(HttpServletRequest request) {
+
+        String ip = request.getHeader("x-forwarded-for");
+        if (StringUtils.isEmpty(ip) || "unknown".equalsIgnoreCase(ip)) {
+            ip = request.getHeader("Proxy-Client-IP");
+        }
+
+        if (StringUtils.isEmpty(ip) || "unknown".equalsIgnoreCase(ip)) {
+            ip = request.getHeader("WL-Proxy-Client-IP");
+        }
+
+        if (StringUtils.isEmpty(ip) || "unknown".equalsIgnoreCase(ip)) {
+            ip = request.getRemoteAddr();
+        }
+
+        if (StringUtils.isEmpty(ip) || "0:0:0:0:0:0:0:1".equalsIgnoreCase(ip)) {
+            ip = "127.0.0.1";
+        }
+
+        if (ip.length() > 15) {
+            if (ip.indexOf(",") > 0) {
+                ip = ip.substring(0, ip.indexOf(","));
+            }
+        }
+
+        return ip;
     }
 }
