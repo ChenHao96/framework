@@ -1,34 +1,17 @@
 package org.steven.chen.utils;
 
 import org.apache.commons.lang.StringUtils;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
-import javax.servlet.http.HttpServletRequest;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.Map;
 
 public final class URLUtils {
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(URLUtils.class);
-
     private URLUtils() {
     }
 
-    public static String currentServerUrl(HttpServletRequest request) {
-
-        if (request == null) return "";
-
-        int port = request.getServerPort();
-        String protocol = request.getScheme();
-        String serverName = request.getServerName();
-        String contextPath = request.getContextPath();
-
-        return newUrl4Param(port, protocol, serverName, contextPath).toString();
-    }
-
-    private static StringBuilder newUrl4Param(int port, String protocol, String serverName, String contextPath) {
+    public static StringBuilder newUrl4Param(int port, String protocol, String serverName, String contextPath) {
 
         StringBuilder sb = new StringBuilder(protocol);
         sb.append("://").append(serverName);
@@ -49,7 +32,6 @@ public final class URLUtils {
             sb.append(contextPath);
         }
 
-        LOGGER.info("newUrl4Param:{}", sb);
         return sb;
     }
 
@@ -90,7 +72,6 @@ public final class URLUtils {
             sb.append("#").append(fragment);
         }
 
-        LOGGER.info("updateUrl:{}", sb);
         return sb.toString();
     }
 
@@ -113,20 +94,5 @@ public final class URLUtils {
         }
 
         return "";
-    }
-
-    public static String createCurrentContextUrl(HttpServletRequest request, String url) {
-
-        if (request == null) return null;
-
-        StringBuilder sb = new StringBuilder(currentServerUrl(request));
-        if (StringUtil.isNotBlank(url)) {
-            if (!url.startsWith("/")) {
-                sb.append("/");
-            }
-            sb.append(url);
-        }
-
-        return sb.toString();
     }
 }

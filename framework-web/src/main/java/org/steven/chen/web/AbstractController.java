@@ -1,6 +1,5 @@
 package org.steven.chen.web;
 
-import org.slf4j.Logger;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.steven.chen.component.process.ProcessHandlerService;
 import org.steven.chen.component.process.handler.InvocableHandlerMethod;
@@ -220,5 +219,22 @@ public abstract class AbstractController implements ProcessHandlerService {
         } catch (IOException e) {
             response.setStatus(500);
         }
+    }
+
+    protected String createCurrentContextUrl(String url) {
+        if (!RequestInterceptor.isHttpRequest()) return url;
+        HttpServletRequest request = getRequest();
+        int port = request.getServerPort();
+        String protocol = request.getScheme();
+        String serverName = request.getServerName();
+        String contextPath = request.getContextPath();
+        StringBuilder sb = URLUtils.newUrl4Param(port, protocol, serverName, contextPath);
+        if (StringUtil.isNotBlank(url)) {
+            if (!url.startsWith("/")) {
+                sb.append("/");
+            }
+            sb.append(url);
+        }
+        return sb.toString();
     }
 }

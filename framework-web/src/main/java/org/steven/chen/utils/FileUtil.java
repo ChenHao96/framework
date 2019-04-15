@@ -30,7 +30,14 @@ public class FileUtil {
     private AliyunProperties properties;
 
     static {
-        init();
+        File file = new File(FILE_PATH_STATIC);
+        if (file.setWritable(true)) {
+            logger.info("filePath writable fail,create path:{}", FILE_PATH_STATIC);
+        } else if (!file.exists()) {
+            if (file.mkdirs()) {
+                logger.info("filePath not exists,create path:{}", FILE_PATH_STATIC);
+            }
+        }
     }
 
     public FileUtil(AliyunProperties properties) {
@@ -39,21 +46,6 @@ public class FileUtil {
 
     private FileUtil(String filePath) {
         this.filePath = filePath;
-    }
-
-    private static void init() {
-
-        File file = new File(FILE_PATH_STATIC);
-        if (file.setWritable(true)) {
-            logger.info("filePath writable fail,create path:{}", FILE_PATH_STATIC);
-            return;
-        }
-
-        if (!file.exists()) {
-            if (file.mkdirs()) {
-                logger.info("filePath not exists,create path:{}", FILE_PATH_STATIC);
-            }
-        }
     }
 
     /**
