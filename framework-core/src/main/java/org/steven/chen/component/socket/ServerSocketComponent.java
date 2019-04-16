@@ -23,7 +23,7 @@ import org.springframework.context.ApplicationContext;
 import org.springframework.stereotype.Component;
 import org.springframework.util.Assert;
 import org.steven.chen.component.ComponentService;
-import org.steven.chen.component.executor.TaskExecutorComponent;
+import org.steven.chen.component.executor.TaskExecutorService;
 import org.steven.chen.component.process.ProcessInvokeService;
 import org.steven.chen.component.process.handler.HandlerFactory;
 import org.steven.chen.component.socket.connect.CommonsMessage;
@@ -71,7 +71,7 @@ public class ServerSocketComponent implements ComponentService {
     private HandlerFactory handlerFactory;
 
     @Resource
-    private TaskExecutorComponent executorComponent;
+    private TaskExecutorService executorService;
 
     @Resource
     private ApplicationContext applicationContext;
@@ -240,7 +240,7 @@ public class ServerSocketComponent implements ComponentService {
                     task.setConnectionContext(handler);
                     task.setInvokeService(invokeService);
                     task.setMessageConvertToHandlerArgs(messageConvertToHandlerArgs);
-                    executorComponent.addHandler(task);
+                    executorService.addHandler(task);
                 } else {
                     LOGGER.warn("NoSuchHandlerDefinition. masterCode:{}, slaveCode:{}", message.getMasterCode(), message.getSlaveCode());
                 }

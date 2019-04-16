@@ -20,7 +20,7 @@ import com.fasterxml.jackson.databind.JsonNode;
 import org.springframework.web.socket.TextMessage;
 import org.springframework.web.socket.WebSocketSession;
 import org.springframework.web.socket.handler.TextWebSocketHandler;
-import org.steven.chen.component.executor.TaskExecutorComponent;
+import org.steven.chen.component.executor.TaskExecutorService;
 import org.steven.chen.component.process.ProcessInvokeService;
 import org.steven.chen.component.process.handler.HandlerFactory;
 import org.steven.chen.component.socket.connect.CommonsMessage;
@@ -38,7 +38,7 @@ public class WebSocket extends TextWebSocketHandler {
     private HandlerFactory handlerFactory;
 
     @Resource
-    private TaskExecutorComponent executorComponent;
+    private TaskExecutorService executorService;
 
     @Resource
     private MessageConvertToHandlerArgs messageConvertToHandlerArgs;
@@ -70,7 +70,7 @@ public class WebSocket extends TextWebSocketHandler {
                 task.setConnectionContext(frameHandler);
                 task.setInvokeService(invokeService);
                 task.setMessageConvertToHandlerArgs(messageConvertToHandlerArgs);
-                executorComponent.addHandler(task);
+                executorService.addHandler(task);
             }
         }
     }

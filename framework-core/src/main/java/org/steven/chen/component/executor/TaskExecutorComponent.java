@@ -30,7 +30,7 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.atomic.AtomicInteger;
 
 @Component
-public class TaskExecutorComponent implements ComponentService {
+public class TaskExecutorComponent implements ComponentService,TaskExecutorService {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(TaskExecutorComponent.class);
 
