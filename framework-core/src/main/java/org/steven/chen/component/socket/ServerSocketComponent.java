@@ -20,7 +20,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.NoSuchBeanDefinitionException;
 import org.springframework.context.ApplicationContext;
-import org.springframework.stereotype.Component;
 import org.springframework.util.Assert;
 import org.steven.chen.component.ComponentService;
 import org.steven.chen.component.executor.TaskExecutorService;
@@ -44,7 +43,6 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicInteger;
 
-@Component
 public class ServerSocketComponent implements ComponentService {
 
     private static final String COMPONENT_NAME = "ServerSocketComponent";
