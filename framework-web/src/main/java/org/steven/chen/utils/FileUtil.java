@@ -158,13 +158,13 @@ public class FileUtil {
         return resultUrl.substring(0, resultUrl.indexOf("?"));
     }
 
-    public static String file2String(File backList) throws IOException {
+    public static String file2String(File file) throws IOException {
 
         int cnt;
         char[] buffer = new char[1024];
         StringBuilder sb = new StringBuilder();
 
-        FileInputStream fis = new FileInputStream(backList);
+        FileInputStream fis = new FileInputStream(file);
         InputStreamReader bis = new InputStreamReader(fis, SYSTEM_ENCODING);
         BufferedReader br = new BufferedReader(bis);
         while ((cnt = br.read(buffer)) != -1) {
