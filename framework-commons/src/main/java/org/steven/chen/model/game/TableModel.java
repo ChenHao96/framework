@@ -16,7 +16,7 @@
 
 package org.steven.chen.model.game;
 
-import org.springframework.util.StringUtils;
+import org.steven.chen.utils.StringUtil;
 
 import java.util.HashSet;
 import java.util.Set;
@@ -56,7 +56,9 @@ public abstract class TableModel<T extends TablePlayerModel> {
         tablePlayers.add(player);
     }
 
-    public void addTablePlayers(T... players) {
+
+    @SafeVarargs
+    public final void addTablePlayers(T... players) {
         if (players != null && players.length > 0) {
             for (T player : players) {
                 addTablePlayer(player);
@@ -65,7 +67,7 @@ public abstract class TableModel<T extends TablePlayerModel> {
     }
 
     public T getTablePlayByName(String name) {
-        if (!StringUtils.hasLength(name)) return null;
+        if (!StringUtil.isNotEmpty(name)) return null;
         if (tablePlayers == null) return null;
         for (T player : tablePlayers) {
             if (player == null) continue;

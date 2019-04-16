@@ -16,7 +16,7 @@
 
 package org.steven.chen.model.game;
 
-import org.springframework.util.StringUtils;
+import org.steven.chen.utils.StringUtil;
 
 import java.util.HashSet;
 import java.util.Set;
@@ -65,7 +65,8 @@ public abstract class GameModel<T extends RoomModel> {
         rooms.add(room);
     }
 
-    public void addRooms(T... rooms) {
+    @SafeVarargs
+    public final void addRooms(T... rooms) {
         if (rooms != null && rooms.length > 0) {
             for (T room : rooms) {
                 addRoom(room);
@@ -74,7 +75,7 @@ public abstract class GameModel<T extends RoomModel> {
     }
 
     public T getRoomByName(String name) {
-        if (!StringUtils.hasLength(name)) return null;
+        if (!StringUtil.isNotEmpty(name)) return null;
         if (rooms == null) return null;
         for (T room : rooms) {
             if (room == null) continue;

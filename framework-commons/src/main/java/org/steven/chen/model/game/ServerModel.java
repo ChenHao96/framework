@@ -16,7 +16,7 @@
 
 package org.steven.chen.model.game;
 
-import org.springframework.util.StringUtils;
+import org.steven.chen.utils.StringUtil;
 
 import java.util.HashSet;
 import java.util.Set;
@@ -56,7 +56,8 @@ public abstract class ServerModel<T extends GameModel> {
         games.add(game);
     }
 
-    public void addGames(T... games) {
+    @SafeVarargs
+    public final void addGames(T... games) {
         if (games != null && games.length > 0) {
             for (T game : games) {
                 addGame(game);
@@ -65,7 +66,7 @@ public abstract class ServerModel<T extends GameModel> {
     }
 
     public T getGameByName(String name) {
-        if (!StringUtils.hasLength(name)) return null;
+        if (!StringUtil.isNotEmpty(name)) return null;
         if (games == null) return null;
         for (T game : games) {
             if (game == null) continue;
