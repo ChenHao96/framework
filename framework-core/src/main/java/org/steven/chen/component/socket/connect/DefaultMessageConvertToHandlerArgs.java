@@ -16,7 +16,6 @@
 
 package org.steven.chen.component.socket.connect;
 
-import com.sun.istack.internal.NotNull;
 import org.steven.chen.utils.mapper.HashMapper;
 import org.steven.chen.utils.mapper.Jackson2FlatMapper;
 
@@ -32,7 +31,7 @@ public class DefaultMessageConvertToHandlerArgs implements MessageConvertToHandl
         return holder.get();
     }
 
-    public void setCommonsMessage(@NotNull CommonsMessage message) {
+    public void setCommonsMessage(CommonsMessage message) {
         holder.set(message);
     }
 
