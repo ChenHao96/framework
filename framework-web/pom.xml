@@ -25,6 +25,8 @@
             <groupId>com.aliyun.oss</groupId>
             <artifactId>aliyun-sdk-oss</artifactId>
             <version>${aliyun-sdk-oss.version}</version>
+            <scope>compile</scope>
+            <optional>true</optional>
         </dependency>
 
         <dependency>
