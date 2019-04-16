@@ -26,6 +26,7 @@ import org.steven.chen.component.executor.TaskExecutorService;
 import org.steven.chen.component.process.ProcessInvokeService;
 import org.steven.chen.component.process.handler.HandlerFactory;
 import org.steven.chen.component.socket.connect.CommonsMessage;
+import org.steven.chen.component.socket.connect.DefaultMessageConvertToHandlerArgs;
 import org.steven.chen.component.socket.connect.MessageConvertToHandlerArgs;
 import org.steven.chen.component.socket.connect.SocketHandlerTask;
 import org.steven.chen.model.ConfigProperty;
@@ -109,11 +110,10 @@ public class ServerSocketComponent implements ComponentService {
     }
 
     private void loadMessageConvert() {
-        Assert.notNull(applicationContext, "initialize applicationContext is required.");
         try {
             messageConvertToHandlerArgs = applicationContext.getBean(MessageConvertToHandlerArgs.class);
         } catch (NoSuchBeanDefinitionException e) {
-            messageConvertToHandlerArgs = null;
+            messageConvertToHandlerArgs = new DefaultMessageConvertToHandlerArgs();
         }
     }
 

@@ -18,7 +18,6 @@ package org.steven.chen.component.process;
 
 import org.springframework.context.ApplicationContext;
 import org.springframework.stereotype.Component;
-import org.springframework.util.Assert;
 import org.steven.chen.component.ComponentService;
 import org.steven.chen.component.process.handler.HandlerFactoryImpl;
 
@@ -59,7 +58,6 @@ public class GameProcessComponent implements ComponentService {
     public void initialize() throws Exception {
 
         initialized = false;
-        Assert.notNull(applicationContext, "initialize applicationContext is required.");
         Map<String, ProcessHandlerService> beanMap = applicationContext.getBeansOfType(ProcessHandlerService.class);
         if (beanMap.size() > 0) {
             Set<Map.Entry<String, ProcessHandlerService>> arrays = beanMap.entrySet();
