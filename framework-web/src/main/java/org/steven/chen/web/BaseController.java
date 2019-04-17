@@ -24,6 +24,7 @@ import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
 
+@Deprecated
 public class BaseController extends AbstractController {
 
     public static final String DATA_JSON_PROPERTY = "data";
