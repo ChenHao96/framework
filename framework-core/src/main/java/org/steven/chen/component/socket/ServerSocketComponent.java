@@ -20,7 +20,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.NoSuchBeanDefinitionException;
 import org.springframework.context.ApplicationContext;
-import org.springframework.util.Assert;
 import org.steven.chen.component.ComponentService;
 import org.steven.chen.component.executor.TaskExecutorService;
 import org.steven.chen.component.process.ProcessInvokeService;
@@ -41,17 +40,16 @@ import java.util.Queue;
 import java.util.concurrent.ConcurrentLinkedQueue;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
-import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicInteger;
 
 public class ServerSocketComponent implements ComponentService {
 
     private static final String COMPONENT_NAME = "ServerSocketComponent";
-    private static final long DEFAULT_NO_DATA_WAIT_TIME = TimeUnit.SECONDS.toMillis(30);
     private static final Logger LOGGER = LoggerFactory.getLogger(ServerSocketComponent.class);
 
     private boolean empty;
     private int processors;
+    private int socketPort;
     private boolean started;
     private boolean runnable;
     private boolean shutdown;
@@ -62,9 +60,6 @@ public class ServerSocketComponent implements ComponentService {
     private Queue<SocketConnectionContext> handlerQueue;
     private final AtomicInteger wait = new AtomicInteger();
     private MessageConvertToHandlerArgs messageConvertToHandlerArgs;
-
-    @Resource
-    protected ConfigProperty config;
 
     @Resource
     private HandlerFactory handlerFactory;
@@ -92,20 +87,13 @@ public class ServerSocketComponent implements ComponentService {
 
     @Override
     public void initialize() throws Exception {
-
         this.initialize = false;
-        Assert.notNull(config.getSocketPort(), "ConfigProperty.socketPort is required!");
-
         loadMessageConvert();
+        socketPort = ConfigProperty.getSocketPort();
         handlerQueue = new ConcurrentLinkedQueue<>();
-        processors = (Runtime.getRuntime().availableProcessors() / 2) + 1;
         executor = Executors.newFixedThreadPool(processors);
-        noDataWaitTime = config.getNoDataWaitTime();
-
-        if (noDataWaitTime < DEFAULT_NO_DATA_WAIT_TIME) {
-            noDataWaitTime = DEFAULT_NO_DATA_WAIT_TIME;
-        }
-
+        noDataWaitTime = ConfigProperty.getNoDataWaitTime();
+        processors = (Runtime.getRuntime().availableProcessors() / 2) + 1;
         empty = initialize = true;
     }
 
@@ -119,7 +107,7 @@ public class ServerSocketComponent implements ComponentService {
 
     @Override
     public void start() throws Exception {
-        serverSocket = new ServerSocket(config.getSocketPort(), 128);
+        serverSocket = new ServerSocket(socketPort, 128);
         new Thread(new SocketAcceptListener(), COMPONENT_NAME).start();
         started = runnable = true;
         ThreadGroup group = new ThreadGroup(COMPONENT_NAME + "-shl");

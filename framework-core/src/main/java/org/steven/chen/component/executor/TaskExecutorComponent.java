@@ -18,12 +18,10 @@ package org.steven.chen.component.executor;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.context.ApplicationContext;
 import org.springframework.stereotype.Component;
 import org.steven.chen.component.ComponentService;
 import org.steven.chen.model.ConfigProperty;
 
-import javax.annotation.Resource;
 import java.util.Queue;
 import java.util.concurrent.ConcurrentLinkedQueue;
 import java.util.concurrent.ExecutorService;
@@ -33,9 +31,8 @@ import java.util.concurrent.atomic.AtomicInteger;
 @Component
 public class TaskExecutorComponent implements ComponentService, TaskExecutorService {
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(TaskExecutorComponent.class);
-
     private static final String COMPONENT_NAME = "TaskExecutorComponent";
+    private static final Logger LOGGER = LoggerFactory.getLogger(TaskExecutorComponent.class);
 
     private boolean empty;
     private boolean runnable;
@@ -43,9 +40,6 @@ public class TaskExecutorComponent implements ComponentService, TaskExecutorServ
     private Queue<Runnable> taskQueue;
     private ExecutorService handlerExecutor;
     private final AtomicInteger wait = new AtomicInteger();
-
-    @Resource
-    private ApplicationContext applicationContext;
 
     @Override
     public String getComponentName() {
@@ -67,23 +61,8 @@ public class TaskExecutorComponent implements ComponentService, TaskExecutorServ
         empty = true;
         runnable = initialized = false;
         taskQueue = new ConcurrentLinkedQueue<>();
-        int threadPoolSize = getConfigThreadPoolSize();
-        if (threadPoolSize < 1) {
-            int availableProcessors = Runtime.getRuntime().availableProcessors();
-            threadPoolSize = (int) (availableProcessors * 2.5);
-        }
-        handlerExecutor = Executors.newFixedThreadPool(threadPoolSize);
+        handlerExecutor = Executors.newFixedThreadPool(ConfigProperty.getThreadPoolSize());
         initialized = true;
-    }
-
-    private int getConfigThreadPoolSize() {
-        try {
-            ConfigProperty result = applicationContext.getBean(ConfigProperty.class);
-            return result.getThreadPoolSize();
-        } catch (Exception e) {
-            LOGGER.warn("getConfigThreadPoolSize", e);
-        }
-        return 0;
     }
 
     public void addHandler(Runnable task) {
