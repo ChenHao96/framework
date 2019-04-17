@@ -20,15 +20,12 @@ import java.lang.annotation.*;
 
 @Inherited
 @Documented
-@Deprecated
-@Target({ElementType.TYPE, ElementType.METHOD})
+@Target(ElementType.METHOD)
 @Retention(RetentionPolicy.RUNTIME)
-public @interface GameProcessAnnotation {
-    byte code() default 0;
+public @interface GameProcessMethod {
+    byte value() default 0;
 
-    String description() default "nothing";
+    String description() default "";
 
-    boolean threadSafety() default THREAD_SAFETY_DEFAULT;
-
-    boolean THREAD_SAFETY_DEFAULT = false;
+    boolean threadSafety() default GameProcessAnnotation.THREAD_SAFETY_DEFAULT;
 }

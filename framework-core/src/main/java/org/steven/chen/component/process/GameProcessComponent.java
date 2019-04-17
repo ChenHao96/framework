@@ -66,21 +66,36 @@ public class GameProcessComponent implements ComponentService {
                 ProcessHandlerService service = entry.getValue();
                 if (service == null) continue;
 
-                GameProcessAnnotation classAnnotation = service.getClass().getAnnotation(GameProcessAnnotation.class);
                 byte masterCode = 0;
-                if (classAnnotation != null) {
-                    masterCode = classAnnotation.code();
+                GameProcessBean classAnnotation = service.getClass().getAnnotation(GameProcessBean.class);
+                if (classAnnotation == null) {
+                    GameProcessAnnotation annotation = service.getClass().getAnnotation(GameProcessAnnotation.class);
+                    if (annotation != null) {
+                        masterCode = annotation.code();
+                    }
+                } else {
+                    masterCode = classAnnotation.value();
                 }
 
                 Method[] methods = service.getClass().getDeclaredMethods();
                 if (methods == null || methods.length == 0) continue;
 
                 for (Method method : methods) {
-                    GameProcessAnnotation methodAnnotation = method.getAnnotation(GameProcessAnnotation.class);
-                    if (methodAnnotation != null) {
-                        byte slaveCode = methodAnnotation.code();
-                        handlerFactory.addHandler(masterCode, slaveCode, service, method, methodAnnotation.threadSafety());
+                    byte slaveCode = 0;
+                    boolean threadSafety = GameProcessAnnotation.THREAD_SAFETY_DEFAULT;
+                    GameProcessMethod methodAnnotation = method.getAnnotation(GameProcessMethod.class);
+                    if (methodAnnotation == null) {
+                        GameProcessAnnotation annotation = method.getAnnotation(GameProcessAnnotation.class);
+                        if (annotation != null) {
+                            slaveCode = annotation.code();
+                            threadSafety = annotation.threadSafety();
+                        }
+                    } else {
+                        slaveCode = methodAnnotation.value();
+                        threadSafety = methodAnnotation.threadSafety();
                     }
+
+                    handlerFactory.addHandler(masterCode, slaveCode, service, method, threadSafety);
                 }
             }
         }
