@@ -14,16 +14,21 @@
  * limitations under the License.
  */
 
-package org.steven.chen.utils.converter.json;
+package org.steven.chen.web;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
+import com.fasterxml.jackson.core.JsonGenerator;
 import com.fasterxml.jackson.core.JsonParser;
 import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import org.steven.chen.utils.StringUtil;
+
+import java.io.IOException;
 
 public class MappingJackson2HttpMessageConverter extends org.springframework.http.converter.json.MappingJackson2HttpMessageConverter {
 
     private static final ObjectMapper mapper = new ObjectMapper();
+    private static final ThreadLocal<String> holder = new ThreadLocal<>();
 
     public MappingJackson2HttpMessageConverter() {
         super(mapper);
@@ -33,5 +38,26 @@ public class MappingJackson2HttpMessageConverter extends org.springframework.htt
         mapper.configure(JsonParser.Feature.ALLOW_SINGLE_QUOTES, true);
         mapper.setSerializationInclusion(JsonInclude.Include.NON_NULL);
         mapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
+    }
+
+    protected static void setJsonPCallBackName(String callBackName) {
+        holder.set(callBackName);
+    }
+
+    @Override
+    protected void writePrefix(JsonGenerator generator, Object object) throws IOException {
+        String callbackName = holder.get();
+        if (StringUtil.isNotEmpty(callbackName)) {
+            generator.writeRaw(String.format("%s(", callbackName));
+        }
+    }
+
+    @Override
+    protected void writeSuffix(JsonGenerator generator, Object object) throws IOException {
+        String callbackName = holder.get();
+        if (StringUtil.isNotEmpty(callbackName)) {
+            generator.writeRaw(");");
+        }
+        holder.remove();
     }
 }

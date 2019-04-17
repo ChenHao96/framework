@@ -5,6 +5,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.web.servlet.HandlerInterceptor;
 import org.springframework.web.servlet.ModelAndView;
+import org.steven.chen.utils.StringUtil;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -13,6 +14,8 @@ import java.util.Map;
 import java.util.Set;
 
 public class RequestInterceptor implements HandlerInterceptor {
+
+    public static final String CALLBACK_HTTP_PARAMETER_NAME = "callback";
 
     private static final ThreadLocal<Boolean> httpRequest = new ThreadLocal<Boolean>() {
         @Override
@@ -36,6 +39,8 @@ public class RequestInterceptor implements HandlerInterceptor {
         request.setAttribute(AbstractController.CLIENT_IP_KEY, ip);
         request.setAttribute(AbstractController.CLIENT_PORT_KEY, port);
         String param = catalinaMap2String(request.getParameterMap());
+        String callBackName = request.getParameter(CALLBACK_HTTP_PARAMETER_NAME);
+        if (StringUtil.isNotEmpty(callBackName)) MappingJackson2HttpMessageConverter.setJsonPCallBackName(callBackName);
         LOGGER.info("request address:{}:{},requestUrl:{},param:{}", ip, port, requestUrl, param);
         return true;
     }
