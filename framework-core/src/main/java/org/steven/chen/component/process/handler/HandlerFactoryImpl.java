@@ -24,7 +24,6 @@ import org.steven.chen.component.process.ProcessHandlerService;
 import org.steven.chen.component.process.ProcessInvokeService;
 
 import java.lang.reflect.Method;
-import java.util.Collections;
 import java.util.Map;
 import java.util.Set;
 import java.util.TreeMap;
@@ -75,16 +74,13 @@ public class HandlerFactoryImpl implements HandlerFactory {
 
         this.classBeans = null;
         this.serviceMethod = null;
-        if(this.process!=null){
-            this.process = Collections.unmodifiableMap(this.process);
-        }
         this.stoped = true;
     }
 
     public void addHandler(byte masterCode, byte slaveCode, ProcessHandlerService bean, Method handler, boolean threadSafety) {
 
         if (bean == null || handler == null) return;
-        if (masterCode == 0 && slaveCode == 0) return;
+        if (masterCode == 0 || slaveCode == 0) return;
 
         Map<Byte, ProcessHandlerService> beanMap = getProcessInterface(masterCode);
         beanMap.put(slaveCode, bean);
