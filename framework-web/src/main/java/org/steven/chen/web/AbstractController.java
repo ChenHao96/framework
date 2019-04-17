@@ -4,6 +4,7 @@ import org.springframework.web.bind.annotation.ModelAttribute;
 import org.steven.chen.component.process.ProcessHandlerService;
 import org.steven.chen.component.process.handler.InvocableHandlerMethod;
 import org.steven.chen.component.socket.connect.SocketConnectionUtil;
+import org.steven.chen.utils.CommonsUtil;
 import org.steven.chen.utils.StringUtil;
 import org.steven.chen.utils.URLUtils;
 
@@ -192,9 +193,7 @@ public abstract class AbstractController implements ProcessHandlerService {
             sb.append(new String(buffer, 0, cnt));
         }
 
-        bis.close();
-        inputStream.close();
-
+        CommonsUtil.safeClose(bis, inputStream);
         return sb.toString();
     }
 
@@ -215,11 +214,10 @@ public abstract class AbstractController implements ProcessHandlerService {
                 ops.flush();
             }
 
-            ops.close();
-            fis.close();
+            CommonsUtil.safeClose(ops, fis);
         } catch (FileNotFoundException e) {
             response.setStatus(404);
-        } catch (IOException e) {
+        } catch (Exception e) {
             response.setStatus(500);
         }
     }

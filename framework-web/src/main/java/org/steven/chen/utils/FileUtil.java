@@ -163,7 +163,6 @@ public class FileUtil {
         int cnt;
         char[] buffer = new char[1024];
         StringBuilder sb = new StringBuilder();
-
         FileInputStream fis = new FileInputStream(file);
         InputStreamReader bis = new InputStreamReader(fis, SYSTEM_ENCODING);
         BufferedReader br = new BufferedReader(bis);
@@ -171,10 +170,7 @@ public class FileUtil {
             sb.append(new String(buffer, 0, cnt));
         }
 
-        br.close();
-        bis.close();
-        fis.close();
-
+        CommonsUtil.safeClose(br, bis, fis);
         return sb.toString();
     }
 }

@@ -23,7 +23,6 @@ import javax.net.ssl.SSLException;
 import javax.net.ssl.SSLSession;
 import javax.net.ssl.SSLSocket;
 import javax.servlet.http.Cookie;
-import java.io.Closeable;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.nio.CharBuffer;
@@ -97,8 +96,7 @@ public class HttpUtils {
                     httpGet.releaseConnection();
                 }
 
-                closeQuietly(httpResponse);
-                closeQuietly(httpClient);
+                CommonsUtil.safeClose(httpResponse,httpClient);
             }
 
             LOGGER.info("get请求url: {}, 花费时间: {} ms", url, System.currentTimeMillis() - start);
@@ -135,8 +133,7 @@ public class HttpUtils {
                     httpPost.releaseConnection();
                 }
 
-                closeQuietly(httpResponse);
-                closeQuietly(httpClient);
+                CommonsUtil.safeClose(httpResponse,httpClient);
             }
 
             LOGGER.info("post请求url: {}, 花费时间: {} ms", url, System.currentTimeMillis() - start);
@@ -282,16 +279,6 @@ public class HttpUtils {
         }
 
         return client;
-    }
-
-    private static void closeQuietly(Closeable closeable) {
-        if (closeable != null) {
-            try {
-                closeable.close();
-            } catch (IOException ignored) {
-
-            }
-        }
     }
 
     private static String toString(Readable from) throws IOException {
