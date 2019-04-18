@@ -75,7 +75,7 @@ public final class ConfigProperty {
         return self.socketPort;
     }
 
-    public void setSocketPort(Integer socketPort) {
+    public void setSocketPort(int socketPort) {
         self.socketPort = socketPort;
     }
 
