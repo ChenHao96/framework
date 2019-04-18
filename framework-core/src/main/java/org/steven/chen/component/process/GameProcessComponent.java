@@ -16,6 +16,8 @@
 
 package org.steven.chen.component.process;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.context.ApplicationContext;
 import org.springframework.stereotype.Component;
 import org.steven.chen.component.ComponentService;
@@ -30,6 +32,7 @@ import java.util.Set;
 public class GameProcessComponent implements ComponentService {
 
     private static final String COMPONENT_NAME = "GameProcessComponent";
+    private static final Logger LOGGER = LoggerFactory.getLogger(GameProcessComponent.class);
 
     private boolean initialized;
 
@@ -56,6 +59,11 @@ public class GameProcessComponent implements ComponentService {
 
     @Override
     public void initialize() throws Exception {
+
+        if (this.initialized) {
+            LOGGER.warn("{} initialize,do not repeat initialize,please!",COMPONENT_NAME);
+            return;
+        }
 
         initialized = false;
         Map<String, ProcessHandlerService> beanMap = applicationContext.getBeansOfType(ProcessHandlerService.class);

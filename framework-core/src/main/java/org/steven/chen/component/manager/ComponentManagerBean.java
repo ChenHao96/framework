@@ -28,6 +28,7 @@ import java.util.List;
 @Component
 public class ComponentManagerBean implements ComponentManager {
 
+    private static final String COMPONENT_NAME = "ComponentManagerBean";
     private static final Logger LOGGER = LoggerFactory.getLogger(ComponentManagerBean.class);
 
     @Autowired
@@ -48,7 +49,7 @@ public class ComponentManagerBean implements ComponentManager {
     public void initialize() {
 
         if (this.initialized) {
-            LOGGER.warn("initialize,do not repeat initialize,please!");
+            LOGGER.warn("{} initialize,do not repeat initialize,please!",COMPONENT_NAME);
             return;
         }
 

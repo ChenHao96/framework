@@ -87,6 +87,11 @@ public class ServerSocketComponent implements ComponentService {
 
     @Override
     public void initialize() throws Exception {
+        if (this.initialize) {
+            LOGGER.warn("{} initialize,do not repeat initialize,please!",COMPONENT_NAME);
+            return;
+        }
+
         this.initialize = false;
         loadMessageConvert();
         socketPort = ConfigProperty.getSocketPort();

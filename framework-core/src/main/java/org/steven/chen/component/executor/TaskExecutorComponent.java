@@ -58,6 +58,12 @@ public class TaskExecutorComponent implements ComponentService, TaskExecutorServ
 
     @Override
     public void initialize() throws Exception {
+
+        if (this.initialized) {
+            LOGGER.warn("{} initialize,do not repeat initialize,please!", COMPONENT_NAME);
+            return;
+        }
+
         empty = true;
         runnable = initialized = false;
         taskQueue = new ConcurrentLinkedQueue<>();
