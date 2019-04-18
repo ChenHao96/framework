@@ -22,6 +22,9 @@ public abstract class PlayerModel {
     private int playerId;
     private String playerName;
 
+    public PlayerModel() {
+    }
+
     public PlayerModel(int playerId, String playerName) {
         this.playerId = playerId;
         this.playerName = playerName;

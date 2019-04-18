@@ -27,6 +27,9 @@ public abstract class ServerModel<T extends GameModel> {
     private Set<T> games;
     private String serverName;
 
+    public ServerModel() {
+    }
+
     public ServerModel(int serverId, String serverName) {
         this.serverId = serverId;
         this.serverName = serverName;

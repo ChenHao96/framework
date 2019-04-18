@@ -27,6 +27,9 @@ public abstract class TableModel<T extends TablePlayerModel> {
     private String tableName;
     private Set<T> tablePlayers;
 
+    public TableModel() {
+    }
+
     public TableModel(int tableId, String tableName) {
         this.tableId = tableId;
         this.tableName = tableName;

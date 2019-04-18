@@ -28,6 +28,9 @@ public abstract class RoomModel<T extends PlayerModel> {
     private Set<T> players;
     private String roomName;
 
+    public RoomModel() {
+    }
+
     public RoomModel(int roomId, String roomName) {
         this.roomId = roomId;
         this.roomName = roomName;

@@ -28,6 +28,9 @@ public abstract class GameModel<T extends RoomModel> {
     private String gameName;
     private ServerModel server;
 
+    public GameModel() {
+    }
+
     public GameModel(int gameId, String gameName) {
         this.gameId = gameId;
         this.gameName = gameName;
