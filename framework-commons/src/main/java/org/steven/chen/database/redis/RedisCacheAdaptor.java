@@ -50,6 +50,10 @@ public interface RedisCacheAdaptor<V> extends CacheAdaptor<String, V>, RedisAdap
 
     void decrement(String key, BigDecimal delta);
 
+    V hashGet(String key, String field);
+
+    Map<String, V> hashGet(String key);
+
     void hashSet(String key, String field, V value);
 
     void hashSet(String key, Map<String, V> values);

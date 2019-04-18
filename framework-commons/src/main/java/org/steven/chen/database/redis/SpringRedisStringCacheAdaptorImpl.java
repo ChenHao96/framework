@@ -125,6 +125,18 @@ public class SpringRedisStringCacheAdaptorImpl implements RedisStringCacheAdapto
     }
 
     @Override
+    public String hashGet(String key, String field) {
+        BoundHashOperations<String, String, String> operations = redisTemplate.boundHashOps(key);
+        return operations.get(field);
+    }
+
+    @Override
+    public Map<String, String> hashGet(String key) {
+        BoundHashOperations<String, String, String> operations = redisTemplate.boundHashOps(key);
+        return operations.entries();
+    }
+
+    @Override
     public void hashSet(String key, String field, String value) {
         BoundHashOperations<String, String, String> operations = redisTemplate.boundHashOps(key);
         operations.put(field, value);
