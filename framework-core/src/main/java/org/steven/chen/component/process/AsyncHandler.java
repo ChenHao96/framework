@@ -22,11 +22,5 @@ import java.lang.annotation.*;
 @Documented
 @Target(ElementType.METHOD)
 @Retention(RetentionPolicy.RUNTIME)
-public @interface GameProcessMethod {
-    byte value() default 0;
-
-    String description() default "";
-
-    @Deprecated
-    boolean threadSafety() default GameProcessAnnotation.THREAD_SAFETY_DEFAULT;
+public @interface AsyncHandler {
 }

@@ -28,6 +28,7 @@ public @interface GameProcessAnnotation {
 
     String description() default "nothing";
 
+    @Deprecated
     boolean threadSafety() default THREAD_SAFETY_DEFAULT;
 
     boolean THREAD_SAFETY_DEFAULT = false;

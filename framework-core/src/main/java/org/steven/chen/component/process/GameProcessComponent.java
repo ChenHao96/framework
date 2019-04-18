@@ -25,6 +25,7 @@ import org.steven.chen.component.process.handler.HandlerFactoryImpl;
 
 import javax.annotation.Resource;
 import java.lang.reflect.Method;
+import java.lang.reflect.Modifier;
 import java.util.Map;
 import java.util.Set;
 
@@ -61,7 +62,7 @@ public class GameProcessComponent implements ComponentService {
     public void initialize() throws Exception {
 
         if (this.initialized) {
-            LOGGER.warn("{} initialize,do not repeat initialize,please!",COMPONENT_NAME);
+            LOGGER.warn("{} initialize,do not repeat initialize,please!", COMPONENT_NAME);
             return;
         }
 
@@ -89,9 +90,15 @@ public class GameProcessComponent implements ComponentService {
                 if (methods == null || methods.length == 0) continue;
 
                 for (Method method : methods) {
+                    if (!Modifier.isPublic(method.getModifiers())) {
+                        LOGGER.warn("{} Method is not public!", method.getName());
+                        continue;
+                    }
+
                     byte slaveCode = 0;
                     boolean threadSafety = GameProcessAnnotation.THREAD_SAFETY_DEFAULT;
                     GameProcessMethod methodAnnotation = method.getAnnotation(GameProcessMethod.class);
+
                     if (methodAnnotation == null) {
                         GameProcessAnnotation annotation = method.getAnnotation(GameProcessAnnotation.class);
                         if (annotation != null) {
@@ -103,6 +110,7 @@ public class GameProcessComponent implements ComponentService {
                         threadSafety = methodAnnotation.threadSafety();
                     }
 
+                    if (method.getAnnotation(AsyncHandler.class) != null) threadSafety = true;
                     handlerFactory.addHandler(masterCode, slaveCode, service, method, threadSafety);
                 }
             }
