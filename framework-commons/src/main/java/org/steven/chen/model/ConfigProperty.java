@@ -16,17 +16,12 @@
 
 package org.steven.chen.model;
 
-import org.steven.chen.utils.StringUtil;
-
 import java.util.concurrent.TimeUnit;
 
-public final class ConfigProperty {
+public class ConfigProperty {
 
     private static final int DEFAULT_SOCKET_PORT = 8899;
-    private static final String DEFAULT_SOCKET_PORT_KEY = "default_socket_port";
     private static final long DEFAULT_NO_DATA_WAIT_TIME = TimeUnit.SECONDS.toMillis(30);
-    private static final String DEFAULT_THREAD_POOL_SIZE_KEY = "default_thread_pool_size";
-    private static final String DEFAULT_NO_DATA_WAIT_TIME_KEY = "default_no_data_wait_time";
 
     private Integer socketPort;
 
@@ -44,16 +39,7 @@ public final class ConfigProperty {
     }
 
     public static int getThreadPoolSize() {
-
-        if (self.threadPoolSize == null) {
-            String threadPoolSize = System.getProperty(DEFAULT_THREAD_POOL_SIZE_KEY);
-            if (StringUtil.isNotEmpty(threadPoolSize)) {
-                self.threadPoolSize = Integer.valueOf(threadPoolSize);
-            } else {
-                self.threadPoolSize = 0;
-            }
-        }
-        if (self.threadPoolSize < 1) {
+        if (self.threadPoolSize == null || self.threadPoolSize < 1) {
             int availableProcessors = Runtime.getRuntime().availableProcessors();
             self.threadPoolSize = (int) (availableProcessors * 2.5);
         }
@@ -70,7 +56,7 @@ public final class ConfigProperty {
                 self.socketPort = DEFAULT_SOCKET_PORT;
             }
         } else {
-            self.socketPort = Integer.valueOf(System.getProperty(DEFAULT_SOCKET_PORT_KEY, DEFAULT_SOCKET_PORT + ""));
+            self.socketPort = DEFAULT_SOCKET_PORT;
         }
         return self.socketPort;
     }
@@ -85,7 +71,7 @@ public final class ConfigProperty {
                 self.noDataWaitTime = DEFAULT_NO_DATA_WAIT_TIME;
             }
         } else {
-            self.noDataWaitTime = Long.valueOf(System.getProperty(DEFAULT_NO_DATA_WAIT_TIME_KEY, DEFAULT_NO_DATA_WAIT_TIME + ""));
+            self.noDataWaitTime = DEFAULT_NO_DATA_WAIT_TIME;
         }
         return self.noDataWaitTime;
     }
