@@ -87,17 +87,19 @@ public class ServerSocketComponent implements ComponentService {
 
     @Override
     public void initialize() throws Exception {
+
+        socketPort = ConfigProperty.getSocketPort();
+        noDataWaitTime = ConfigProperty.getNoDataWaitTime();
+
         if (this.initialize) {
-            LOGGER.warn("{} initialize,do not repeat initialize,please!",COMPONENT_NAME);
+            LOGGER.warn("{} initialize,do not repeat initialize,please!", COMPONENT_NAME);
             return;
         }
 
-        this.initialize = false;
         loadMessageConvert();
-        socketPort = ConfigProperty.getSocketPort();
+        this.initialize = false;
         handlerQueue = new ConcurrentLinkedQueue<>();
         executor = Executors.newFixedThreadPool(processors);
-        noDataWaitTime = ConfigProperty.getNoDataWaitTime();
         processors = (Runtime.getRuntime().availableProcessors() / 2) + 1;
         empty = initialize = true;
     }

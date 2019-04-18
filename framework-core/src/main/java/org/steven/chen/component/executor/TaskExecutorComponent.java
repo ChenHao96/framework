@@ -34,6 +34,7 @@ public class TaskExecutorComponent implements ComponentService, TaskExecutorServ
     private static final String COMPONENT_NAME = "TaskExecutorComponent";
     private static final Logger LOGGER = LoggerFactory.getLogger(TaskExecutorComponent.class);
 
+    private int poolSize;
     private boolean empty;
     private boolean runnable;
     private boolean initialized;
@@ -60,6 +61,10 @@ public class TaskExecutorComponent implements ComponentService, TaskExecutorServ
     public void initialize() throws Exception {
 
         if (this.initialized) {
+            if (ConfigProperty.getThreadPoolSize() > poolSize) {
+                poolSize = ConfigProperty.getThreadPoolSize();
+                handlerExecutor = Executors.newFixedThreadPool(poolSize);
+            }
             LOGGER.warn("{} initialize,do not repeat initialize,please!", COMPONENT_NAME);
             return;
         }
@@ -67,7 +72,8 @@ public class TaskExecutorComponent implements ComponentService, TaskExecutorServ
         empty = true;
         runnable = initialized = false;
         taskQueue = new ConcurrentLinkedQueue<>();
-        handlerExecutor = Executors.newFixedThreadPool(ConfigProperty.getThreadPoolSize());
+        poolSize = ConfigProperty.getThreadPoolSize();
+        handlerExecutor = Executors.newFixedThreadPool(poolSize);
         initialized = true;
     }
 
