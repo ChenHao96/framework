@@ -40,7 +40,7 @@ public final class Jackson2FlatMapper implements HashMapper {
         mapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
     }
 
-    public Map<String, Object> fromFlatMapper(Map<String, Object> target) {
+    public Map<String, Object> fromFlatMapper(Map<String, ?> target) {
         try {
             return mapFlatten(target);
         } catch (Exception e) {
@@ -48,7 +48,7 @@ public final class Jackson2FlatMapper implements HashMapper {
         }
     }
 
-    public <T> T fromFlatMapper(Map<String, Object> target, Class<T> clazz) {
+    public <T> T fromFlatMapper(Map<String, ?> target, Class<T> clazz) {
         try {
             Map<String, Object> cacheMap = fromFlatMapper(target);
             if (cacheMap == null) {
@@ -98,16 +98,16 @@ public final class Jackson2FlatMapper implements HashMapper {
         }
     }
 
-    private Map<String, Object> mapFlatten(Map<String, Object> target) throws Exception {
+    private Map<String, Object> mapFlatten(Map<String, ?> target) throws Exception {
         if (target == null) return null;
         Map<String, Object> resultMap = new LinkedHashMap<>();
         doUnFlatten("", resultMap, target);
         return resultMap;
     }
 
-    private void doUnFlatten(String propertyPrefix, Map<String, Object> cacheMap, Map<String, Object> target) throws Exception {
-        Set<Map.Entry<String, Object>> entries = target.entrySet();
-        for (Map.Entry<String, Object> entry : entries) {
+    private void doUnFlatten(String propertyPrefix, Map<String, Object> cacheMap, Map<String, ?> target) throws Exception {
+        Set<? extends Map.Entry<String, ?>> entries = target.entrySet();
+        for (Map.Entry<String, ?> entry : entries) {
             String key = entry.getKey();
             Object value = entry.getValue();
             if (key.startsWith(propertyPrefix)) {
@@ -125,7 +125,7 @@ public final class Jackson2FlatMapper implements HashMapper {
     }
 
     @SuppressWarnings("unchecked")
-    private void processMap(String propertyPrefix, Map<String, Object> cacheMap, Map<String, Object> target, String key) throws Exception {
+    private void processMap(String propertyPrefix, Map<String, Object> cacheMap, Map<String, ?> target, String key) throws Exception {
         key = key.substring(0, key.indexOf(PARTING));
         if (key.contains(ARRAY_PREFIX)) {
             Integer index = Integer.valueOf(key.substring(key.indexOf(ARRAY_PREFIX) + 1, key.indexOf(ARRAY_SUFFIX)));
