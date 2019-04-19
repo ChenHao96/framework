@@ -26,7 +26,7 @@ import org.steven.chen.utils.StringUtil;
 
 import java.util.*;
 
-public final class Jackson2FlatMapper implements HashMapper {
+public final class Jackson2FlatMapper {
 
     private static final String PARTING = ".";
     private static final String ARRAY_PREFIX = "[";

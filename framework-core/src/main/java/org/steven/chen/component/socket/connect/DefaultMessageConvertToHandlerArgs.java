@@ -16,7 +16,6 @@
 
 package org.steven.chen.component.socket.connect;
 
-import org.steven.chen.utils.mapper.HashMapper;
 import org.steven.chen.utils.mapper.Jackson2FlatMapper;
 
 import java.util.Map;
@@ -25,7 +24,7 @@ public class DefaultMessageConvertToHandlerArgs implements MessageConvertToHandl
 
     private static final ThreadLocal<CommonsMessage> holder = new ThreadLocal<>();
 
-    protected HashMapper object2FlatMapper = new Jackson2FlatMapper();
+    protected Jackson2FlatMapper object2FlatMapper = new Jackson2FlatMapper();
 
     protected CommonsMessage getCommonsMessage() {
         return holder.get();
