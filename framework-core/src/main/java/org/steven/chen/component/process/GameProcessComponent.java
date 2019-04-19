@@ -77,12 +77,7 @@ public class GameProcessComponent implements ComponentService {
 
                 byte masterCode = 0;
                 GameProcessBean classAnnotation = service.getClass().getAnnotation(GameProcessBean.class);
-                if (classAnnotation == null) {
-                    GameProcessAnnotation annotation = service.getClass().getAnnotation(GameProcessAnnotation.class);
-                    if (annotation != null) {
-                        masterCode = annotation.code();
-                    }
-                } else {
+                if (classAnnotation != null) {
                     masterCode = classAnnotation.value();
                 }
 
@@ -95,21 +90,9 @@ public class GameProcessComponent implements ComponentService {
                         continue;
                     }
 
-                    byte slaveCode = 0;
-                    boolean threadSafety = GameProcessAnnotation.THREAD_SAFETY_DEFAULT;
+                    boolean threadSafety = false;
                     GameProcessMethod methodAnnotation = method.getAnnotation(GameProcessMethod.class);
-
-                    if (methodAnnotation == null) {
-                        GameProcessAnnotation annotation = method.getAnnotation(GameProcessAnnotation.class);
-                        if (annotation != null) {
-                            slaveCode = annotation.code();
-                            threadSafety = annotation.threadSafety();
-                        }
-                    } else {
-                        slaveCode = methodAnnotation.value();
-                        threadSafety = methodAnnotation.threadSafety();
-                    }
-
+                    byte slaveCode = methodAnnotation == null ? 0 : methodAnnotation.value();
                     if (method.getAnnotation(AsyncHandler.class) != null) threadSafety = true;
                     handlerFactory.addHandler(masterCode, slaveCode, service, method, threadSafety);
                 }

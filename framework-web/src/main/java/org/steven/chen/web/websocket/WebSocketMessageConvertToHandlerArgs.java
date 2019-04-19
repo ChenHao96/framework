@@ -47,12 +47,7 @@ public class WebSocketMessageConvertToHandlerArgs extends DefaultMessageConvertT
         message.setData(null);
         if (obj != null) {
             try {
-                String responseBody;
-                if (obj instanceof String) {
-                    responseBody = obj.toString();
-                } else {
-                    responseBody = JsonUtils.object2Json(obj);
-                }
+                String responseBody = JsonUtils.object2Json(obj);
                 if (StringUtil.isNotEmpty(responseBody)) {
                     message.setData(responseBody.getBytes(StandardCharsets.UTF_8));
                 }

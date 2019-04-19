@@ -26,6 +26,7 @@ import java.util.Arrays;
 public final class CommonsMessage {
 
     public static final String DATA_NAME = "data";
+    public static final String CHECK_CODE_NAME = "checkCode";
     public static final String SLAVE_CODE_NAME = "slaveCode";
     public static final String MASTER_CODE_NAME = "masterCode";
 

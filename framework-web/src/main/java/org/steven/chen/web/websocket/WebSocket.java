@@ -27,7 +27,7 @@ import org.steven.chen.component.socket.connect.CommonsMessage;
 import org.steven.chen.component.socket.connect.MessageConvertToHandlerArgs;
 import org.steven.chen.component.socket.connect.SocketHandlerTask;
 import org.steven.chen.utils.JsonUtils;
-import org.steven.chen.utils.StringUtil;
+import org.steven.chen.utils.encrypt.MD5Utils;
 
 import javax.annotation.Resource;
 import java.nio.charset.StandardCharsets;
@@ -57,20 +57,21 @@ public class WebSocket extends TextWebSocketHandler {
             request.setMasterCode(masterCode);
             if (jsonNode.has(CommonsMessage.DATA_NAME)) {
                 String dataBody = jsonNode.get(CommonsMessage.DATA_NAME).asText();
-                if (StringUtil.isEmpty(dataBody)) {
-                    request.setData(dataBody.getBytes(StandardCharsets.UTF_8));
+                if (jsonNode.has(CommonsMessage.CHECK_CODE_NAME)) {
+                    if (MD5Utils.isEquals(dataBody, jsonNode.get(CommonsMessage.CHECK_CODE_NAME).asText())) {
+                        request.setData(dataBody.getBytes(StandardCharsets.UTF_8));
+                        ProcessInvokeService invokeService = handlerFactory.getProcessMethod(request.getMasterCode(), request.getSlaveCode());
+                        if (invokeService != null) {
+                            SocketHandlerTask task = new SocketHandlerTask(request);
+                            WebSocketFrameHandler frameHandler = new WebSocketFrameHandler(session);
+                            frameHandler.setMessageConvertToHandlerArgs(messageConvertToHandlerArgs);
+                            task.setConnectionContext(frameHandler);
+                            task.setInvokeService(invokeService);
+                            task.setMessageConvertToHandlerArgs(messageConvertToHandlerArgs);
+                            executorService.addHandler(task);
+                        }
+                    }
                 }
-            }
-
-            ProcessInvokeService invokeService = handlerFactory.getProcessMethod(request.getMasterCode(), request.getSlaveCode());
-            if (invokeService != null) {
-                SocketHandlerTask task = new SocketHandlerTask(request);
-                WebSocketFrameHandler frameHandler = new WebSocketFrameHandler(session);
-                frameHandler.setMessageConvertToHandlerArgs(messageConvertToHandlerArgs);
-                task.setConnectionContext(frameHandler);
-                task.setInvokeService(invokeService);
-                task.setMessageConvertToHandlerArgs(messageConvertToHandlerArgs);
-                executorService.addHandler(task);
             }
         }
     }

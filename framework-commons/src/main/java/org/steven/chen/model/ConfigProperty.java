@@ -18,7 +18,7 @@ package org.steven.chen.model;
 
 import java.util.concurrent.TimeUnit;
 
-public class ConfigProperty {
+public final class ConfigProperty {
 
     private static final int DEFAULT_SOCKET_PORT = 8899;
     private static final long DEFAULT_NO_DATA_WAIT_TIME = TimeUnit.SECONDS.toMillis(30);
