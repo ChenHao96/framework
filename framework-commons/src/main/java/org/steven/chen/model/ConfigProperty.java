@@ -24,9 +24,7 @@ public final class ConfigProperty {
     private static final long DEFAULT_NO_DATA_WAIT_TIME = TimeUnit.SECONDS.toMillis(30);
 
     private Integer socketPort;
-
     private Long noDataWaitTime;
-
     private Integer threadPoolSize;
 
     private static final ConfigProperty self = new ConfigProperty();
