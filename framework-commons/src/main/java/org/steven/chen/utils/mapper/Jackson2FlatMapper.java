@@ -40,7 +40,6 @@ public final class Jackson2FlatMapper implements HashMapper {
         mapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
     }
 
-    @Override
     public Map<String, Object> fromFlatMapper(Map<String, Object> target) {
         try {
             return mapFlatten(target);
@@ -49,7 +48,6 @@ public final class Jackson2FlatMapper implements HashMapper {
         }
     }
 
-    @Override
     public <T> T fromFlatMapper(Map<String, Object> target, Class<T> clazz) {
         try {
             Map<String, Object> cacheMap = fromFlatMapper(target);
@@ -62,7 +60,6 @@ public final class Jackson2FlatMapper implements HashMapper {
         }
     }
 
-    @Override
     public Map<String, Object> toFlatMapper(Object object) {
         Map<String, Object> resultMap = new LinkedHashMap<>();
         try {

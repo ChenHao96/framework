@@ -18,6 +18,7 @@ package org.steven.chen.utils.mapper;
 
 import java.util.Map;
 
+@Deprecated
 public interface HashMapper {
 
     Map<String, Object> toFlatMapper(Object object);
