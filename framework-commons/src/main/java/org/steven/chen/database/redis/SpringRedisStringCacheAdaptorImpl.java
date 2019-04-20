@@ -16,12 +16,12 @@
 
 package org.steven.chen.database.redis;
 
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.redis.connection.DataType;
 import org.springframework.data.redis.core.BoundHashOperations;
 import org.springframework.data.redis.core.BoundValueOperations;
 import org.springframework.data.redis.core.StringRedisTemplate;
 
-import javax.annotation.Resource;
 import java.math.BigDecimal;
 import java.util.Date;
 import java.util.Map;
@@ -30,12 +30,13 @@ import java.util.concurrent.TimeUnit;
 
 public class SpringRedisStringCacheAdaptorImpl implements RedisStringCacheAdaptor {
 
-    @Resource
+    @Autowired
     private StringRedisTemplate redisTemplate;
 
     @Override
     public boolean delete(String key) {
-        return redisTemplate.delete(key);
+        redisTemplate.delete(key);
+        return true;
     }
 
     @Override
@@ -101,25 +102,13 @@ public class SpringRedisStringCacheAdaptorImpl implements RedisStringCacheAdapto
     @Override
     public void increment(String key) {
         BoundValueOperations<String, String> operations = redisTemplate.boundValueOps(key);
-        operations.increment();
+        operations.increment(1);
     }
 
     @Override
     public void increment(String key, BigDecimal delta) {
         BoundValueOperations<String, String> operations = redisTemplate.boundValueOps(key);
         operations.increment(delta.doubleValue());
-    }
-
-    @Override
-    public void decrement(String key) {
-        BoundValueOperations<String, String> operations = redisTemplate.boundValueOps(key);
-        operations.decrement();
-    }
-
-    @Override
-    public void decrement(String key, BigDecimal delta) {
-        BoundValueOperations<String, String> operations = redisTemplate.boundValueOps(key);
-        operations.decrement(delta.longValue());
     }
 
     @Override

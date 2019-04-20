@@ -46,10 +46,6 @@ public interface RedisCacheAdaptor<V> extends CacheAdaptor<String, V>, RedisAdap
 
     void increment(String key, BigDecimal delta);
 
-    void decrement(String key);
-
-    void decrement(String key, BigDecimal delta);
-
     V hashGet(String key, String field);
 
     Map<String, V> hashGet(String key);
