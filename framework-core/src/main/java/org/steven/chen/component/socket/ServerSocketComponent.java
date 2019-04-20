@@ -98,9 +98,9 @@ public class ServerSocketComponent implements ComponentService {
 
         loadMessageConvert();
         this.initialize = false;
-        handlerQueue = new ConcurrentLinkedQueue<>();
-        executor = Executors.newFixedThreadPool(processors);
         processors = (Runtime.getRuntime().availableProcessors() / 2) + 1;
+        executor = Executors.newFixedThreadPool(processors);
+        handlerQueue = new ConcurrentLinkedQueue<>();
         empty = initialize = true;
     }
 
