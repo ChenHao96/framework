@@ -26,7 +26,6 @@ import java.util.Queue;
 import java.util.concurrent.ConcurrentLinkedQueue;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
-import java.util.concurrent.atomic.AtomicInteger;
 
 @Component
 public class TaskExecutorComponent implements ComponentService, TaskExecutorService {
@@ -35,12 +34,11 @@ public class TaskExecutorComponent implements ComponentService, TaskExecutorServ
     private static final Logger LOGGER = LoggerFactory.getLogger(TaskExecutorComponent.class);
 
     private int poolSize;
-    private boolean empty;
     private boolean runnable;
     private boolean initialized;
     private Queue<Runnable> taskQueue;
     private ExecutorService handlerExecutor;
-    private final AtomicInteger wait = new AtomicInteger();
+    private final Object wait = new Object();
 
     @Override
     public String getComponentName() {
@@ -69,7 +67,6 @@ public class TaskExecutorComponent implements ComponentService, TaskExecutorServ
             return;
         }
 
-        empty = true;
         runnable = initialized = false;
         taskQueue = new ConcurrentLinkedQueue<>();
         poolSize = ConfigProperty.getThreadPoolSize();
@@ -81,15 +78,19 @@ public class TaskExecutorComponent implements ComponentService, TaskExecutorServ
         if (!runnable) return;
         taskQueue.add(task);
         synchronized (wait) {
-            wait.incrementAndGet();
             wait.notify();
-            empty = false;
         }
     }
 
     @Override
     public void start() throws Exception {
         if (runnable) return;
+
+        if (!this.initialized) {
+            LOGGER.warn("initialize is not success.");
+            return;
+        }
+
         new Thread(new TaskThreadRunnable(), COMPONENT_NAME).start();
         runnable = true;
     }
@@ -98,34 +99,29 @@ public class TaskExecutorComponent implements ComponentService, TaskExecutorServ
     public void stop() throws Exception {
         if (!runnable) return;
         runnable = false;
-        if (empty) {
-            synchronized (wait) {
-                wait.notify();
-            }
-        }
         handlerExecutor.shutdown();
+        while (!handlerExecutor.isTerminated()) {
+            Thread.sleep(1000);
+        }
     }
 
     private class TaskThreadRunnable implements Runnable {
         @Override
         public void run() {
-            do {
-                synchronized (wait) {
-                    try {
-                        if (wait.decrementAndGet() < 0) {
-                            wait.wait();
-                            if (!runnable) break;
-                        }
-                    } catch (InterruptedException e) {
-                        LOGGER.warn("TaskThreadRunnable run.", e);
-                    }
-                }
-
+            while (runnable) {
                 Runnable task = taskQueue.poll();
-                if (task != null) {
-                    handlerExecutor.submit(task);
+                if (task == null) {
+                    synchronized (wait) {
+                        try {
+                            wait.wait();
+                        } catch (InterruptedException e) {
+                            LOGGER.warn("", e);
+                        }
+                    }
+                    continue;
                 }
-            } while (runnable);
+                handlerExecutor.submit(task);
+            }
         }
     }
 }

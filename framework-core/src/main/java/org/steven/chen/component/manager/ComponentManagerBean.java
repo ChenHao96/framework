@@ -49,7 +49,7 @@ public class ComponentManagerBean implements ComponentManager {
     public void initialize() {
 
         if (this.initialized) {
-            LOGGER.warn("{} initialize,do not repeat initialize,please!",COMPONENT_NAME);
+            LOGGER.warn("{} initialize,do not repeat initialize,please!", COMPONENT_NAME);
             return;
         }
 
@@ -77,6 +77,8 @@ public class ComponentManagerBean implements ComponentManager {
     }
 
     public void startup() {
+
+        if (this.startup) return;
 
         if (!this.initialized) {
             LOGGER.warn("startup,initialize is not success.");

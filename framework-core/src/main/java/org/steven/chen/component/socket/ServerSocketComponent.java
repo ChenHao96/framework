@@ -38,27 +38,19 @@ import java.net.Socket;
 import java.net.SocketException;
 import java.util.Queue;
 import java.util.concurrent.ConcurrentLinkedQueue;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
-import java.util.concurrent.atomic.AtomicInteger;
 
 public class ServerSocketComponent implements ComponentService {
 
     private static final String COMPONENT_NAME = "ServerSocketComponent";
     private static final Logger LOGGER = LoggerFactory.getLogger(ServerSocketComponent.class);
 
-    private boolean empty;
     private int processors;
     private int socketPort;
     private boolean started;
-    private boolean runnable;
-    private boolean shutdown;
     private long noDataWaitTime;
     protected boolean initialize;
-    private ExecutorService executor;
     private ServerSocket serverSocket;
     private Queue<SocketConnectionContext> handlerQueue;
-    private final AtomicInteger wait = new AtomicInteger();
     private MessageConvertToHandlerArgs messageConvertToHandlerArgs;
 
     @Resource
@@ -88,88 +80,73 @@ public class ServerSocketComponent implements ComponentService {
     @Override
     public void initialize() throws Exception {
 
-        socketPort = ConfigProperty.getSocketPort();
-        noDataWaitTime = ConfigProperty.getNoDataWaitTime();
-
-        if (this.initialize) {
-            LOGGER.warn("{} initialize,do not repeat initialize,please!", COMPONENT_NAME);
-            return;
-        }
+        this.socketPort = ConfigProperty.getSocketPort();
+        this.noDataWaitTime = ConfigProperty.getNoDataWaitTime();
+        if (this.initialize) return;
 
         loadMessageConvert();
         this.initialize = false;
-        processors = (Runtime.getRuntime().availableProcessors() / 2) + 1;
-        executor = Executors.newFixedThreadPool(processors);
-        handlerQueue = new ConcurrentLinkedQueue<>();
-        empty = initialize = true;
+        this.handlerQueue = new ConcurrentLinkedQueue<>();
+        this.processors = (Runtime.getRuntime().availableProcessors() / 2) + 1;
+        this.initialize = true;
     }
 
     private void loadMessageConvert() {
         try {
-            messageConvertToHandlerArgs = applicationContext.getBean(MessageConvertToHandlerArgs.class);
+            this.messageConvertToHandlerArgs = this.applicationContext.getBean(MessageConvertToHandlerArgs.class);
         } catch (NoSuchBeanDefinitionException e) {
-            messageConvertToHandlerArgs = new DefaultMessageConvertToHandlerArgs();
+            this.messageConvertToHandlerArgs = new DefaultMessageConvertToHandlerArgs();
         }
     }
 
     @Override
     public void start() throws Exception {
-        serverSocket = new ServerSocket(socketPort, 128);
+        if (this.started) return;
+        if (!this.initialize) {
+            LOGGER.warn("initialize is not success.");
+            return;
+        }
+
+        this.serverSocket = new ServerSocket(this.socketPort, 128);
         new Thread(new SocketAcceptListener(), COMPONENT_NAME).start();
-        started = runnable = true;
         ThreadGroup group = new ThreadGroup(COMPONENT_NAME + "-shl");
-        for (int i = 0; i < processors; i++) {
+        for (int i = 0; i < this.processors; i++) {
             new Thread(group, new SocketHandlerListener()).start();
         }
+        this.started = true;
     }
 
     @Override
     public void stop() throws Exception {
-
-        shutdown = true;
-        runnable = started = false;
-
-        if (empty) {
-            synchronized (wait) {
-                wait.notifyAll();
-            }
-        }
+        if (!this.started) return;
 
         try {
-            serverSocket.close();
+            this.serverSocket.close();
         } catch (IOException e) {
             LOGGER.warn("ServerSocketComponent shutdown.", e);
         }
-
-        executor.shutdown();
+        this.started = false;
     }
 
     private void incrementHandler(SocketConnectionContext handler) {
-        handlerQueue.add(handler);
-        synchronized (wait) {
-            wait.incrementAndGet();
-            wait.notify();
-            empty = false;
-        }
+        this.handlerQueue.add(handler);
     }
 
     private class SocketAcceptListener implements Runnable {
 
         @Override
         public void run() {
-
             do {
                 try {
                     Socket client = serverSocket.accept();
-                    if (shutdown) break;
+                    if (!started) break;
                     SocketFrameHandler frameHandler = new SocketFrameHandler(client, noDataWaitTime);
                     frameHandler.setMessageConvertToHandlerArgs(messageConvertToHandlerArgs);
                     incrementHandler(frameHandler);
                 } catch (IOException e) {
-                    if (shutdown) break;
                     LOGGER.warn("serverSocket accept exception.", e);
                 }
-            } while (true);
+            } while (started);
         }
     }
 
@@ -177,20 +154,12 @@ public class ServerSocketComponent implements ComponentService {
 
         @Override
         public void run() {
-            do {
-                synchronized (wait) {
-                    try {
-                        if (wait.decrementAndGet() < 0) {
-                            wait.wait();
-                            if (!runnable) break;
-                        }
-                    } catch (InterruptedException e) {
-                        LOGGER.warn("SocketHandlerListener wait.", e);
-                    }
-                }
-
+            while (true) {
                 SocketConnectionContext handler = pollHandler();
-                if (handler == null) continue;
+                if (handler == null) {
+                    if (!started) break;
+                    continue;
+                }
 
                 if (started) {
                     if (!handler.isClose()) {
@@ -203,7 +172,7 @@ public class ServerSocketComponent implements ComponentService {
                         LOGGER.warn("SocketHandlerListener close.", e);
                     }
                 }
-            } while (true);
+            }
         }
 
         private SocketConnectionContext pollHandler() {

@@ -61,10 +61,7 @@ public class GameProcessComponent implements ComponentService {
     @Override
     public void initialize() throws Exception {
 
-        if (this.initialized) {
-            LOGGER.warn("{} initialize,do not repeat initialize,please!", COMPONENT_NAME);
-            return;
-        }
+        if (this.initialized) return;
 
         initialized = false;
         Map<String, ProcessHandlerService> beanMap = applicationContext.getBeansOfType(ProcessHandlerService.class);
