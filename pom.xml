@@ -22,13 +22,12 @@
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 
         <jedis.version>2.9.0</jedis.version>
-        <druid.version>1.1.9</druid.version>
         <mybatis.version>3.5.0</mybatis.version>
         <logback.version>1.2.3</logback.version>
         <pinyin4j.version>2.5.0</pinyin4j.version>
         <org.slf4j.version>1.7.9</org.slf4j.version>
         <javaee-api.version>8.0</javaee-api.version>
-        <spring.version>5.1.5.RELEASE</spring.version>
+        <spring.version>4.3.23.RELEASE</spring.version>
         <httpclient.version>4.5.2</httpclient.version>
         <commons-lang.version>2.6</commons-lang.version>
         <commons-codec.version>1.12</commons-codec.version>

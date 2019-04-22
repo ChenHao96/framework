@@ -4,6 +4,7 @@ import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.web.servlet.HandlerInterceptor;
+import org.springframework.web.servlet.ModelAndView;
 import org.steven.chen.utils.StringUtil;
 
 import javax.servlet.http.HttpServletRequest;
@@ -29,6 +30,16 @@ public class RequestInterceptor implements HandlerInterceptor {
         if (StringUtil.isNotEmpty(callBackName)) MappingJackson2HttpMessageConverter.setJsonPCallBackName(callBackName);
         LOGGER.info("request address:{}:{},requestUrl:{},param:{}", ip, port, requestUrl, param);
         return true;
+    }
+
+    @Override
+    public void postHandle(HttpServletRequest httpServletRequest, HttpServletResponse httpServletResponse, Object o, ModelAndView modelAndView) throws Exception {
+
+    }
+
+    @Override
+    public void afterCompletion(HttpServletRequest httpServletRequest, HttpServletResponse httpServletResponse, Object o, Exception e) throws Exception {
+
     }
 
     private String catalinaMap2String(Map map) {
