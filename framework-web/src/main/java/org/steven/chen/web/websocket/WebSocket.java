@@ -50,13 +50,13 @@ public class WebSocket extends TextWebSocketHandler {
         if (jsonNode != null && jsonNode.has(CommonsMessage.MASTER_CODE_NAME) && jsonNode.has(CommonsMessage.SLAVE_CODE_NAME)) {
             byte slaveCode = (byte) jsonNode.get(CommonsMessage.SLAVE_CODE_NAME).asInt();
             byte masterCode = (byte) jsonNode.get(CommonsMessage.MASTER_CODE_NAME).asInt();
-            CommonsMessage request = new CommonsMessage();
-            request.setSlaveCode(slaveCode);
-            request.setMasterCode(masterCode);
             if (jsonNode.has(CommonsMessage.DATA_NAME)) {
                 String dataBody = jsonNode.get(CommonsMessage.DATA_NAME).asText();
                 if (jsonNode.has(CommonsMessage.CHECK_CODE_NAME)) {
                     if (MD5Utils.isEquals(dataBody, jsonNode.get(CommonsMessage.CHECK_CODE_NAME).asText())) {
+                        CommonsMessage request = new CommonsMessage();
+                        request.setSlaveCode(slaveCode);
+                        request.setMasterCode(masterCode);
                         request.setData(dataBody.getBytes(StandardCharsets.UTF_8));
                         ProcessInvokeService invokeService = handlerFactory.getProcessMethod(request.getMasterCode(), request.getSlaveCode());
                         if (invokeService != null) {
