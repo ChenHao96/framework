@@ -99,6 +99,9 @@ public class TaskExecutorComponent implements ComponentService, TaskExecutorServ
     public void stop() throws Exception {
         if (!runnable) return;
         runnable = false;
+        synchronized (wait) {
+            wait.notify();
+        }
         handlerExecutor.shutdown();
         while (!handlerExecutor.isTerminated()) {
             Thread.sleep(1000);
