@@ -32,7 +32,7 @@ public class HandlerFactoryImpl implements HandlerFactory {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(HandlerFactoryImpl.class);
 
-    private boolean addfinish = false;
+    private boolean addFinish = false;
     private Map<Byte, Map<Byte, Method>> serviceMethod;
     private Map<Byte, Map<Byte, ProcessHandlerService>> classBeans;
     private Map<Byte, Map<Byte, ProcessInvokeService>> process;
@@ -44,7 +44,7 @@ public class HandlerFactoryImpl implements HandlerFactory {
 
     @Override
     public ProcessInvokeService getProcessMethod(byte masterCode, byte slaveCode) {
-        if (this.addfinish) LOGGER.warn("handlerFactory is not stop add handler.");
+        if (!this.addFinish) LOGGER.warn("handlerFactory is not stop add handler.");
         if (this.process == null) return null;
         Map<Byte, ProcessInvokeService> invokeServiceMap = this.process.get(masterCode);
         if (invokeServiceMap == null) return null;
@@ -73,7 +73,7 @@ public class HandlerFactoryImpl implements HandlerFactory {
 
         this.classBeans = null;
         this.serviceMethod = null;
-        this.addfinish = true;
+        this.addFinish = true;
     }
 
     public void addHandler(byte masterCode, byte slaveCode, ProcessHandlerService bean, Method handler, boolean threadSafety) {
