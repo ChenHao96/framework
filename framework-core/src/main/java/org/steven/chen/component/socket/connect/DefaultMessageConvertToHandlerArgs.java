@@ -27,7 +27,13 @@ public class DefaultMessageConvertToHandlerArgs implements MessageConvertToHandl
     protected Jackson2FlatMapper object2FlatMapper = new Jackson2FlatMapper();
 
     protected CommonsMessage getCommonsMessage() {
-        return holder.get();
+        return getCommonsMessage(false);
+    }
+
+    protected CommonsMessage getCommonsMessage(boolean instance) {
+        CommonsMessage message = holder.get();
+        message = message == null ? instance ? new CommonsMessage() : null : message;
+        return message;
     }
 
     public void setCommonsMessage(CommonsMessage message) {

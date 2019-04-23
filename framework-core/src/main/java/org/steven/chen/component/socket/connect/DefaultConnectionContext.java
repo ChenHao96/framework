@@ -16,7 +16,10 @@
 
 package org.steven.chen.component.socket.connect;
 
-import java.util.*;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Set;
 import java.util.concurrent.locks.ReadWriteLock;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
 
@@ -24,12 +27,6 @@ public abstract class DefaultConnectionContext implements ConnectionContext {
 
     private Map<String, Object> cacheMap = new HashMap<>();
     private ReadWriteLock lock = new ReentrantReadWriteLock();
-    private String id = UUID.randomUUID().toString().replaceAll("-", "");
-
-    @Override
-    public String Id() {
-        return id;
-    }
 
     @Override
     public void setAttribute(String name, Object obj) {

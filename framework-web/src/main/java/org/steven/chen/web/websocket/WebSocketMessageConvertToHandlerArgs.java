@@ -32,6 +32,7 @@ public class WebSocketMessageConvertToHandlerArgs extends DefaultMessageConvertT
     @Override
     public Map<String, Object> convertArgs() {
         CommonsMessage message = getCommonsMessage();
+        if (message == null) return null;
         String requestBody = new String(message.getData(), StandardCharsets.UTF_8);
         try {
             JsonNode jsonNode = JsonUtils.jsonStr2JsonNode(requestBody);
@@ -43,7 +44,7 @@ public class WebSocketMessageConvertToHandlerArgs extends DefaultMessageConvertT
 
     @Override
     public CommonsMessage convertMessageReturn(Object obj) {
-        CommonsMessage message = getCommonsMessage();
+        CommonsMessage message = getCommonsMessage(true);
         message.setData(null);
         if (obj != null) {
             try {

@@ -25,9 +25,7 @@ import org.steven.chen.component.socket.connect.MessageConvertToHandlerArgs;
 import org.steven.chen.utils.JsonUtils;
 
 import java.io.IOException;
-import java.util.Collections;
 import java.util.Set;
-import java.util.UUID;
 
 public class WebSocketFrameHandler implements ConnectionContext {
 
@@ -35,18 +33,12 @@ public class WebSocketFrameHandler implements ConnectionContext {
     private String connectionIp;
     private WebSocketSession session;
     private MessageConvertToHandlerArgs messageConvertToHandlerArgs;
-    private String id = UUID.randomUUID().toString().replaceAll("-", "");
 
     public WebSocketFrameHandler(WebSocketSession session) {
         Assert.notNull(session, "WebSocketSession session client is required!");
         this.session = session;
         this.connectionPort = session.getRemoteAddress().getPort();
         this.connectionIp = session.getRemoteAddress().getHostName();
-    }
-
-    @Override
-    public String Id() {
-        return id;
     }
 
     @Override
@@ -96,7 +88,7 @@ public class WebSocketFrameHandler implements ConnectionContext {
 
     @Override
     public Set<String> getAttributeNames() {
-        return Collections.unmodifiableSet(session.getAttributes().keySet());
+        return session.getAttributes().keySet();
     }
 
     @Override
