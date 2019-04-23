@@ -50,6 +50,8 @@ public class ServerSocketComponent implements ComponentService {
     private long noDataWaitTime;
     protected boolean initialize;
     private ServerSocket serverSocket;
+    private Thread[] slackList;
+    private final Object wait = new Object();
     private Queue<SocketConnectionContext> handlerQueue;
     private MessageConvertToHandlerArgs messageConvertToHandlerArgs;
 
@@ -88,6 +90,7 @@ public class ServerSocketComponent implements ComponentService {
         this.initialize = false;
         this.handlerQueue = new ConcurrentLinkedQueue<>();
         this.processors = (Runtime.getRuntime().availableProcessors() / 2) + 1;
+        this.slackList = new Thread[this.processors];
         this.initialize = true;
     }
 
@@ -111,25 +114,45 @@ public class ServerSocketComponent implements ComponentService {
         new Thread(new SocketAcceptListener(), COMPONENT_NAME).start();
         ThreadGroup group = new ThreadGroup(COMPONENT_NAME + "-shl");
         for (int i = 0; i < this.processors; i++) {
-            new Thread(group, new SocketHandlerListener()).start();
+            this.slackList[i] = new Thread(group, new SocketHandlerListener());
+            this.slackList[i].start();
         }
         this.started = true;
     }
 
     @Override
     public void stop() throws Exception {
+
         if (!this.started) return;
+        this.started = false;
+        synchronized (wait) {
+            wait.notifyAll();
+        }
+
+        boolean listenerRunning = false;
+        do {
+            for (Thread thread : slackList) {
+                if (thread != null) {
+                    Thread.State state = thread.getState();
+                    if (!Thread.State.TERMINATED.equals(state)) {
+                        listenerRunning = true;
+                    }
+                }
+            }
+        } while (listenerRunning);
 
         try {
             this.serverSocket.close();
         } catch (IOException e) {
             LOGGER.warn("ServerSocketComponent shutdown.", e);
         }
-        this.started = false;
     }
 
     private void incrementHandler(SocketConnectionContext handler) {
         this.handlerQueue.add(handler);
+        synchronized (wait) {
+            wait.notify();
+        }
     }
 
     private class SocketAcceptListener implements Runnable {
@@ -158,6 +181,14 @@ public class ServerSocketComponent implements ComponentService {
                 SocketConnectionContext handler = pollHandler();
                 if (handler == null) {
                     if (!started) break;
+                    synchronized (wait) {
+                        try {
+                            wait.wait();
+                        } catch (InterruptedException e) {
+                            e.printStackTrace();
+                            LOGGER.warn("pollHandler wait.", e);
+                        }
+                    }
                     continue;
                 }
 
