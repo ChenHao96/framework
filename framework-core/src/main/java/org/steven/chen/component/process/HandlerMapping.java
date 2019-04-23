@@ -20,9 +20,9 @@ import java.lang.annotation.*;
 
 @Inherited
 @Documented
-@Target(ElementType.TYPE)
+@Target({ElementType.TYPE,ElementType.METHOD})
 @Retention(RetentionPolicy.RUNTIME)
-public @interface GameProcessBean {
+public @interface HandlerMapping {
     byte value() default 0;
 
     String description() default "";
