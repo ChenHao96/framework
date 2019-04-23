@@ -19,7 +19,6 @@ package org.steven.chen.component.process.handler;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
-import org.springframework.util.Assert;
 import org.steven.chen.component.process.ProcessHandlerService;
 import org.steven.chen.component.process.ProcessInvokeService;
 
@@ -33,7 +32,7 @@ public class HandlerFactoryImpl implements HandlerFactory {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(HandlerFactoryImpl.class);
 
-    private boolean stoped = false;
+    private boolean addfinish = false;
     private Map<Byte, Map<Byte, Method>> serviceMethod;
     private Map<Byte, Map<Byte, ProcessHandlerService>> classBeans;
     private Map<Byte, Map<Byte, ProcessInvokeService>> process;
@@ -45,7 +44,7 @@ public class HandlerFactoryImpl implements HandlerFactory {
 
     @Override
     public ProcessInvokeService getProcessMethod(byte masterCode, byte slaveCode) {
-        Assert.isTrue(stoped, "handlerFactory is not stop add handler.");
+        if (this.addfinish) LOGGER.warn("handlerFactory is not stop add handler.");
         if (this.process == null) return null;
         Map<Byte, ProcessInvokeService> invokeServiceMap = this.process.get(masterCode);
         if (invokeServiceMap == null) return null;
@@ -74,7 +73,7 @@ public class HandlerFactoryImpl implements HandlerFactory {
 
         this.classBeans = null;
         this.serviceMethod = null;
-        this.stoped = true;
+        this.addfinish = true;
     }
 
     public void addHandler(byte masterCode, byte slaveCode, ProcessHandlerService bean, Method handler, boolean threadSafety) {
