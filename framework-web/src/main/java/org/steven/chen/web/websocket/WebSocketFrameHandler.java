@@ -16,6 +16,8 @@
 
 package org.steven.chen.web.websocket;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.util.Assert;
 import org.springframework.web.socket.TextMessage;
 import org.springframework.web.socket.WebSocketSession;
@@ -33,6 +35,7 @@ public class WebSocketFrameHandler implements ConnectionContext {
     private String connectionIp;
     private WebSocketSession session;
     private MessageConvertToHandlerArgs messageConvertToHandlerArgs;
+    private static final Logger LOGGER = LoggerFactory.getLogger(WebSocketFrameHandler.class);
 
     public WebSocketFrameHandler(WebSocketSession session) {
         Assert.notNull(session, "WebSocketSession session client is required!");
@@ -66,12 +69,19 @@ public class WebSocketFrameHandler implements ConnectionContext {
     }
 
     @Override
-    public void sendMessage(CommonsMessage message) throws IOException {
-        session.sendMessage(new TextMessage(JsonUtils.object2Json(message)));
+    public void sendMessage(CommonsMessage message) {
+        if (!session.isOpen()) return;
+        try {
+            String content = JsonUtils.object2Json(message);
+            session.sendMessage(new TextMessage(content));
+        } catch (IOException e) {
+            LOGGER.warn("sendMessage", e);
+        }
     }
 
     @Override
-    public void sendMessage(Object message) throws IOException {
+    public void sendMessage(Object message) {
+        if (!session.isOpen()) return;
         Assert.notNull(messageConvertToHandlerArgs, "MessageConvertToHandlerArgs is required!");
         sendMessage(messageConvertToHandlerArgs.convertMessageReturn(message));
     }

@@ -26,9 +26,9 @@ public interface ConnectionContext extends Closeable {
 
     void close() throws IOException;
 
-    void sendMessage(CommonsMessage message) throws IOException;
+    void sendMessage(CommonsMessage message);
 
-    void sendMessage(Object message) throws IOException;
+    void sendMessage(Object message);
 
     void setAttribute(String name, Object obj);
 

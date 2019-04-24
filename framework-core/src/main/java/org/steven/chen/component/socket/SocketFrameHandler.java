@@ -16,6 +16,8 @@
 
 package org.steven.chen.component.socket;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.util.Assert;
 import org.steven.chen.component.socket.connect.CommonsMessage;
 import org.steven.chen.component.socket.connect.DefaultConnectionContext;
@@ -37,6 +39,7 @@ public class SocketFrameHandler extends DefaultConnectionContext implements Sock
     private InputStream clientInputStream;
     private OutputStream clientOutputStream;
     private MessageConvertToHandlerArgs messageConvertToHandlerArgs;
+    private static final Logger LOGGER = LoggerFactory.getLogger(SocketFrameHandler.class);
 
     private long noDataWaitTime;
 
@@ -96,19 +99,25 @@ public class SocketFrameHandler extends DefaultConnectionContext implements Sock
     }
 
     @Override
-    public void sendMessage(CommonsMessage message) throws IOException {
+    public void sendMessage(CommonsMessage message) {
 
         if (message == null) return;
         if (clientOutputStream == null) return;
+        if (client.isOutputShutdown()) return;
 
         byte[] buf = CommonsMessage.createByteByMessage(message);
 
-        clientOutputStream.write(buf);
-        clientOutputStream.flush();
+        try {
+            clientOutputStream.write(buf);
+            clientOutputStream.flush();
+        } catch (IOException e) {
+            LOGGER.warn("sendMessage", e);
+        }
     }
 
     @Override
-    public void sendMessage(Object message) throws IOException {
+    public void sendMessage(Object message) {
+        if (client.isOutputShutdown()) return;
         Assert.notNull(messageConvertToHandlerArgs, "MessageConvertToHandlerArgs is required!");
         sendMessage(messageConvertToHandlerArgs.convertMessageReturn(message));
     }
