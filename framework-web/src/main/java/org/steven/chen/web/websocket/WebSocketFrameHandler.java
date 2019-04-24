@@ -60,7 +60,7 @@ public class WebSocketFrameHandler implements ConnectionContext {
 
     @Override
     public boolean isClose() {
-        return session.isOpen();
+        return !session.isOpen();
     }
 
     @Override
