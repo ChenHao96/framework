@@ -82,12 +82,13 @@ public class WebSocketFrameHandler implements ConnectionContext {
     public void sendMessage(CommonsMessage message) {
         if (isClose()) return;
         try {
-            Map<String, Object> context = new HashMap<>(3);
-            context.put("slaveCode", message.getSlaveCode());
-            context.put("masterCode", message.getMasterCode());
-            context.put("data", new String(message.getData(), StandardCharsets.UTF_8));
-            String content = JsonUtils.object2Json(context);
-            session.sendMessage(new TextMessage(content));
+            Map<String, Object> content = new HashMap<>(3);
+            content.put("slaveCode", message.getSlaveCode());
+            content.put("masterCode", message.getMasterCode());
+            String response = new String(message.getData(), StandardCharsets.UTF_8);
+            content.put("data", JsonUtils.jsonStr2JsonNode(response));
+            response = JsonUtils.object2Json(content);
+            session.sendMessage(new TextMessage(response));
         } catch (IOException e) {
             LOGGER.warn("sendMessage", e);
         }
