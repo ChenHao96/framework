@@ -34,7 +34,7 @@ import java.net.SocketException;
 import java.util.LinkedList;
 import java.util.List;
 
-public class SocketFrameHandler extends DefaultConnectionContext implements SocketConnectionContext {
+public class SocketServerConnectionContext extends DefaultConnectionContext implements SocketConnectionContext {
 
     private Socket client;
     private int connectionPort;
@@ -44,11 +44,11 @@ public class SocketFrameHandler extends DefaultConnectionContext implements Sock
     private OutputStream clientOutputStream;
     private List<ConnectionCloseProcess> closeProcesses;
     private MessageConvertToHandlerArgs messageConvertToHandlerArgs;
-    private static final Logger LOGGER = LoggerFactory.getLogger(SocketFrameHandler.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(SocketServerConnectionContext.class);
 
     private long noDataWaitTime;
 
-    public SocketFrameHandler(Socket client, long noDataWaitTime) {
+    public SocketServerConnectionContext(Socket client, long noDataWaitTime) {
         Assert.notNull(client, "SocketFrameHandler Socket client is required!");
 
         this.client = client;

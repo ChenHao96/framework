@@ -16,6 +16,7 @@
 
 package org.steven.chen.component.socket.connect;
 
+import io.netty.buffer.ByteBuf;
 import org.springframework.util.Assert;
 
 import java.io.DataInputStream;
@@ -108,19 +109,19 @@ public final class CommonsMessage {
         return new CommonsMessage(buf[0], buf[1], Arrays.copyOfRange(buf, 2, buf.length));
     }
 
-    public static CommonsMessage createMessageByByteBuf(ByteBuffer byteBuffer) {
+    public static CommonsMessage createMessageByByteBuf(ByteBuf byteBuf) {
 
-        short bodyHead = byteBuffer.getShort();
+        short bodyHead = byteBuf.readShort();
         Assert.isTrue(bodyHead == BODY_HEAD, "byteBuf bodyHead is fail!");
-        int length = byteBuffer.getInt();
+        int length = byteBuf.readInt();
 
         short checkCode = 0;
         if (length > 0) {
-            checkCode = byteBuffer.getShort();
+            checkCode = byteBuf.readShort();
         }
 
         byte[] buf = new byte[length + 2];
-        byteBuffer.get(buf);
+        byteBuf.readBytes(buf);
         if (length > 0) {
             Assert.isTrue(checkCode == calcCheckSum(0, buf.length, buf), "byteBuf checkCode is not equals!");
         }

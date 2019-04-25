@@ -158,7 +158,7 @@ public class ServerSocketComponent implements ComponentService {
                 try {
                     Socket client = serverSocket.accept();
                     if (!started) break;
-                    SocketFrameHandler frameHandler = new SocketFrameHandler(client, noDataWaitTime);
+                    SocketServerConnectionContext frameHandler = new SocketServerConnectionContext(client, noDataWaitTime);
                     frameHandler.setMessageConvertToHandlerArgs(messageConvertToHandlerArgs);
                     incrementHandler(frameHandler);
                 } catch (IOException e) {

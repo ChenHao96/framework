@@ -61,7 +61,7 @@ public class WebSocket extends TextWebSocketHandler {
                         ProcessInvokeService invokeService = handlerFactory.getProcessMethod(request.getMasterCode(), request.getSlaveCode());
                         if (invokeService != null) {
                             SocketHandlerTask task = new SocketHandlerTask(request);
-                            WebSocketFrameHandler frameHandler = new WebSocketFrameHandler(session);
+                            WebSocketConnectionContext frameHandler = new WebSocketConnectionContext(session);
                             frameHandler.setMessageConvertToHandlerArgs(messageConvertToHandlerArgs);
                             task.setConnectionContext(frameHandler);
                             task.setInvokeService(invokeService);

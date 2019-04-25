@@ -31,16 +31,16 @@ import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.util.*;
 
-public class WebSocketFrameHandler implements ConnectionContext {
+public class WebSocketConnectionContext implements ConnectionContext {
 
     private int connectionPort;
     private String connectionIp;
     private WebSocketSession session;
     private List<ConnectionCloseProcess> closeProcesses;
     private MessageConvertToHandlerArgs messageConvertToHandlerArgs;
-    private static final Logger LOGGER = LoggerFactory.getLogger(WebSocketFrameHandler.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(WebSocketConnectionContext.class);
 
-    public WebSocketFrameHandler(WebSocketSession session) {
+    public WebSocketConnectionContext(WebSocketSession session) {
         Assert.notNull(session, "WebSocketSession session client is required!");
         this.session = session;
         this.connectionPort = session.getRemoteAddress().getPort();

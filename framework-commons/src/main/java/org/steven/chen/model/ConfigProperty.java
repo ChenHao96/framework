@@ -21,9 +21,11 @@ import java.util.concurrent.TimeUnit;
 public class ConfigProperty {
 
     public static final int DEFAULT_SOCKET_PORT = 8899;
+    public static final boolean DEFAULT_SOCKET_SSL = false;
     public static final long DEFAULT_NO_DATA_WAIT_TIME = TimeUnit.SECONDS.toMillis(30);
     public static final int DEFAULT_THREAD_POOL_SIZE = (int) (Runtime.getRuntime().availableProcessors() * 2.5);
 
+    private Boolean socketSsl = DEFAULT_SOCKET_SSL;
     private Integer socketPort = DEFAULT_SOCKET_PORT;
     private Long noDataWaitTime = DEFAULT_NO_DATA_WAIT_TIME;
     private Integer threadPoolSize = DEFAULT_THREAD_POOL_SIZE;
@@ -50,5 +52,13 @@ public class ConfigProperty {
 
     public void setThreadPoolSize(Integer threadPoolSize) {
         this.threadPoolSize = threadPoolSize;
+    }
+
+    public Boolean getSocketSsl() {
+        return socketSsl;
+    }
+
+    public void setSocketSsl(Boolean socketSsl) {
+        this.socketSsl = socketSsl;
     }
 }
