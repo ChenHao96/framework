@@ -32,6 +32,12 @@
             <artifactId>framework-commons</artifactId>
             <version>1.1.4-RELEASE</version>
         </dependency>
+
+        <dependency>
+            <groupId>io.lettuce</groupId>
+            <artifactId>lettuce-core</artifactId>
+            <version>${lettuce-core.version}</version>
+        </dependency>
     </dependencies>
 
     <build>

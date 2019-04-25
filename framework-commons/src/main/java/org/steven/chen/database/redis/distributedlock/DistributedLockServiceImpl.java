@@ -24,7 +24,8 @@ import org.springframework.stereotype.Service;
 import org.steven.chen.utils.StringUtil;
 import redis.clients.jedis.Jedis;
 import redis.clients.jedis.JedisCluster;
-import redis.clients.jedis.JedisCommands;
+import redis.clients.jedis.commands.JedisCommands;
+import redis.clients.jedis.params.SetParams;
 
 import javax.annotation.Resource;
 import java.util.Arrays;
@@ -71,7 +72,7 @@ public class DistributedLockServiceImpl implements DistributedLockService {
         try {
             String result = (String) redisTemplate.execute((RedisCallback<String>) connection -> {
                 JedisCommands commands = (JedisCommands) connection.getNativeConnection();
-                return commands.set(key, token, "nx", "ex", expireTimeSeconds);
+                return commands.set(key, token, new SetParams().nx().ex(expireTimeSeconds));
             });
             if (StringUtil.isNotEmpty(result)) {
                 LOGGER.info("get Lock success , key: {}, thread name: {}", key, Thread.currentThread().getName());
