@@ -20,6 +20,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.util.Assert;
 import org.steven.chen.component.socket.connect.CommonsMessage;
+import org.steven.chen.component.socket.connect.ConnectionCloseProcess;
 import org.steven.chen.component.socket.connect.DefaultConnectionContext;
 import org.steven.chen.component.socket.connect.MessageConvertToHandlerArgs;
 import org.steven.chen.utils.CommonsUtil;
@@ -30,6 +31,8 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.net.Socket;
 import java.net.SocketException;
+import java.util.LinkedList;
+import java.util.List;
 
 public class SocketFrameHandler extends DefaultConnectionContext implements SocketConnectionContext {
 
@@ -39,6 +42,7 @@ public class SocketFrameHandler extends DefaultConnectionContext implements Sock
     private long lastLogTime = 0L;
     private InputStream clientInputStream;
     private OutputStream clientOutputStream;
+    private List<ConnectionCloseProcess> closeProcesses;
     private MessageConvertToHandlerArgs messageConvertToHandlerArgs;
     private static final Logger LOGGER = LoggerFactory.getLogger(SocketFrameHandler.class);
 
@@ -97,6 +101,13 @@ public class SocketFrameHandler extends DefaultConnectionContext implements Sock
 
     @Override
     public void close() throws IOException {
+        if (isClose()) return;
+        if (closeProcesses != null) {
+            for (ConnectionCloseProcess closeProcess : closeProcesses) {
+                if (closeProcess == null) continue;
+                closeProcess.process(this);
+            }
+        }
         CommonsUtil.safeClose(clientInputStream, clientOutputStream, client);
     }
 
@@ -114,6 +125,15 @@ public class SocketFrameHandler extends DefaultConnectionContext implements Sock
         } catch (IOException e) {
             LOGGER.warn("sendMessage", e);
         }
+    }
+
+    @Override
+    public void addCloseProcess(ConnectionCloseProcess process) {
+        if (process == null) return;
+        if (closeProcesses == null) {
+            closeProcesses = new LinkedList<>();
+        }
+        closeProcesses.add(process);
     }
 
     @Override

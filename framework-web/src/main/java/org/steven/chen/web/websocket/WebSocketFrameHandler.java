@@ -22,11 +22,14 @@ import org.springframework.util.Assert;
 import org.springframework.web.socket.TextMessage;
 import org.springframework.web.socket.WebSocketSession;
 import org.steven.chen.component.socket.connect.CommonsMessage;
+import org.steven.chen.component.socket.connect.ConnectionCloseProcess;
 import org.steven.chen.component.socket.connect.ConnectionContext;
 import org.steven.chen.component.socket.connect.MessageConvertToHandlerArgs;
 import org.steven.chen.utils.JsonUtils;
 
 import java.io.IOException;
+import java.util.LinkedList;
+import java.util.List;
 import java.util.Set;
 
 public class WebSocketFrameHandler implements ConnectionContext {
@@ -34,6 +37,7 @@ public class WebSocketFrameHandler implements ConnectionContext {
     private int connectionPort;
     private String connectionIp;
     private WebSocketSession session;
+    private List<ConnectionCloseProcess> closeProcesses;
     private MessageConvertToHandlerArgs messageConvertToHandlerArgs;
     private static final Logger LOGGER = LoggerFactory.getLogger(WebSocketFrameHandler.class);
 
@@ -65,6 +69,13 @@ public class WebSocketFrameHandler implements ConnectionContext {
 
     @Override
     public void close() throws IOException {
+        if (isClose()) return;
+        if (closeProcesses != null) {
+            for (ConnectionCloseProcess closeProcess : closeProcesses) {
+                if (closeProcess == null) continue;
+                closeProcess.process(this);
+            }
+        }
         session.close();
     }
 
@@ -109,5 +120,14 @@ public class WebSocketFrameHandler implements ConnectionContext {
     @Override
     public void clearAttribute() {
         session.getAttributes().clear();
+    }
+
+    @Override
+    public void addCloseProcess(ConnectionCloseProcess process) {
+        if (process == null) return;
+        if (closeProcesses == null) {
+            closeProcesses = new LinkedList<>();
+        }
+        closeProcesses.add(process);
     }
 }

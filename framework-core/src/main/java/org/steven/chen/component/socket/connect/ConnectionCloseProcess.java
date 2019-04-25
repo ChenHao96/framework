@@ -16,33 +16,9 @@
 
 package org.steven.chen.component.socket.connect;
 
-import java.io.Closeable;
 import java.io.IOException;
-import java.util.Set;
 
-public interface ConnectionContext extends Closeable {
+public interface ConnectionCloseProcess {
 
-    boolean isClose();
-
-    void close() throws IOException;
-
-    void sendMessage(CommonsMessage message);
-
-    void addCloseProcess(ConnectionCloseProcess process);
-
-    void sendMessage(Object message);
-
-    void setAttribute(String name, Object obj);
-
-    Object getAttribute(String name);
-
-    Set<String> getAttributeNames();
-
-    Object removeAttribute(String name);
-
-    void clearAttribute();
-
-    String getConnectionIp();
-
-    int getConnectionPort();
+    void process(ConnectionContext context) throws IOException;
 }
