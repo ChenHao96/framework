@@ -70,7 +70,7 @@ public class WebSocketFrameHandler implements ConnectionContext {
 
     @Override
     public void sendMessage(CommonsMessage message) {
-        if (!session.isOpen()) return;
+        if (isClose()) return;
         try {
             String content = JsonUtils.object2Json(message);
             session.sendMessage(new TextMessage(content));
@@ -81,7 +81,7 @@ public class WebSocketFrameHandler implements ConnectionContext {
 
     @Override
     public void sendMessage(Object message) {
-        if (!session.isOpen()) return;
+        if (isClose()) return;
         Assert.notNull(messageConvertToHandlerArgs, "MessageConvertToHandlerArgs is required!");
         sendMessage(messageConvertToHandlerArgs.convertMessageReturn(message));
     }

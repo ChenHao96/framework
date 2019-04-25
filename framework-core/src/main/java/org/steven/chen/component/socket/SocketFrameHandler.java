@@ -29,6 +29,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.net.Socket;
+import java.net.SocketException;
 
 public class SocketFrameHandler extends DefaultConnectionContext implements SocketConnectionContext {
 
@@ -74,6 +75,7 @@ public class SocketFrameHandler extends DefaultConnectionContext implements Sock
 
     @Override
     public CommonsMessage receiveMessage() throws IOException {
+        if (isClose() || client.isInputShutdown()) return null;
         DataInputStream dataInputStream = new DataInputStream(clientInputStream);
         if (dataInputStream.available() >= CommonsMessage.MIN_DATA_LENGTH) {
             lastLogTime = System.currentTimeMillis();
@@ -101,15 +103,14 @@ public class SocketFrameHandler extends DefaultConnectionContext implements Sock
     @Override
     public void sendMessage(CommonsMessage message) {
 
-        if (message == null) return;
-        if (clientOutputStream == null) return;
-        if (client.isOutputShutdown()) return;
-
+        if (message == null || isClose() || client.isOutputShutdown()) return;
         byte[] buf = CommonsMessage.createByteByMessage(message);
 
         try {
             clientOutputStream.write(buf);
             clientOutputStream.flush();
+        } catch (SocketException close) {
+            CommonsUtil.safeClose(this);
         } catch (IOException e) {
             LOGGER.warn("sendMessage", e);
         }
@@ -117,7 +118,7 @@ public class SocketFrameHandler extends DefaultConnectionContext implements Sock
 
     @Override
     public void sendMessage(Object message) {
-        if (client.isOutputShutdown()) return;
+        if (message == null || isClose() || client.isOutputShutdown()) return;
         Assert.notNull(messageConvertToHandlerArgs, "MessageConvertToHandlerArgs is required!");
         sendMessage(messageConvertToHandlerArgs.convertMessageReturn(message));
     }
