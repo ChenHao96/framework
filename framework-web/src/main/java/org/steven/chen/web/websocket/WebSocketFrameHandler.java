@@ -28,9 +28,8 @@ import org.steven.chen.component.socket.connect.MessageConvertToHandlerArgs;
 import org.steven.chen.utils.JsonUtils;
 
 import java.io.IOException;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Set;
+import java.nio.charset.StandardCharsets;
+import java.util.*;
 
 public class WebSocketFrameHandler implements ConnectionContext {
 
@@ -83,7 +82,11 @@ public class WebSocketFrameHandler implements ConnectionContext {
     public void sendMessage(CommonsMessage message) {
         if (isClose()) return;
         try {
-            String content = JsonUtils.object2Json(message);
+            Map<String, Object> context = new HashMap<>(3);
+            context.put("slaveCode", message.getSlaveCode());
+            context.put("masterCode", message.getMasterCode());
+            context.put("data", new String(message.getData(), StandardCharsets.UTF_8));
+            String content = JsonUtils.object2Json(context);
             session.sendMessage(new TextMessage(content));
         } catch (IOException e) {
             LOGGER.warn("sendMessage", e);
