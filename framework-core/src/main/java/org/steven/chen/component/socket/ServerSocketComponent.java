@@ -83,8 +83,12 @@ public class ServerSocketComponent implements ComponentService {
     @Override
     public void initialize() throws Exception {
 
-        this.socketPort = configProperty == null ? ConfigProperty.DEFAULT_SOCKET_PORT : configProperty.getSocketPort();
-        this.noDataWaitTime = configProperty == null ? ConfigProperty.DEFAULT_NO_DATA_WAIT_TIME : configProperty.getNoDataWaitTime();
+        if (this.configProperty == null) {
+            this.configProperty = ConfigProperty.getInstance();
+        }
+
+        this.socketPort = configProperty.getSocketPort();
+        this.noDataWaitTime = configProperty.getNoDataWaitTime();
         if (this.initialize) return;
 
         this.initialize = false;

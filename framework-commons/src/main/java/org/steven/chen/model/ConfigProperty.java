@@ -25,10 +25,24 @@ public class ConfigProperty {
     public static final long DEFAULT_NO_DATA_WAIT_TIME = TimeUnit.SECONDS.toMillis(30);
     public static final int DEFAULT_THREAD_POOL_SIZE = (int) (Runtime.getRuntime().availableProcessors() * 2.5);
 
-    private Boolean socketSsl = DEFAULT_SOCKET_SSL;
-    private Integer socketPort = DEFAULT_SOCKET_PORT;
-    private Long noDataWaitTime = DEFAULT_NO_DATA_WAIT_TIME;
-    private Integer threadPoolSize = DEFAULT_THREAD_POOL_SIZE;
+    private static final ConfigProperty inner;
+
+    static {
+        inner = new ConfigProperty();
+        inner.socketSsl = DEFAULT_SOCKET_SSL;
+        inner.socketPort = DEFAULT_SOCKET_PORT;
+        inner.noDataWaitTime = DEFAULT_NO_DATA_WAIT_TIME;
+        inner.threadPoolSize = DEFAULT_THREAD_POOL_SIZE;
+    }
+
+    public static ConfigProperty getInstance() {
+        return inner;
+    }
+
+    private Boolean socketSsl;
+    private Integer socketPort;
+    private Long noDataWaitTime;
+    private Integer threadPoolSize;
 
     public Integer getSocketPort() {
         return socketPort;
