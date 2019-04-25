@@ -18,6 +18,7 @@ package org.steven.chen.component.executor;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import org.steven.chen.component.ComponentService;
 import org.steven.chen.model.ConfigProperty;
@@ -40,6 +41,9 @@ public class TaskExecutorComponent implements ComponentService, TaskExecutorServ
     private ExecutorService handlerExecutor;
     private final Object wait = new Object();
 
+    @Autowired(required = false)
+    private ConfigProperty configProperty;
+
     @Override
     public String getComponentName() {
         return COMPONENT_NAME;
@@ -59,9 +63,11 @@ public class TaskExecutorComponent implements ComponentService, TaskExecutorServ
     public void initialize() throws Exception {
 
         if (this.initialized) {
-            if (ConfigProperty.getThreadPoolSize() > poolSize) {
-                poolSize = ConfigProperty.getThreadPoolSize();
-                handlerExecutor = Executors.newFixedThreadPool(poolSize);
+            if (configProperty != null && configProperty.getThreadPoolSize() > poolSize) {
+                poolSize = configProperty.getThreadPoolSize();
+                if (handlerExecutor.isTerminated() || handlerExecutor.isShutdown()) {
+                    handlerExecutor = Executors.newFixedThreadPool(poolSize);
+                }
             }
             LOGGER.warn("{} initialize,do not repeat initialize,please!", COMPONENT_NAME);
             return;
@@ -69,7 +75,7 @@ public class TaskExecutorComponent implements ComponentService, TaskExecutorServ
 
         runnable = initialized = false;
         taskQueue = new ConcurrentLinkedQueue<>();
-        poolSize = ConfigProperty.getThreadPoolSize();
+        poolSize = configProperty == null ? ConfigProperty.DEFAULT_THREAD_POOL_SIZE : configProperty.getThreadPoolSize();
         handlerExecutor = Executors.newFixedThreadPool(poolSize);
         initialized = true;
     }
@@ -85,12 +91,10 @@ public class TaskExecutorComponent implements ComponentService, TaskExecutorServ
     @Override
     public void start() throws Exception {
         if (runnable) return;
-
         if (!this.initialized) {
             LOGGER.warn("initialize is not success.");
             return;
         }
-
         new Thread(new TaskThreadRunnable(), COMPONENT_NAME).start();
         runnable = true;
     }

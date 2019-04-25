@@ -18,8 +18,7 @@ package org.steven.chen.component.socket;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.NoSuchBeanDefinitionException;
-import org.springframework.context.ApplicationContext;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.steven.chen.component.ComponentService;
 import org.steven.chen.component.executor.TaskExecutorService;
 import org.steven.chen.component.process.ProcessInvokeService;
@@ -53,16 +52,18 @@ public class ServerSocketComponent implements ComponentService {
     private Thread[] slackList;
     private final Object wait = new Object();
     private Queue<SocketConnectionContext> handlerQueue;
-    private MessageConvertToHandlerArgs messageConvertToHandlerArgs;
 
     @Resource
     private HandlerFactory handlerFactory;
 
+    @Autowired(required = false)
+    private ConfigProperty configProperty;
+
     @Resource
     private TaskExecutorService executorService;
 
-    @Resource
-    private ApplicationContext applicationContext;
+    @Autowired(required = false)
+    private MessageConvertToHandlerArgs messageConvertToHandlerArgs;
 
     @Override
     public String getComponentName() {
@@ -82,24 +83,18 @@ public class ServerSocketComponent implements ComponentService {
     @Override
     public void initialize() throws Exception {
 
-        this.socketPort = ConfigProperty.getSocketPort();
-        this.noDataWaitTime = ConfigProperty.getNoDataWaitTime();
+        this.socketPort = configProperty == null ? ConfigProperty.DEFAULT_SOCKET_PORT : configProperty.getSocketPort();
+        this.noDataWaitTime = configProperty == null ? ConfigProperty.DEFAULT_NO_DATA_WAIT_TIME : configProperty.getNoDataWaitTime();
         if (this.initialize) return;
 
-        loadMessageConvert();
         this.initialize = false;
         this.handlerQueue = new ConcurrentLinkedQueue<>();
         this.processors = (Runtime.getRuntime().availableProcessors() / 2) + 1;
         this.slackList = new Thread[this.processors];
-        this.initialize = true;
-    }
-
-    private void loadMessageConvert() {
-        try {
-            this.messageConvertToHandlerArgs = this.applicationContext.getBean(MessageConvertToHandlerArgs.class);
-        } catch (NoSuchBeanDefinitionException e) {
+        if (this.messageConvertToHandlerArgs == null) {
             this.messageConvertToHandlerArgs = new DefaultMessageConvertToHandlerArgs();
         }
+        this.initialize = true;
     }
 
     @Override

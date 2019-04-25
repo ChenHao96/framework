@@ -18,16 +18,16 @@ package org.steven.chen.component.process;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.context.ApplicationContext;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
+import org.springframework.util.CollectionUtils;
 import org.steven.chen.component.ComponentService;
 import org.steven.chen.component.process.handler.HandlerFactoryImpl;
 
 import javax.annotation.Resource;
 import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
-import java.util.Map;
-import java.util.Set;
+import java.util.List;
 
 @Component
 public class GameProcessComponent implements ComponentService {
@@ -40,8 +40,8 @@ public class GameProcessComponent implements ComponentService {
     @Resource
     private HandlerFactoryImpl handlerFactory;
 
-    @Resource
-    private ApplicationContext applicationContext;
+    @Autowired(required = false)
+    private List<ProcessHandlerService> processHandlerServices;
 
     @Override
     public String getComponentName() {
@@ -64,12 +64,8 @@ public class GameProcessComponent implements ComponentService {
         if (this.initialized) return;
 
         initialized = false;
-        Map<String, ProcessHandlerService> beanMap = applicationContext.getBeansOfType(ProcessHandlerService.class);
-        if (beanMap.size() > 0) {
-            Set<Map.Entry<String, ProcessHandlerService>> arrays = beanMap.entrySet();
-            for (Map.Entry<String, ProcessHandlerService> entry : arrays) {
-
-                ProcessHandlerService service = entry.getValue();
+        if (!CollectionUtils.isEmpty(processHandlerServices)) {
+            for (ProcessHandlerService service : processHandlerServices) {
                 if (service == null) continue;
 
                 boolean threadSafety = false;

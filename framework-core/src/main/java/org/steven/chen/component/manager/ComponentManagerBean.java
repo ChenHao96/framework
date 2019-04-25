@@ -31,7 +31,7 @@ public class ComponentManagerBean implements ComponentManager {
     private static final String COMPONENT_NAME = "ComponentManagerBean";
     private static final Logger LOGGER = LoggerFactory.getLogger(ComponentManagerBean.class);
 
-    @Autowired
+    @Autowired(required = false)
     private List<ComponentService> componentServiceList;
 
     private boolean error = false;

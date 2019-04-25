@@ -18,63 +18,37 @@ package org.steven.chen.model;
 
 import java.util.concurrent.TimeUnit;
 
-public final class ConfigProperty {
+public class ConfigProperty {
 
-    private static final int DEFAULT_SOCKET_PORT = 8899;
-    private static final long DEFAULT_NO_DATA_WAIT_TIME = TimeUnit.SECONDS.toMillis(30);
+    public static final int DEFAULT_SOCKET_PORT = 8899;
+    public static final long DEFAULT_NO_DATA_WAIT_TIME = TimeUnit.SECONDS.toMillis(30);
+    public static final int DEFAULT_THREAD_POOL_SIZE = (int) (Runtime.getRuntime().availableProcessors() * 2.5);
 
     private Integer socketPort;
     private Long noDataWaitTime;
     private Integer threadPoolSize;
 
-    private static final ConfigProperty self = new ConfigProperty();
-
-    private ConfigProperty() {
+    public Integer getSocketPort() {
+        return socketPort;
     }
 
-    public static ConfigProperty getInstance() {
-        return self;
+    public void setSocketPort(Integer socketPort) {
+        this.socketPort = socketPort;
     }
 
-    public static int getThreadPoolSize() {
-        if (self.threadPoolSize == null || self.threadPoolSize < 1) {
-            int availableProcessors = Runtime.getRuntime().availableProcessors();
-            self.threadPoolSize = (int) (availableProcessors * 2.5);
-        }
-        return self.threadPoolSize;
+    public Long getNoDataWaitTime() {
+        return noDataWaitTime;
     }
 
-    public void setThreadPoolSize(int threadPoolSize) {
-        self.threadPoolSize = threadPoolSize;
+    public void setNoDataWaitTime(Long noDataWaitTime) {
+        this.noDataWaitTime = noDataWaitTime;
     }
 
-    public static Integer getSocketPort() {
-        if (self.socketPort != null) {
-            if (self.socketPort < 1) {
-                self.socketPort = DEFAULT_SOCKET_PORT;
-            }
-        } else {
-            self.socketPort = DEFAULT_SOCKET_PORT;
-        }
-        return self.socketPort;
+    public Integer getThreadPoolSize() {
+        return threadPoolSize;
     }
 
-    public void setSocketPort(int socketPort) {
-        self.socketPort = socketPort;
-    }
-
-    public static long getNoDataWaitTime() {
-        if (self.noDataWaitTime != null) {
-            if (self.noDataWaitTime < DEFAULT_NO_DATA_WAIT_TIME) {
-                self.noDataWaitTime = DEFAULT_NO_DATA_WAIT_TIME;
-            }
-        } else {
-            self.noDataWaitTime = DEFAULT_NO_DATA_WAIT_TIME;
-        }
-        return self.noDataWaitTime;
-    }
-
-    public void setNoDataWaitTime(long noDataWaitTime) {
-        self.noDataWaitTime = noDataWaitTime;
+    public void setThreadPoolSize(Integer threadPoolSize) {
+        this.threadPoolSize = threadPoolSize;
     }
 }
