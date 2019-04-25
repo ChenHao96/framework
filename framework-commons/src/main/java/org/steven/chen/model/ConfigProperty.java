@@ -24,9 +24,9 @@ public class ConfigProperty {
     public static final long DEFAULT_NO_DATA_WAIT_TIME = TimeUnit.SECONDS.toMillis(30);
     public static final int DEFAULT_THREAD_POOL_SIZE = (int) (Runtime.getRuntime().availableProcessors() * 2.5);
 
-    private Integer socketPort;
-    private Long noDataWaitTime;
-    private Integer threadPoolSize;
+    private Integer socketPort = DEFAULT_SOCKET_PORT;
+    private Long noDataWaitTime = DEFAULT_NO_DATA_WAIT_TIME;
+    private Integer threadPoolSize = DEFAULT_THREAD_POOL_SIZE;
 
     public Integer getSocketPort() {
         return socketPort;
