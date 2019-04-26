@@ -24,7 +24,7 @@ import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.TimeUnit;
 
-public interface RedisCacheAdaptor<V> extends CacheAdaptor<String, V>, RedisAdaptor {
+public interface RedisCacheAdaptor<V> extends CacheAdaptor<String, V> {
 
     Set<String> keys(String pattern);
 
@@ -46,11 +46,19 @@ public interface RedisCacheAdaptor<V> extends CacheAdaptor<String, V>, RedisAdap
 
     void increment(String key, BigDecimal delta);
 
+    void decrement(String key);
+
+    void decrement(String key, Long delta);
+
     V hashGet(String key, String field);
 
     Map<String, V> hashGet(String key);
 
     void hashSet(String key, String field, V value);
+
+    void hashIncrement(String key, String field);
+
+    void hashIncrement(String key, String field, BigDecimal delta);
 
     void hashSet(String key, Map<String, V> values);
 

@@ -21,7 +21,7 @@ import io.netty.channel.ChannelHandlerContext;
 import io.netty.handler.codec.ByteToMessageCodec;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.steven.chen.component.socket.connect.CommonsMessage;
+import org.steven.chen.component.net.CommonsMessage;
 
 import java.nio.ByteBuffer;
 import java.util.List;

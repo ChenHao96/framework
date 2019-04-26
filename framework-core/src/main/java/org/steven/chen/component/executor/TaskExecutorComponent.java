@@ -23,10 +23,10 @@ import org.springframework.stereotype.Component;
 import org.steven.chen.component.ComponentService;
 import org.steven.chen.model.ConfigProperty;
 
-import java.util.Queue;
-import java.util.concurrent.ConcurrentLinkedQueue;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
+import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.TimeUnit;
 
 @Component
 public class TaskExecutorComponent implements ComponentService, TaskExecutorService {
@@ -36,10 +36,10 @@ public class TaskExecutorComponent implements ComponentService, TaskExecutorServ
 
     private int poolSize;
     private boolean runnable;
-    private boolean initialized;
-    private Queue<Runnable> taskQueue;
+    private boolean initialized = false;
+    private boolean rebuildExecutor = false;
     private ExecutorService handlerExecutor;
-    private final Object wait = new Object();
+    private ScheduledExecutorService scheduler;
 
     @Autowired(required = false)
     private ConfigProperty configProperty;
@@ -62,74 +62,87 @@ public class TaskExecutorComponent implements ComponentService, TaskExecutorServ
     @Override
     public void initialize() throws Exception {
 
+        int cachePoolSize = configProperty == null ? ConfigProperty.getThreadPoolSizeStatic() : configProperty.getThreadPoolSize();
+        if (cachePoolSize > poolSize) {
+            rebuildExecutor = true;
+            poolSize = cachePoolSize;
+        }
+
         if (this.initialized) {
-            int cachePoolSize = configProperty == null ? ConfigProperty.getThreadPoolSizeStatic() : configProperty.getThreadPoolSize();
-            if (cachePoolSize > poolSize) {
-                poolSize = cachePoolSize;
-                if (handlerExecutor.isTerminated() || handlerExecutor.isShutdown()) {
-                    handlerExecutor = Executors.newFixedThreadPool(poolSize);
-                }
-            }
             LOGGER.warn("{} initialize,do not repeat initialize,please!", COMPONENT_NAME);
             return;
         }
 
-        runnable = initialized = false;
-        taskQueue = new ConcurrentLinkedQueue<>();
-        poolSize = configProperty == null ? ConfigProperty.getThreadPoolSizeStatic() : configProperty.getThreadPoolSize();
-        handlerExecutor = Executors.newFixedThreadPool(poolSize);
         initialized = true;
-    }
-
-    public void addHandler(Runnable task) {
-        if (!runnable) return;
-        taskQueue.add(task);
-        synchronized (wait) {
-            wait.notify();
-        }
     }
 
     @Override
     public void start() throws Exception {
-        if (runnable) return;
+
         if (!this.initialized) {
             LOGGER.warn("initialize is not success.");
             return;
+        } else if (runnable) return;
+
+        runnable = false;
+        checkExecutor();
+        if (rebuildExecutor) {
+            scheduler = Executors.newScheduledThreadPool(poolSize);
+            handlerExecutor = Executors.newFixedThreadPool(poolSize);
+            rebuildExecutor = false;
         }
-        new Thread(new TaskThreadRunnable(), COMPONENT_NAME).start();
+
         runnable = true;
+    }
+
+    private void checkExecutor() throws InterruptedException {
+        checkExecutorShutdown(handlerExecutor);
+        checkExecutorShutdown(scheduler);
+    }
+
+    private void checkExecutorShutdown(ExecutorService executor) throws InterruptedException {
+        if (executor != null) {
+            if (!executor.isShutdown()) {
+                executor.shutdown();
+                while (!executor.isTerminated()) {
+                    Thread.sleep(1000);
+                }
+            }
+        }
     }
 
     @Override
     public void stop() throws Exception {
         if (!runnable) return;
+        checkExecutor();
         runnable = false;
-        synchronized (wait) {
-            wait.notify();
-        }
-        handlerExecutor.shutdown();
-        while (!handlerExecutor.isTerminated()) {
-            Thread.sleep(1000);
-        }
     }
 
-    private class TaskThreadRunnable implements Runnable {
-        @Override
-        public void run() {
-            while (runnable) {
-                Runnable task = taskQueue.poll();
-                if (task == null) {
-                    synchronized (wait) {
-                        try {
-                            wait.wait();
-                        } catch (InterruptedException e) {
-                            LOGGER.warn("", e);
-                        }
-                    }
-                    continue;
-                }
-                handlerExecutor.submit(task);
-            }
-        }
+    @Override
+    public void addHandler(Runnable task) {
+        if (!runnable) return;
+        handlerExecutor.submit(task);
+    }
+
+    @Override
+    public void addHandlerDelay(Runnable task, long delay, TimeUnit unit) {
+        addHandlerDelay(task, 0, delay, unit);
+    }
+
+    @Override
+    public void addHandlerDelay(Runnable task, long initialDelay, long delay, TimeUnit unit) {
+        if (!runnable) return;
+        scheduler.scheduleWithFixedDelay(task, initialDelay, delay, unit);
+    }
+
+    @Override
+    public void addHandlerRate(Runnable task, long period, TimeUnit unit) {
+        addHandlerRate(task, 0, period, unit);
+    }
+
+    @Override
+    public void addHandlerRate(Runnable task, long initialDelay, long period, TimeUnit unit) {
+        if (!runnable) return;
+        scheduler.scheduleAtFixedRate(task, initialDelay, period, unit);
     }
 }

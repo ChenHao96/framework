@@ -13,9 +13,11 @@ import org.steven.chen.component.process.ProcessHandlerService;
 import org.steven.chen.component.process.ProcessInvokeService;
 
 import java.lang.reflect.Method;
+import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
 
+@Deprecated
 public class InvocableHandlerMethod extends HandlerMethod implements ProcessInvokeService {
 
     private ParameterNameDiscoverer parameterNameDiscoverer = new DefaultParameterNameDiscoverer();
@@ -55,7 +57,7 @@ public class InvocableHandlerMethod extends HandlerMethod implements ProcessInvo
      * @return 返回对应的参数列表
      * @throws Exception
      */
-    private Object[] getMethodArgumentValues(Map<String, Object> providedArgs) throws Exception {
+    protected Object[] getMethodArgumentValues(Map<String, Object> providedArgs) throws Exception {
         MethodParameter[] parameters = getMethodParameters();
         Object[] args = new Object[parameters.length];
         for (int i = 0; i < parameters.length; i++) {
@@ -80,12 +82,34 @@ public class InvocableHandlerMethod extends HandlerMethod implements ProcessInvo
         return args;
     }
 
-    private Object resolveProvidedArgument(MethodParameter parameter, Map<String, Object> providedArgs) {
+    private static final Map<Class, Class> baseNumberType = toBaseNumberType();
+
+    private static Map<Class, Class> toBaseNumberType() {
+        Map<Class, Class> result = new HashMap<>(8);
+        result.put(long.class, Long.class);
+        result.put(int.class, Integer.class);
+        result.put(double.class, Double.class);
+        result.put(byte.class, Byte.class);
+        result.put(short.class, Short.class);
+        result.put(float.class, Float.class);
+        result.put(boolean.class, Boolean.class);
+        result.put(char.class, Character.class);
+        return result;
+    }
+
+    private static Class<?> getParameterType(Class<?> clazz) {
+        Class result = baseNumberType.get(clazz);
+        return result == null ? clazz : result;
+    }
+
+    protected Object resolveProvidedArgument(MethodParameter parameter, Map<String, Object> providedArgs) {
         if (providedArgs == null) return null;
-        if (parameter.getParameterType().isInstance(providedArgs)) return providedArgs;
+        Class<?> parameterType = getParameterType(parameter.getParameterType());
+        if (parameterType.isInstance(providedArgs)) return providedArgs;
         Set<Map.Entry<String, Object>> entries = providedArgs.entrySet();
         for (Map.Entry<String, Object> entry : entries) {
-            if (parameter.getParameterType().isInstance(entry.getValue())) {
+            if (parameterType.isInstance(entry.getValue())) {
+                //TODO:NullPointerException
                 if (parameter.getParameterName().equals(entry.getKey())) {
                     return entry.getValue();
                 }
@@ -114,7 +138,7 @@ public class InvocableHandlerMethod extends HandlerMethod implements ProcessInvo
         return BeanUtils.instantiateClass(parameter.getParameterType());
     }
 
-    protected Object createAttributeFromRequestValue(Object sourceValue, String attributeName, MethodParameter parameter) {
+    private Object createAttributeFromRequestValue(Object sourceValue, String attributeName, MethodParameter parameter) {
         DataBinder binder = new DataBinder(sourceValue, attributeName);
         ConversionService conversionService = binder.getConversionService();
         TypeDescriptor source = TypeDescriptor.valueOf(sourceValue.getClass());
@@ -125,11 +149,11 @@ public class InvocableHandlerMethod extends HandlerMethod implements ProcessInvo
         return null;
     }
 
-    private boolean supportsParameter(MethodParameter parameter) {
+    protected boolean supportsParameter(MethodParameter parameter) {
         return !BeanUtils.isSimpleProperty(parameter.getParameterType());
     }
 
-    private String getArgumentResolutionErrorMessage(MethodParameter parameter, String text) {
+    protected String getArgumentResolutionErrorMessage(MethodParameter parameter, String text) {
         Class<?> paramType = parameter.getParameterType();
         return String.format("%s argument %d of type '%s'", text, parameter.getParameterIndex(), paramType.getName());
     }

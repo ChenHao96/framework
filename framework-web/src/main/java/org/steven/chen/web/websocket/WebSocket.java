@@ -21,11 +21,11 @@ import org.springframework.web.socket.TextMessage;
 import org.springframework.web.socket.WebSocketSession;
 import org.springframework.web.socket.handler.TextWebSocketHandler;
 import org.steven.chen.component.executor.TaskExecutorService;
+import org.steven.chen.component.net.CommonsMessage;
+import org.steven.chen.component.net.MessageConvertToHandlerArgs;
+import org.steven.chen.component.net.SocketHandlerTask;
 import org.steven.chen.component.process.ProcessInvokeService;
 import org.steven.chen.component.process.handler.HandlerFactory;
-import org.steven.chen.component.socket.connect.CommonsMessage;
-import org.steven.chen.component.socket.connect.MessageConvertToHandlerArgs;
-import org.steven.chen.component.socket.connect.SocketHandlerTask;
 import org.steven.chen.utils.JsonUtils;
 import org.steven.chen.utils.encrypt.MD5Utils;
 

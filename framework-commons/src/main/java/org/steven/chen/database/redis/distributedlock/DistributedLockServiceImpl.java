@@ -18,9 +18,8 @@ package org.steven.chen.database.redis.distributedlock;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.data.redis.core.RedisCallback;
-import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Service;
+import org.steven.chen.database.redis.RedisAdaptor;
 import org.steven.chen.utils.StringUtil;
 import redis.clients.jedis.Jedis;
 import redis.clients.jedis.JedisCluster;
@@ -44,7 +43,7 @@ public class DistributedLockServiceImpl implements DistributedLockService {
     private static final String EXPIRE_LOCK_SCRIPT = "  if redis.call(\"get\",KEYS[1]) == ARGV[1] then\n    return redis.call(\"expire\",KEYS[1],ARGV[2])\n  else\n        return 0\n  end\n";
 
     @Resource
-    private RedisTemplate redisTemplate;
+    private RedisAdaptor redisAdaptor;
 
     public boolean tryLock(String businessCode, String uniqueKey) {
         return tryLock(businessCode, uniqueKey, LOCK_EXPIRE_TIME_SECOND);
@@ -70,7 +69,7 @@ public class DistributedLockServiceImpl implements DistributedLockService {
         final String key = generateKey(businessCode, uniqueKey);
 
         try {
-            String result = (String) redisTemplate.execute((RedisCallback<String>) connection -> {
+            String result = redisAdaptor.execute(connection -> {
                 JedisCommands commands = (JedisCommands) connection.getNativeConnection();
                 return commands.set(key, token, new SetParams().nx().ex(expireTimeSeconds));
             });
@@ -113,7 +112,7 @@ public class DistributedLockServiceImpl implements DistributedLockService {
 
     private boolean compareTokenAndExpireKey(String key, String token, int expireTimeSeconds) {
         if (StringUtil.isNotBlank(token)) {
-            Long result = (Long) redisTemplate.execute((RedisCallback<Long>) connection -> {
+            Long result = redisAdaptor.execute(connection -> {
                 Object nativeConnection = connection.getNativeConnection();
                 if (nativeConnection instanceof JedisCluster) {// 集群模式
                     return (Long) ((JedisCluster) nativeConnection).eval(EXPIRE_LOCK_SCRIPT, Collections.singletonList(key), Arrays.asList(token, String.valueOf(expireTimeSeconds)));
@@ -132,7 +131,7 @@ public class DistributedLockServiceImpl implements DistributedLockService {
 
     private void compareTokenAndDelKey(String key, String token) {
         if (StringUtil.isNotBlank(token)) {
-            Long result = (Long) redisTemplate.execute((RedisCallback<Long>) connection -> {
+            Long result = redisAdaptor.execute(connection -> {
                 Object nativeConnection = connection.getNativeConnection();
                 if (nativeConnection instanceof JedisCluster) {// 集群模式
                     return (Long) ((JedisCluster) nativeConnection).eval(UNLOCK_SCRIPT, Collections.singletonList(key), Collections.singletonList(token));

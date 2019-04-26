@@ -19,11 +19,11 @@ package org.steven.chen.component.netty;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.SimpleChannelInboundHandler;
 import org.steven.chen.component.executor.TaskExecutorService;
+import org.steven.chen.component.net.CommonsMessage;
+import org.steven.chen.component.net.MessageConvertToHandlerArgs;
+import org.steven.chen.component.net.SocketHandlerTask;
 import org.steven.chen.component.process.ProcessInvokeService;
 import org.steven.chen.component.process.handler.HandlerFactory;
-import org.steven.chen.component.socket.connect.CommonsMessage;
-import org.steven.chen.component.socket.connect.MessageConvertToHandlerArgs;
-import org.steven.chen.component.socket.connect.SocketHandlerTask;
 
 public class NettySocketFrameHandler extends SimpleChannelInboundHandler<CommonsMessage> {
 

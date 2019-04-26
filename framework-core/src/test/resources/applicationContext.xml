@@ -8,5 +8,7 @@
 
     <bean class="org.steven.chen.utils.mapper.Jackson2FlatMapper"/>
     <context:component-scan base-package="org.steven.chen.component"/>
-    <bean class="org.steven.chen.component.socket.ServerSocketComponent"/>
+
+    <context:component-scan base-package="org.steven.chen.game.handler"/>
+    <!--<bean class="org.steven.chen.component.socket.ServerSocketComponent"/>-->
 </beans>

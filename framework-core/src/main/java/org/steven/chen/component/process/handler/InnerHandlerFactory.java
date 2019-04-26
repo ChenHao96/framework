@@ -14,17 +14,15 @@
  * limitations under the License.
  */
 
-package org.steven.chen.component.socket.connect;
+package org.steven.chen.component.process.handler;
 
-import java.util.Map;
+import org.steven.chen.component.process.ProcessHandlerService;
 
-public interface MessageConvertToHandlerArgs {
+import java.lang.reflect.Method;
 
-    void setCommonsMessage(CommonsMessage message);
+public interface InnerHandlerFactory {
 
-    void removeCommonsMessage();
+    void addHandlerStop();
 
-    Map<String, Object> convertArgs();
-
-    CommonsMessage convertMessageReturn(Object obj);
+    void addHandler(byte masterCode, byte slaveCode, ProcessHandlerService bean, Method handler, boolean threadSafety);
 }

@@ -22,9 +22,9 @@ import io.netty.channel.ChannelOption;
 import io.netty.channel.socket.SocketChannel;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.steven.chen.component.executor.TaskExecutorService;
+import org.steven.chen.component.net.DefaultMessageConvertToHandlerArgs;
+import org.steven.chen.component.net.MessageConvertToHandlerArgs;
 import org.steven.chen.component.process.handler.HandlerFactory;
-import org.steven.chen.component.socket.connect.DefaultMessageConvertToHandlerArgs;
-import org.steven.chen.component.socket.connect.MessageConvertToHandlerArgs;
 
 import javax.annotation.Resource;
 

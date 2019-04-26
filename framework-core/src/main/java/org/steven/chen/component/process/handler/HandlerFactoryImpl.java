@@ -18,7 +18,6 @@ package org.steven.chen.component.process.handler;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.stereotype.Service;
 import org.steven.chen.component.process.ProcessHandlerService;
 import org.steven.chen.component.process.ProcessInvokeService;
 
@@ -27,8 +26,8 @@ import java.util.Map;
 import java.util.Set;
 import java.util.TreeMap;
 
-@Service
-public class HandlerFactoryImpl implements HandlerFactory {
+@Deprecated
+public class HandlerFactoryImpl implements HandlerFactory, InnerHandlerFactory {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(HandlerFactoryImpl.class);
 
@@ -51,6 +50,7 @@ public class HandlerFactoryImpl implements HandlerFactory {
         return invokeServiceMap.get(slaveCode);
     }
 
+    @Override
     public void addHandlerStop() {
 
         if (this.serviceMethod != null) {
@@ -76,6 +76,7 @@ public class HandlerFactoryImpl implements HandlerFactory {
         this.addFinish = true;
     }
 
+    @Override
     public void addHandler(byte masterCode, byte slaveCode, ProcessHandlerService bean, Method handler, boolean threadSafety) {
 
         if (bean == null || handler == null) return;
@@ -96,8 +97,12 @@ public class HandlerFactoryImpl implements HandlerFactory {
         this.serviceMethod.put(masterCode, methodMap);
 
         Map<Byte, ProcessInvokeService> invokeServiceMap = getProcessInvoke(masterCode);
-        invokeServiceMap.put(slaveCode, threadSafety ? new InvocableHandlerMethodThreadSafety(bean, handler) : new InvocableHandlerMethod(bean, handler));
+        invokeServiceMap.put(slaveCode, putHandlerMethod(threadSafety, bean, handler));
         this.process.put(masterCode, invokeServiceMap);
+    }
+
+    protected ProcessInvokeService putHandlerMethod(boolean threadSafety, ProcessHandlerService bean, Method handler) {
+        return threadSafety ? new InvocableHandlerMethodThreadSafety(bean, handler) : new InvocableHandlerMethod(bean, handler);
     }
 
     private Map<Byte, Method> getProcessMethodMap(byte masterCode) {

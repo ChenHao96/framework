@@ -16,6 +16,17 @@
 
 package org.steven.chen.component.executor;
 
+import java.util.concurrent.TimeUnit;
+
 public interface TaskExecutorService {
+
     void addHandler(Runnable task);
+
+    void addHandlerDelay(Runnable task, long delay, TimeUnit unit);
+
+    void addHandlerDelay(Runnable task, long initialDelay, long delay, TimeUnit unit);
+
+    void addHandlerRate(Runnable task, long period, TimeUnit unit);
+
+    void addHandlerRate(Runnable task, long initialDelay, long period, TimeUnit unit);
 }

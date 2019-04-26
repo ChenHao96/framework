@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package org.steven.chen.component.socket.connect;
+package org.steven.chen.component.net;
 
 import org.steven.chen.utils.mapper.Jackson2FlatMapper;
 
@@ -36,6 +36,7 @@ public class DefaultMessageConvertToHandlerArgs implements MessageConvertToHandl
         return message;
     }
 
+    @Override
     public void setCommonsMessage(CommonsMessage message) {
         holder.set(message);
     }

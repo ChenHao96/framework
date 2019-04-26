@@ -19,10 +19,10 @@ package org.steven.chen.component.socket;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.util.Assert;
-import org.steven.chen.component.socket.connect.CommonsMessage;
-import org.steven.chen.component.socket.connect.ConnectionCloseProcess;
-import org.steven.chen.component.socket.connect.DefaultConnectionContext;
-import org.steven.chen.component.socket.connect.MessageConvertToHandlerArgs;
+import org.steven.chen.component.net.CommonsMessage;
+import org.steven.chen.component.net.ConnectionCloseProcess;
+import org.steven.chen.component.net.DefaultConnectionContext;
+import org.steven.chen.component.net.MessageConvertToHandlerArgs;
 import org.steven.chen.utils.CommonsUtil;
 
 import java.io.DataInputStream;

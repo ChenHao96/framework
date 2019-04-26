@@ -16,13 +16,13 @@
 
 package org.steven.chen.database.redis;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.redis.connection.DataType;
 import org.springframework.data.redis.core.BoundHashOperations;
 import org.springframework.data.redis.core.BoundValueOperations;
 import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.stereotype.Service;
 
+import javax.annotation.Resource;
 import java.math.BigDecimal;
 import java.util.Date;
 import java.util.Map;
@@ -30,9 +30,9 @@ import java.util.Set;
 import java.util.concurrent.TimeUnit;
 
 @Service
-public class SpringRedisStringCacheAdaptorImpl implements RedisStringCacheAdaptor {
+public class RedisStringCacheAdaptorImpl implements RedisStringCacheAdaptor {
 
-    @Autowired
+    @Resource
     private StringRedisTemplate redisTemplate;
 
     @Override
@@ -104,13 +104,25 @@ public class SpringRedisStringCacheAdaptorImpl implements RedisStringCacheAdapto
     @Override
     public void increment(String key) {
         BoundValueOperations<String, String> operations = redisTemplate.boundValueOps(key);
-        operations.increment(1);
+        operations.increment();
     }
 
     @Override
     public void increment(String key, BigDecimal delta) {
         BoundValueOperations<String, String> operations = redisTemplate.boundValueOps(key);
         operations.increment(delta.doubleValue());
+    }
+
+    @Override
+    public void decrement(String key) {
+        BoundValueOperations<String, String> operations = redisTemplate.boundValueOps(key);
+        operations.decrement();
+    }
+
+    @Override
+    public void decrement(String key, Long delta) {
+        BoundValueOperations<String, String> operations = redisTemplate.boundValueOps(key);
+        operations.decrement(delta);
     }
 
     @Override
@@ -129,6 +141,18 @@ public class SpringRedisStringCacheAdaptorImpl implements RedisStringCacheAdapto
     public void hashSet(String key, String field, String value) {
         BoundHashOperations<String, String, String> operations = redisTemplate.boundHashOps(key);
         operations.put(field, value);
+    }
+
+    @Override
+    public void hashIncrement(String key, String field) {
+        BoundHashOperations<String, String, String> operations = redisTemplate.boundHashOps(key);
+        operations.increment(field, 1);
+    }
+
+    @Override
+    public void hashIncrement(String key, String field, BigDecimal delta) {
+        BoundHashOperations<String, String, String> operations = redisTemplate.boundHashOps(key);
+        operations.increment(field, delta.doubleValue());
     }
 
     @Override

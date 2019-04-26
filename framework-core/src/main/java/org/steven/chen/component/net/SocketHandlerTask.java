@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package org.steven.chen.component.socket.connect;
+package org.steven.chen.component.net;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

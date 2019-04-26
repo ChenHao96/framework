@@ -20,7 +20,7 @@ import io.netty.channel.ChannelHandlerContext;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.util.Assert;
-import org.steven.chen.component.socket.connect.*;
+import org.steven.chen.component.net.*;
 
 import java.io.IOException;
 import java.net.InetSocketAddress;

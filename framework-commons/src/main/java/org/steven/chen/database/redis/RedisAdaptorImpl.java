@@ -16,9 +16,24 @@
 
 package org.steven.chen.database.redis;
 
+import org.springframework.data.redis.core.ReactiveStringRedisTemplate;
 import org.springframework.data.redis.core.RedisCallback;
+import org.springframework.data.redis.core.StringRedisTemplate;
+import org.springframework.stereotype.Service;
 
-public interface RedisAdaptor {
+import javax.annotation.Resource;
 
-    <T> T execute(RedisCallback<T> action);
+@Service
+public class RedisAdaptorImpl implements RedisAdaptor, RedisReactiveAdaptor {
+
+    @Resource
+    private StringRedisTemplate redisTemplate;
+
+    @Resource
+    private ReactiveStringRedisTemplate reactiveStringRedisTemplate;
+
+    @Override
+    public <T> T execute(RedisCallback<T> action) {
+        return redisTemplate.execute(action);
+    }
 }

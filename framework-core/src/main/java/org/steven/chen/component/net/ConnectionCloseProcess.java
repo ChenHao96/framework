@@ -14,14 +14,11 @@
  * limitations under the License.
  */
 
-package org.steven.chen.component.socket;
-
-import org.steven.chen.component.net.CommonsMessage;
-import org.steven.chen.component.net.ConnectionContext;
+package org.steven.chen.component.net;
 
 import java.io.IOException;
 
-public interface SocketConnectionContext extends ConnectionContext {
+public interface ConnectionCloseProcess {
 
-    CommonsMessage receiveMessage() throws IOException;
+    void process(ConnectionContext context) throws IOException;
 }

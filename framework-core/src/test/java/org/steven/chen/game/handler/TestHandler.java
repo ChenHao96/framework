@@ -1,0 +1,42 @@
+/**
+ * Copyright 2019 ChenHao96
+ * <p>
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ * <p>
+ * http://www.apache.org/licenses/LICENSE-2.0
+ * <p>
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
+package org.steven.chen.game.handler;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.stereotype.Component;
+import org.steven.chen.component.process.HandlerMapping;
+import org.steven.chen.component.process.ProcessHandlerService;
+import org.steven.chen.game.model.TestModel;
+
+import java.util.Map;
+import java.util.Set;
+
+@Component
+@HandlerMapping(1)
+public class TestHandler implements ProcessHandlerService {
+
+    private static final Logger LOGGER = LoggerFactory.getLogger(TestHandler.class);
+
+    @HandlerMapping(1)
+    public void say(int code, String name, TestModel model,Set<TestModel> cards, Map<String, Object> ext) {
+        LOGGER.info("say model:{}", model);
+        LOGGER.info("say code:{},name:{}", code, name);
+        LOGGER.info("say cards:{}", cards);
+        LOGGER.info("say ext:{}", ext);
+    }
+}

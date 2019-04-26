@@ -21,10 +21,10 @@ import org.slf4j.LoggerFactory;
 import org.springframework.util.Assert;
 import org.springframework.web.socket.TextMessage;
 import org.springframework.web.socket.WebSocketSession;
-import org.steven.chen.component.socket.connect.CommonsMessage;
-import org.steven.chen.component.socket.connect.ConnectionCloseProcess;
-import org.steven.chen.component.socket.connect.ConnectionContext;
-import org.steven.chen.component.socket.connect.MessageConvertToHandlerArgs;
+import org.steven.chen.component.net.CommonsMessage;
+import org.steven.chen.component.net.ConnectionCloseProcess;
+import org.steven.chen.component.net.ConnectionContext;
+import org.steven.chen.component.net.MessageConvertToHandlerArgs;
 import org.steven.chen.utils.JsonUtils;
 
 import java.io.IOException;

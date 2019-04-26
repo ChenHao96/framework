@@ -23,8 +23,12 @@ import org.junit.runner.RunWith;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import org.steven.chen.component.manager.ComponentManager;
+import org.steven.chen.component.process.ProcessInvokeService;
+import org.steven.chen.component.process.handler.HandlerFactory;
 
 import javax.annotation.Resource;
+import java.util.HashMap;
+import java.util.Map;
 
 @RunWith(SpringJUnit4ClassRunner.class)
 @ContextConfiguration("classpath:applicationContext.xml")
@@ -32,6 +36,9 @@ public class TestCode {
 
     @Resource
     private ComponentManager componentManager;
+
+    @Resource
+    private HandlerFactory handlerFactory;
 
     @Before
     public void before() {
@@ -42,8 +49,20 @@ public class TestCode {
     }
 
     @Test
-    public void testApp(){
-
+    public void testApp() throws Exception {
+        ProcessInvokeService invokeService = handlerFactory.getProcessMethod((byte) 1, (byte) 1);
+        if (invokeService != null) {
+            Map<String,Object> param = new HashMap<>();
+            param.put("code",1);
+//            param.put("name",1L);
+            param.put("name2",'a');
+//            param.put("cards",1D);
+            param.put("name3",(byte)1);
+            param.put("name4",(short)1);
+//            param.put("ext",(float)1);
+            param.put("ext2",false);
+            invokeService.invokeProcess(param);
+        }
     }
 
     @After

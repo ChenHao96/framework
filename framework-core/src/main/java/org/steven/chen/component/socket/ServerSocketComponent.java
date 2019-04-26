@@ -21,12 +21,12 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.steven.chen.component.ComponentService;
 import org.steven.chen.component.executor.TaskExecutorService;
+import org.steven.chen.component.net.CommonsMessage;
+import org.steven.chen.component.net.DefaultMessageConvertToHandlerArgs;
+import org.steven.chen.component.net.MessageConvertToHandlerArgs;
+import org.steven.chen.component.net.SocketHandlerTask;
 import org.steven.chen.component.process.ProcessInvokeService;
 import org.steven.chen.component.process.handler.HandlerFactory;
-import org.steven.chen.component.socket.connect.CommonsMessage;
-import org.steven.chen.component.socket.connect.DefaultMessageConvertToHandlerArgs;
-import org.steven.chen.component.socket.connect.MessageConvertToHandlerArgs;
-import org.steven.chen.component.socket.connect.SocketHandlerTask;
 import org.steven.chen.model.ConfigProperty;
 import org.steven.chen.utils.CommonsUtil;
 

@@ -14,11 +14,9 @@
  * limitations under the License.
  */
 
-package org.steven.chen.component.socket.connect;
+package org.steven.chen.database.redis;
 
-import java.io.IOException;
+public interface RedisReactiveAdaptor {
 
-public interface ConnectionCloseProcess {
 
-    void process(ConnectionContext context) throws IOException;
 }

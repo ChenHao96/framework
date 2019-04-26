@@ -14,14 +14,17 @@
  * limitations under the License.
  */
 
-package org.steven.chen.component.socket;
+package org.steven.chen.component.net;
 
-import org.steven.chen.component.net.CommonsMessage;
-import org.steven.chen.component.net.ConnectionContext;
+import java.util.Map;
 
-import java.io.IOException;
+public interface MessageConvertToHandlerArgs {
 
-public interface SocketConnectionContext extends ConnectionContext {
+    void setCommonsMessage(CommonsMessage message);
 
-    CommonsMessage receiveMessage() throws IOException;
+    void removeCommonsMessage();
+
+    Map<String, Object> convertArgs();
+
+    CommonsMessage convertMessageReturn(Object obj);
 }

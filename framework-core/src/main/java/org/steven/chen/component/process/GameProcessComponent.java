@@ -22,7 +22,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import org.springframework.util.CollectionUtils;
 import org.steven.chen.component.ComponentService;
-import org.steven.chen.component.process.handler.HandlerFactoryImpl;
+import org.steven.chen.component.process.handler.InnerHandlerFactory;
 
 import javax.annotation.Resource;
 import java.lang.reflect.Method;
@@ -38,7 +38,7 @@ public class GameProcessComponent implements ComponentService {
     private boolean initialized;
 
     @Resource
-    private HandlerFactoryImpl handlerFactory;
+    private InnerHandlerFactory handlerFactory;
 
     @Autowired(required = false)
     private List<ProcessHandlerService> processHandlerServices;

@@ -14,14 +14,23 @@
  * limitations under the License.
  */
 
-package org.steven.chen.component.socket;
+package org.steven.chen.component.process.handler;
 
-import org.steven.chen.component.net.CommonsMessage;
-import org.steven.chen.component.net.ConnectionContext;
+import org.steven.chen.component.process.ProcessHandlerService;
 
-import java.io.IOException;
+import java.lang.reflect.Method;
+import java.util.Map;
 
-public interface SocketConnectionContext extends ConnectionContext {
+public class NewHandlerMethodThreadSafety extends NewHandlerMethod {
 
-    CommonsMessage receiveMessage() throws IOException;
+    public NewHandlerMethodThreadSafety(ProcessHandlerService bean, Method method) {
+        super(bean, method);
+    }
+
+    @Override
+    public Object invokeProcess(Map<String, Object> args) throws Exception {
+        synchronized (getBean()) {
+            return super.invokeProcess(args);
+        }
+    }
 }
