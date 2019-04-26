@@ -53,10 +53,7 @@ public abstract class AbstractNettyComponent implements ComponentService {
     public void initialize() throws Exception {
         if (this.initialize) return;
         this.initialize = false;
-        if (this.configProperty == null) {
-            this.configProperty = ConfigProperty.getInstance();
-        }
-        if (this.configProperty.getSocketSsl()) {
+        if (configProperty == null ? ConfigProperty.getSocketSslStatic() : configProperty.getSocketSsl()) {
             SelfSignedCertificate ssc = new SelfSignedCertificate();
             this.sslCtx = SslContextBuilder.forServer(ssc.certificate(), ssc.privateKey()).build();
         }
@@ -76,7 +73,7 @@ public abstract class AbstractNettyComponent implements ComponentService {
         if (!this.start) return;
         if (!this.initialize) return;
         this.start = false;
-        int port = this.configProperty.getSocketPort();
+        int port = configProperty == null ? ConfigProperty.getSocketPortStatic() : configProperty.getSocketPort();
         this.bootstrap.bind(port).sync();
         this.start = true;
     }

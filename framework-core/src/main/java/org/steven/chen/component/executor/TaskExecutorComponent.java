@@ -62,13 +62,10 @@ public class TaskExecutorComponent implements ComponentService, TaskExecutorServ
     @Override
     public void initialize() throws Exception {
 
-        if (this.configProperty == null) {
-            this.configProperty = ConfigProperty.getInstance();
-        }
-
         if (this.initialized) {
-            if (configProperty.getThreadPoolSize() > poolSize) {
-                poolSize = configProperty.getThreadPoolSize();
+            int cachePoolSize = configProperty == null ? ConfigProperty.getThreadPoolSizeStatic() : configProperty.getThreadPoolSize();
+            if (cachePoolSize > poolSize) {
+                poolSize = cachePoolSize;
                 if (handlerExecutor.isTerminated() || handlerExecutor.isShutdown()) {
                     handlerExecutor = Executors.newFixedThreadPool(poolSize);
                 }
@@ -79,7 +76,7 @@ public class TaskExecutorComponent implements ComponentService, TaskExecutorServ
 
         runnable = initialized = false;
         taskQueue = new ConcurrentLinkedQueue<>();
-        poolSize = configProperty.getThreadPoolSize();
+        poolSize = configProperty == null ? ConfigProperty.getThreadPoolSizeStatic() : configProperty.getThreadPoolSize();
         handlerExecutor = Executors.newFixedThreadPool(poolSize);
         initialized = true;
     }
