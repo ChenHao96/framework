@@ -38,7 +38,6 @@ import java.net.SocketException;
 import java.util.Queue;
 import java.util.concurrent.ConcurrentLinkedQueue;
 
-@Deprecated
 public class ServerSocketComponent implements ComponentService {
 
     private static final String COMPONENT_NAME = "ServerSocketComponent";
