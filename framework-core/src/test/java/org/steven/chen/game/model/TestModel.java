@@ -16,14 +16,15 @@
 
 package org.steven.chen.game.model;
 
+import java.util.HashSet;
 import java.util.Map;
-import java.util.Set;
 
 public class TestModel {
 
     private int code;
     private String name;
-    private Set<TestModel> cards;
+    private TestModel model;
+    private HashSet<TestModel> cards;
     private Map<String, Object> ext;
 
     public int getCode() {
@@ -42,11 +43,11 @@ public class TestModel {
         this.name = name;
     }
 
-    public Set<TestModel> getCards() {
+    public HashSet<TestModel> getCards() {
         return cards;
     }
 
-    public void setCards(Set<TestModel> cards) {
+    public void setCards(HashSet<TestModel> cards) {
         this.cards = cards;
     }
 
@@ -58,12 +59,21 @@ public class TestModel {
         this.ext = ext;
     }
 
+    public TestModel getModel() {
+        return model;
+    }
+
+    public void setModel(TestModel model) {
+        this.model = model;
+    }
+
     @Override
     public String toString() {
         final StringBuilder sb = new StringBuilder("TestModel{");
         sb.append("code=").append(code);
         sb.append(", name='").append(name).append('\'');
         sb.append(", cards=").append(cards);
+        sb.append(", model=").append(model);
         sb.append(", ext=").append(ext);
         sb.append('}');
         return sb.toString();

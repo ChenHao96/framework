@@ -16,21 +16,18 @@
 
 package org.steven.chen.component.process.handler;
 
-import org.steven.chen.component.process.ProcessHandlerService;
+import org.springframework.core.annotation.AliasFor;
 
-import java.lang.reflect.Method;
-import java.util.Map;
+import java.lang.annotation.*;
 
-public class NewHandlerMethodThreadSafety extends NewHandlerMethod {
+@Documented
+@Target(ElementType.PARAMETER)
+@Retention(RetentionPolicy.RUNTIME)
+public @interface MapParameter {
 
-    public NewHandlerMethodThreadSafety(ProcessHandlerService bean, Method method) {
-        super(bean, method);
-    }
+    @AliasFor("prefix")
+    String value() default "";
 
-    @Override
-    public Object invokeProcess(Map<String, Object> args) throws Exception {
-        synchronized (getBean()) {
-            return super.invokeProcess(args);
-        }
-    }
+    @AliasFor("value")
+    String prefix() default "";
 }

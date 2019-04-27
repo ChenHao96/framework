@@ -60,16 +60,6 @@ public final class Jackson2FlatMapper {
         }
     }
 
-//    public void fromFlatMapper(Map<String, ?> target, Object obj) {
-//        try {
-//            Map<String, Object> cacheMap = fromFlatMapper(target);
-//
-//            return mapper.readValue(mapper.writeValueAsString(cacheMap), clazz);
-//        } catch (Exception e) {
-//            throw new RuntimeException(e);
-//        }
-//    }
-
     public Map<String, Object> toFlatMapper(Object object) {
         Map<String, Object> resultMap = new LinkedHashMap<>();
         try {

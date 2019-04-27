@@ -21,10 +21,11 @@ import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
 import org.steven.chen.component.process.HandlerMapping;
 import org.steven.chen.component.process.ProcessHandlerService;
+import org.steven.chen.component.process.handler.MapParameter;
 import org.steven.chen.game.model.TestModel;
 
+import java.util.HashSet;
 import java.util.Map;
-import java.util.Set;
 
 @Component
 @HandlerMapping(1)
@@ -33,7 +34,7 @@ public class TestHandler implements ProcessHandlerService {
     private static final Logger LOGGER = LoggerFactory.getLogger(TestHandler.class);
 
     @HandlerMapping(1)
-    public void say(int code, String name, TestModel model,Set<TestModel> cards, Map<String, Object> ext) {
+    public void say(int code, String name, TestModel model, HashSet<TestModel> cards, @MapParameter(prefix = "ext") Map<String, Object> ext) {
         LOGGER.info("say model:{}", model);
         LOGGER.info("say code:{},name:{}", code, name);
         LOGGER.info("say cards:{}", cards);

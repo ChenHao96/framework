@@ -18,6 +18,7 @@ package org.steven.chen.component.process.handler;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.stereotype.Service;
 import org.steven.chen.component.process.ProcessHandlerService;
 import org.steven.chen.component.process.ProcessInvokeService;
 
@@ -26,7 +27,7 @@ import java.util.Map;
 import java.util.Set;
 import java.util.TreeMap;
 
-@Deprecated
+@Service
 public class HandlerFactoryImpl implements HandlerFactory, InnerHandlerFactory {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(HandlerFactoryImpl.class);
@@ -101,7 +102,7 @@ public class HandlerFactoryImpl implements HandlerFactory, InnerHandlerFactory {
         this.process.put(masterCode, invokeServiceMap);
     }
 
-    protected ProcessInvokeService putHandlerMethod(boolean threadSafety, ProcessHandlerService bean, Method handler) {
+    private ProcessInvokeService putHandlerMethod(boolean threadSafety, ProcessHandlerService bean, Method handler) {
         return threadSafety ? new InvocableHandlerMethodThreadSafety(bean, handler) : new InvocableHandlerMethod(bean, handler);
     }
 

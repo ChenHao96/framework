@@ -14,19 +14,25 @@
  * limitations under the License.
  */
 
-package org.steven.chen.component.process.handler;
+package org.steven.chen.game;
 
-import org.springframework.stereotype.Service;
-import org.steven.chen.component.process.ProcessHandlerService;
-import org.steven.chen.component.process.ProcessInvokeService;
+import org.steven.chen.utils.mapper.Jackson2FlatMapper;
 
-import java.lang.reflect.Method;
+import java.util.HashMap;
+import java.util.Map;
 
-@Service
-public class HandlerFactoryNewImpl extends HandlerFactoryImpl {
+public class TestJackson2FlatMapper {
 
-    @Override
-    protected ProcessInvokeService putHandlerMethod(boolean threadSafety, ProcessHandlerService bean, Method handler) {
-        return threadSafety ? new NewHandlerMethodThreadSafety(bean, handler) : new NewHandlerMethod(bean, handler);
+    private static final Jackson2FlatMapper jackson2FlatMapper = new Jackson2FlatMapper();
+
+    public static void main(String[] args) {
+
+        Map<String, Object> param = new HashMap<>();
+        param.put("code", 1);
+        param.put("name", "name");
+        param.put("cards[0].code", 1);
+        param.put("model.code", 1);
+        param = jackson2FlatMapper.fromFlatMapper(param);
+        System.out.println(param);
     }
 }

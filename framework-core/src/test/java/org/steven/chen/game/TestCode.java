@@ -52,15 +52,12 @@ public class TestCode {
     public void testApp() throws Exception {
         ProcessInvokeService invokeService = handlerFactory.getProcessMethod((byte) 1, (byte) 1);
         if (invokeService != null) {
-            Map<String,Object> param = new HashMap<>();
-            param.put("code",1);
-//            param.put("name",1L);
-            param.put("name2",'a');
-//            param.put("cards",1D);
-            param.put("name3",(byte)1);
-            param.put("name4",(short)1);
-//            param.put("ext",(float)1);
-            param.put("ext2",false);
+            Map<String, Object> param = new HashMap<>();
+            param.put("code", 1);
+            param.put("name", "name");
+            param.put("cards[0].code", 2);
+            param.put("model.code", 3);
+            param.put("ext.code", 4);
             invokeService.invokeProcess(param);
         }
     }

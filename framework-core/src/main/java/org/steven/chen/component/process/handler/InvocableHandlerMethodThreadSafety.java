@@ -21,7 +21,6 @@ import org.steven.chen.component.process.ProcessHandlerService;
 import java.lang.reflect.Method;
 import java.util.Map;
 
-@Deprecated
 public class InvocableHandlerMethodThreadSafety extends InvocableHandlerMethod {
     public InvocableHandlerMethodThreadSafety(ProcessHandlerService bean, Method method) {
         super(bean, method);
