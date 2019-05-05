@@ -6,7 +6,7 @@
        xsi:schemaLocation="http://www.springframework.org/schema/beans
         http://www.springframework.org/schema/beans/spring-beans.xsd http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context.xsd">
 
-    <bean class="org.steven.chen.utils.mapper.Jackson2FlatMapper"/>
+    <bean class="org.steven.chen.utils.mapper.Jackson2FlatMapperK"/>
     <context:component-scan base-package="org.steven.chen.component"/>
 
     <context:component-scan base-package="org.steven.chen.game.handler"/>

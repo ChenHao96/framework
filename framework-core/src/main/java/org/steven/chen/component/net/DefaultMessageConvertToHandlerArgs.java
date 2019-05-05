@@ -16,7 +16,7 @@
 
 package org.steven.chen.component.net;
 
-import org.steven.chen.utils.mapper.Jackson2FlatMapper;
+import org.steven.chen.utils.mapper.Jackson2FlatMapperK;
 
 import java.util.Map;
 
@@ -24,7 +24,7 @@ public class DefaultMessageConvertToHandlerArgs implements MessageConvertToHandl
 
     private static final ThreadLocal<CommonsMessage> holder = new ThreadLocal<>();
 
-    protected Jackson2FlatMapper object2FlatMapper = new Jackson2FlatMapper();
+    protected Jackson2FlatMapperK object2FlatMapper = new Jackson2FlatMapperK();
 
     protected CommonsMessage getCommonsMessage() {
         return getCommonsMessage(false);

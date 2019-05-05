@@ -10,7 +10,7 @@ import org.steven.chen.component.process.ProcessInvokeService;
 import org.steven.chen.utils.BaseDataTypeUtil;
 import org.steven.chen.utils.JsonUtils;
 import org.steven.chen.utils.StringUtil;
-import org.steven.chen.utils.mapper.Jackson2FlatMapper;
+import org.steven.chen.utils.mapper.Jackson2FlatMapperK;
 
 import java.beans.BeanInfo;
 import java.beans.Introspector;
@@ -23,7 +23,7 @@ import java.util.Set;
 
 public class InvocableHandlerMethod extends HandlerMethod implements ProcessInvokeService {
 
-    private static final Jackson2FlatMapper jackson2FlatMapper = new Jackson2FlatMapper();
+    private static final Jackson2FlatMapperK jackson2FlatMapper = new Jackson2FlatMapperK();
 
     protected ParameterNameDiscoverer parameterNameDiscoverer = new DefaultParameterNameDiscoverer();
 
