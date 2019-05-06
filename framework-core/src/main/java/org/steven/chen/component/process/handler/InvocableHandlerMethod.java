@@ -2,6 +2,7 @@ package org.steven.chen.component.process.handler;
 
 import org.steven.chen.component.process.ProcessHandlerService;
 import org.steven.chen.component.process.ProcessInvokeService;
+import org.steven.chen.utils.mapper.Jackson2FlatMapperK;
 
 import java.lang.reflect.Method;
 import java.util.Map;
@@ -10,16 +11,11 @@ public class InvocableHandlerMethod implements ProcessInvokeService {
 
     private ProcessHandlerService bean;
     private InvocableHandlerMethodK invocableHandlerMethodK;
-
-    private static final ThreadLocal<Map<String, Object>> processParam = new ThreadLocal<>();
+    private static final Jackson2FlatMapperK jackson2FlatMapper = new Jackson2FlatMapperK();
 
     public InvocableHandlerMethod(ProcessHandlerService bean, Method method) {
         this.bean = bean;
         this.invocableHandlerMethodK = new InvocableHandlerMethodK(bean, method);
-    }
-
-    public static Map<String, Object> getProcessParam() {
-        return processParam.get();
     }
 
     public ProcessHandlerService getBean() {
@@ -32,12 +28,9 @@ public class InvocableHandlerMethod implements ProcessInvokeService {
     }
 
     @Override
-    public Object invokeProcess(Map<String, Object> args) throws Exception {
-        processParam.set(args);
-        try {
-            return invocableHandlerMethodK.invokeProcess(args);
-        } finally {
-            processParam.remove();
-        }
+    public Object invokeProcess(Map<String, Object> providedArgs) throws Exception {
+        providedArgs = jackson2FlatMapper.fromFlatMapper(providedArgs);
+        Object[] args = invocableHandlerMethodK.getMethodArgumentValues(providedArgs);
+        return invocableHandlerMethodK.getBridgedMethod().invoke(bean, args);
     }
 }
