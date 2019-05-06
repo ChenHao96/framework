@@ -16,6 +16,7 @@
 
 package org.steven.chen.database.redis;
 
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.redis.core.ReactiveStringRedisTemplate;
 import org.springframework.data.redis.core.RedisCallback;
 import org.springframework.data.redis.core.StringRedisTemplate;
@@ -29,7 +30,7 @@ public class RedisAdaptorImpl implements RedisAdaptor, RedisReactiveAdaptor {
     @Resource
     private StringRedisTemplate redisTemplate;
 
-    @Resource
+    @Autowired(required = false)
     private ReactiveStringRedisTemplate reactiveStringRedisTemplate;
 
     @Override
