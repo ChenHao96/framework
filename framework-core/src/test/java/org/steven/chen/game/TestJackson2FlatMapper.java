@@ -27,6 +27,7 @@ public class TestJackson2FlatMapper {
 
     public static void main(String[] args) {
 
+        long start = System.currentTimeMillis();
         Map<String, Object> param = new HashMap<>();
         param.put("code", 1);
         param.put("name", "name");
@@ -41,7 +42,6 @@ public class TestJackson2FlatMapper {
         param = jackson2FlatMapper.fromFlatMapper(param);
         System.out.println(param);
         System.out.println(jackson2FlatMapper.toFlatMapper(param));
+        System.out.println(System.currentTimeMillis()-start);
     }
-
-
 }

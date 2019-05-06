@@ -87,17 +87,12 @@ final class Jackson2FlatMapperK {
     private fun processArray(resultMap: LinkedHashMap<String, Any>, key: String, value: Any) {
         val index = (key.substring(key.indexOf(ARRAY_PREFIX) + 1, key.indexOf(ARRAY_SUFFIX))).toInt();
         val tmpKey = key.substring(0, key.indexOf(ARRAY_PREFIX));
-        var item = resultMap[tmpKey] as? LinkedList<Any>;
+        var item = resultMap[tmpKey] as? UpdateList<Any>;
         if (item == null) {
-            item = LinkedList<Any>();
+            item = UpdateList<Any>();
             resultMap.put(tmpKey, item);
         }
-        if (item.size > index) {
-            //TODO：
-            item.add(index, value);
-        } else {
-            item.add(value);
-        }
+        item.put(index, value);
     }
 
     @Suppress("UNCHECKED_CAST")
@@ -106,20 +101,15 @@ final class Jackson2FlatMapperK {
         if (key.contains(ARRAY_PREFIX)) {
             val index = (key.substring(key.indexOf(ARRAY_PREFIX) + 1, key.indexOf(ARRAY_SUFFIX))).toInt();
             val tmpKey = key.substring(0, key.indexOf(ARRAY_PREFIX));
-            var item = resultMap[tmpKey] as? LinkedList<Any>;
+            var item = resultMap[tmpKey] as? UpdateList<Any>;
             if (item == null) {
-                item = LinkedList<Any>();
+                item = UpdateList<Any>();
                 resultMap.put(tmpKey, item);
             }
-            var childMap: LinkedHashMap<String, Any>? = if (item.size <= index) null else item[index] as? LinkedHashMap<String, Any>;
+            var childMap = item[index] as? LinkedHashMap<String, Any>;
             if (childMap == null) {
                 childMap = LinkedHashMap<String, Any>();
-                if (item.size > index) {
-                    //TODO：
-                    item.add(index, childMap);
-                } else {
-                    item.add(childMap);
-                }
+                item.put(index, childMap);
             }
             doUnFlatten(propertyPrefix + key + PARTING, childMap, target)
         } else {
