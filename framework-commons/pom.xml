@@ -96,9 +96,12 @@
             <scope>compile</scope>
             <optional>true</optional>
         </dependency>
+
         <dependency>
             <groupId>org.jetbrains.kotlin</groupId>
             <artifactId>kotlin-stdlib</artifactId>
+            <scope>compile</scope>
+            <optional>true</optional>
         </dependency>
     </dependencies>
 
