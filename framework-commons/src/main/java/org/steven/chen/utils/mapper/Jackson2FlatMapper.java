@@ -7,7 +7,7 @@ public final class Jackson2FlatMapper {
 
     private static final Jackson2FlatMapperK jackson2FlatMapperK = new Jackson2FlatMapperK();
 
-    public <T> T fromFlatMapper(Map<String, Object> target, Class<T> clazz) throws IOException {
+    public <T> T fromFlatMapper(Map<String, ?> target, Class<T> clazz) throws IOException {
         return jackson2FlatMapperK.fromFlatMapper(target, clazz);
     }
 
@@ -15,7 +15,7 @@ public final class Jackson2FlatMapper {
         return jackson2FlatMapperK.toFlatMapper(obj);
     }
 
-    public Map<String, Object> fromFlatMapper(Map<String, Object> target) {
+    public Map<String, Object> fromFlatMapper(Map<String, ?> target) {
         return jackson2FlatMapperK.fromFlatMapper(target);
     }
 }
