@@ -12,10 +12,20 @@ import java.util.*
 
 final class Jackson2FlatMapperK {
 
-    private final val PARTING = ".";
-    private final val ARRAY_PREFIX = "[";
-    private final val ARRAY_SUFFIX = "]";
-    private final val mapper: ObjectMapper = getObjectMapper();
+    companion object {
+        private val PARTING = ".";
+        private val ARRAY_PREFIX = "[";
+        private val ARRAY_SUFFIX = "]";
+        private val mapper: ObjectMapper = getObjectMapper();
+
+        private fun getObjectMapper(): ObjectMapper {
+            val result = ObjectMapper();
+            result.configure(JsonParser.Feature.ALLOW_SINGLE_QUOTES, true)
+            result.setSerializationInclusion(JsonInclude.Include.NON_NULL)
+            result.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false)
+            return result;
+        }
+    }
 
     @Throws(IOException::class)
     fun <T> fromFlatMapper(target: Map<String, Any>, clazz: Class<T>): T {
@@ -38,7 +48,7 @@ final class Jackson2FlatMapperK {
 
     fun fromFlatMapper(target: Map<String, Any>?): Map<String, Any>? {
         if (target == null) return null;
-        var resultMap = LinkedHashMap<String, Any>();
+        val resultMap = LinkedHashMap<String, Any>();
         doUnFlatten("", resultMap, target);
         return resultMap;
     }
@@ -67,14 +77,14 @@ final class Jackson2FlatMapperK {
     }
 
     private fun doUnFlatten(propertyPrefix: String, resultMap: LinkedHashMap<String, Any>, target: Map<String, Any>) {
-        var entries = target.entries;
+        val entries = target.entries;
         for ((pKey, value) in entries) {
             if (pKey.startsWith(propertyPrefix)) {
-                var key = pKey.substring(propertyPrefix.length);
+                val key = pKey.substring(propertyPrefix.length);
                 if (key.contains(PARTING)) {
                     processMap(propertyPrefix, resultMap, target, key);
                     continue;
-                } else if (key.contains(ARRAY_PREFIX)) {
+                } else if (checkArrayKey(key)) {
                     processArray(resultMap, key, value);
                     continue;
                 }
@@ -95,10 +105,24 @@ final class Jackson2FlatMapperK {
         item.put(index, value);
     }
 
+    private fun checkArrayKey(key: String): Boolean {
+        val prefixIndex = key.indexOf(ARRAY_PREFIX);
+        val suffixIndex = key.indexOf(ARRAY_SUFFIX);
+        if (prefixIndex >= 0) {
+            if (suffixIndex == -1) {
+                throw IllegalArgumentException("The array key($key) is not found $ARRAY_SUFFIX !");
+            } else if (suffixIndex < prefixIndex) {
+                throw IllegalArgumentException("The array key $ARRAY_SUFFIX index < $ARRAY_PREFIX index !");
+            }
+            return true;
+        }
+        return false;
+    }
+
     @Suppress("UNCHECKED_CAST")
     private fun processMap(propertyPrefix: String, resultMap: LinkedHashMap<String, Any>, target: Map<String, Any>, pKey: String) {
-        var key = pKey.substring(0, pKey.indexOf(PARTING));
-        if (key.contains(ARRAY_PREFIX)) {
+        val key = pKey.substring(0, pKey.indexOf(PARTING));
+        if (checkArrayKey(key)) {
             val index = (key.substring(key.indexOf(ARRAY_PREFIX) + 1, key.indexOf(ARRAY_SUFFIX))).toInt();
             val tmpKey = key.substring(0, key.indexOf(ARRAY_PREFIX));
             var item = resultMap[tmpKey] as? UpdateList<Any>;
@@ -120,13 +144,5 @@ final class Jackson2FlatMapperK {
             }
             doUnFlatten(propertyPrefix + key + PARTING, item, target)
         }
-    }
-
-    private fun getObjectMapper(): ObjectMapper {
-        var result = ObjectMapper();
-        result.configure(JsonParser.Feature.ALLOW_SINGLE_QUOTES, true)
-        result.setSerializationInclusion(JsonInclude.Include.NON_NULL)
-        result.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false)
-        return result;
     }
 }

@@ -34,11 +34,11 @@ public class TestJackson2FlatMapper {
         param.put("cards[3]", 3);
         param.put("cards[1]", 1);
         param.put("cards[4]", 4);
-        param.put("cards[0]", 0);
-        param.put("cards[2]", 2);
+//        param.put("cards[0]", 0);
+//        param.put("cards[2]", 2);
         param.put("model.code", 1);
         param.put("model.cards[1].code", 1);
-        param.put("model.cards[0].code", 0);
+//        param.put("model.cards[0].code", 0);
         param = jackson2FlatMapper.fromFlatMapper(param);
         System.out.println(param);
         System.out.println(jackson2FlatMapper.toFlatMapper(param));
