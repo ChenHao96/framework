@@ -16,8 +16,12 @@
 
 package org.steven.chen.utils.jdbc;
 
-public class SqlManyResultException extends RuntimeException {
-    public SqlManyResultException(String message) {
+public class SqlJdbcException extends RuntimeException {
+    public SqlJdbcException(String message) {
         super(message);
+    }
+
+    public SqlJdbcException(Throwable throwable) {
+        super(throwable);
     }
 }

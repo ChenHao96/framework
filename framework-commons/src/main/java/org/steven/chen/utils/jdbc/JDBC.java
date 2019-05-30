@@ -16,7 +16,7 @@ public class JDBC {
             connection = DriverManager.getConnection(url, userName, password);
             connection.setAutoCommit(false);
         } catch (Exception e) {
-            throw new RuntimeException(e);
+            throw new SqlJdbcException(e);
         }
     }
 
@@ -25,7 +25,7 @@ public class JDBC {
         List<Map<String, Object>> result = query(sql, params);
         if (result == null || result.size() == 0) return null;
         if (result.size() > 1) {
-            throw new SqlManyResultException(String.format("Many Result size:%d", result.size()));
+            throw new SqlJdbcException(String.format("Many Result size:%d", result.size()));
         }
 
         return result.get(0);
@@ -40,12 +40,10 @@ public class JDBC {
             resultSet = preparedStatement.executeQuery();
             return getResultMaps(resultSet);
         } catch (Exception e) {
-            e.printStackTrace();
+            throw new SqlJdbcException(e);
         } finally {
             CommonsUtil.safeClose(resultSet, preparedStatement);
         }
-
-        return null;
     }
 
     private List<Map<String, Object>> getResultMaps(ResultSet resultSet) throws SQLException {
@@ -79,7 +77,7 @@ public class JDBC {
             preparedStatement = addPsParams(connection, sql, params);
             result = preparedStatement.executeUpdate();
         } catch (Exception e) {
-            e.printStackTrace();
+            throw new SqlJdbcException(e);
         } finally {
             CommonsUtil.safeClose(preparedStatement);
         }
@@ -97,7 +95,7 @@ public class JDBC {
             result = callableStatement.executeUpdate();
             returnPsParams4Call(callableStatement, params);
         } catch (Exception e) {
-            e.printStackTrace();
+            throw new SqlJdbcException(e);
         } finally {
             CommonsUtil.safeClose(callableStatement);
         }
@@ -122,7 +120,7 @@ public class JDBC {
                 returnPsParams4Call(callableStatement, params);
             }
         } catch (Exception e) {
-            e.printStackTrace();
+            throw new SqlJdbcException(e);
         } finally {
             CommonsUtil.safeClose(callableStatement);
         }
@@ -139,7 +137,7 @@ public class JDBC {
             try {
                 params[i].returnValue = callableStatement.getObject(i + 1);
             } catch (SQLException e) {
-                throw new RuntimeException(e);
+                throw new SqlJdbcException(e);
             }
         }
     }
@@ -188,7 +186,7 @@ public class JDBC {
                 connection.commit();
             }
         } catch (SQLException e) {
-            throw new RuntimeException(e);
+            throw new SqlJdbcException(e);
         }
     }
 
@@ -198,7 +196,7 @@ public class JDBC {
                 connection.rollback();
             }
         } catch (SQLException e) {
-            throw new RuntimeException(e);
+            throw new SqlJdbcException(e);
         }
     }
 
