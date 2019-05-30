@@ -51,7 +51,7 @@ public class MyBatisSQLSingleMonitorInterceptor implements Interceptor {
             return invocation.proceed();
         } finally {
             long endTime = System.currentTimeMillis();
-            logger.info("SQL:[id:{}][ts:{}][cost:{}ms] ", sqlMappingID, transactionID, endTime - beginTime);
+            logger.debug("SQL:[id:{}][ts:{}][cost:{}ms] ", sqlMappingID, transactionID, endTime - beginTime);
         }
     }
 
