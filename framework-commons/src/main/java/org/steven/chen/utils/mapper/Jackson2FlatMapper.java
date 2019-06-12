@@ -5,7 +5,7 @@ import java.util.Map;
 
 public final class Jackson2FlatMapper {
 
-    private static final Jackson2FlatMapperK jackson2FlatMapperK = new Jackson2FlatMapperK();
+    private Jackson2FlatMapperK jackson2FlatMapperK = new Jackson2FlatMapperK();
 
     public <T> T fromFlatMapper(Map<String, ?> target, Class<T> clazz) throws IOException {
         return jackson2FlatMapperK.fromFlatMapper(target, clazz);
