@@ -18,7 +18,6 @@ package org.steven.chen.game;
 
 import org.steven.chen.utils.mapper.Jackson2FlatMapperK;
 
-import java.util.HashMap;
 import java.util.Map;
 
 public class TestJackson2FlatMapper {
@@ -26,22 +25,12 @@ public class TestJackson2FlatMapper {
     private static final Jackson2FlatMapperK jackson2FlatMapper = new Jackson2FlatMapperK();
 
     public static void main(String[] args) {
-
         long start = System.currentTimeMillis();
-        Map<String, Object> param = new HashMap<>();
-        param.put("code", 1);
-        param.put("name", "name");
-        param.put("cards[3]", 3);
-        param.put("cards[1]", 1);
-        param.put("cards[4]", 4);
-//        param.put("cards[0]", 0);
-//        param.put("cards[2]", 2);
-        param.put("model.code", 1);
-        param.put("model.cards[1].code", 1);
-//        param.put("model.cards[0].code", 0);
-        param = jackson2FlatMapper.fromFlatMapper(param);
+        TestModel model = new TestModel();
+        model.setU('A');
+        Map<String, Object> param = jackson2FlatMapper.toFlatMapper(model);
         System.out.println(param);
         System.out.println(jackson2FlatMapper.toFlatMapper(param));
-        System.out.println(System.currentTimeMillis()-start);
+        System.out.println(System.currentTimeMillis() - start);
     }
 }

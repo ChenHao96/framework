@@ -71,7 +71,7 @@ final class Jackson2FlatMapperK {
                 val entry = iterator.next()
                 doFlatten(tmpPrefix + entry.key, entry.value, resultMap)
             }
-        } else if (source.isNumber || source.isTextual) {
+        } else {
             resultMap.put(propertyPrefix, source.asText())
         }
     }
