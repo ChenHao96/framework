@@ -10,7 +10,7 @@
     <modelVersion>4.0.0</modelVersion>
 
     <packaging>jar</packaging>
-    <version>1.1.7.1-RELEASE</version>
+    <version>1.1.7-RELEASE</version>
     <artifactId>framework-commons</artifactId>
 
     <dependencies>
