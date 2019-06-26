@@ -1,22 +1,54 @@
 package org.steven.chen.utils;
 
 import org.apache.commons.lang.StringUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.util.CollectionUtils;
 
+import javax.servlet.http.HttpServletRequest;
+import java.io.UnsupportedEncodingException;
 import java.net.URI;
 import java.net.URISyntaxException;
+import java.net.URLEncoder;
+import java.util.HashMap;
 import java.util.Map;
+import java.util.Set;
 
 public final class URLUtils {
 
-    private URLUtils() {
+    public static final String CHARSET = "UTF-8";
+    private static final Logger LOGGER = LoggerFactory.getLogger(URLUtils.class);
+
+    public static String createCallBackUrl(String url, HttpServletRequest request) {
+
+        if (request == null) return null;
+
+        StringBuilder sb = new StringBuilder(currentServerUrl(request));
+        if (StringUtils.isNotBlank(url)) {
+            if (!url.startsWith("/")) {
+                sb.append("/");
+            }
+            sb.append(url);
+        }
+
+        String callBackUrl = sb.toString();
+        LOGGER.info("createCallBackUrl callBackUrl:{}", callBackUrl);
+        return callBackUrl;
     }
 
-    public static StringBuilder newUrl4Param(int port, String protocol, String serverName, String contextPath) {
+    public static String currentServerUrl(HttpServletRequest request) {
+        if (request == null) return "";
+        int port = request.getServerPort();
+        String protocol = request.getScheme();
+        String serverName = request.getServerName();
+        String contextPath = request.getContextPath();
+        return newUrl4Param(port, protocol, serverName, contextPath).toString();
+    }
 
+    private static StringBuilder newUrl4Param(int port, String protocol, String serverName, String contextPath) {
         StringBuilder sb = new StringBuilder(protocol);
         sb.append("://").append(serverName);
-
-        if (port != -1) {
+        if (port > 0 && port < 65536) {
             if ("http".equals(protocol)) {
                 if (port != 80) {
                     sb.append(":").append(port);
@@ -27,11 +59,8 @@ public final class URLUtils {
                 }
             }
         }
-
-        if (StringUtils.isNotEmpty(contextPath)) {
-            sb.append(contextPath);
-        }
-
+        if (StringUtils.isNotEmpty(contextPath)) sb.append(contextPath);
+        LOGGER.info("newUrl4Param:{}", sb);
         return sb;
     }
 
@@ -52,17 +81,10 @@ public final class URLUtils {
         String contextPath = uri.getPath();
         StringBuilder sb = newUrl4Param(port, protocol, serverName, contextPath);
 
-        sb.append("?");
-        String paramStr = map2ParamStr(param);
+        param = updateRawQueryParam(uri.getRawQuery(), param);
+        String paramStr = paramToQueryString(param);
         if (StringUtils.isNotEmpty(paramStr)) {
             sb.append(paramStr);
-        }
-
-        String query = uri.getRawQuery();
-        if (StringUtils.isNotEmpty(query)) {
-            sb.append(query);
-        } else {
-            sb.append("_");
         }
 
         String fragment = uri.getFragment();
@@ -72,27 +94,91 @@ public final class URLUtils {
             sb.append("#").append(fragment);
         }
 
+        LOGGER.info("updateUrl:{}", sb);
         return sb.toString();
     }
 
-    private static String map2ParamStr(Map<String, String> params) {
+    private static Map<String, String> updateRawQueryParam(String rawQuery, Map<String, String> param) {
+        Map<String, String> queryMap = getQueryMap(rawQuery);
+        int paramCount = queryMap == null ? 0 : queryMap.size();
+        paramCount += param == null ? 0 : param.size();
+        if (paramCount == 0) return null;
+        Map<String, String> result = new HashMap<>(paramCount);
+        putNewMap(param, result);
+        putNewMap(queryMap, result);
+        return result;
+    }
 
-        if (params != null && params.size() > 0) {
-            StringBuilder builder = new StringBuilder();
-            for (String key : params.keySet()) {
-                if (StringUtils.isNotBlank(key)) {
-                    String value = params.get(key);
-                    if (StringUtils.isEmpty(value)) {
-                        value = "null";
-                    }
-                    value = value.trim().replaceAll(" ", "%20").replaceAll("\t", "");
-                    builder.append(key).append("=").append(value).append("&");
-                }
+    private static void putNewMap(Map<String, String> param, Map<String, String> result) {
+        if (param != null) {
+            Set<Map.Entry<String, String>> entrySet = param.entrySet();
+            for (Map.Entry<String, String> entry : entrySet) {
+                String key = entry.getKey();
+                if (key == null) continue;
+                key = urlEncode(key, CHARSET);
+                result.put(key, entry.getValue());
             }
+        }
+    }
 
-            return builder.toString();
+    public static String paramToQueryString(Map<String, String> params, String charset, boolean encode) {
+        if (CollectionUtils.isEmpty(params)) return "";
+        StringBuilder paramString = new StringBuilder();
+        boolean noFirst = false;
+        for (Map.Entry<String, String> entry : params.entrySet()) {
+            String key = entry.getKey();
+            if (StringUtil.isBlank(key)) continue;
+
+            String value = entry.getValue();
+            if (encode) key = urlEncode(key, charset);
+
+            if (StringUtil.isNotBlank(value)) {
+                if (encode) value = urlEncode(value, charset);
+                if (noFirst) paramString.append("&");
+                paramString.append(key).append("=").append(value);
+                noFirst = true;
+            }
+        }
+        return paramString.toString();
+    }
+
+    public static Map<String, String> getQueryMap(String rawQuery) {
+
+        String[] pas = null;
+        if (StringUtils.isNotEmpty(rawQuery)) {
+            pas = rawQuery.split("&");
         }
 
-        return "";
+        Map<String, String> result = null;
+        if (pas != null) {
+            result = new HashMap<>(pas.length);
+            for (String str : pas) {
+                if (str == null) continue;
+                String[] kv = str.split("=");
+                if (kv.length == 2) {
+                    String key = kv[0];
+                    String value = kv[1];
+                    result.put(key, value);
+                }
+            }
+        }
+
+        return result;
+    }
+
+    public static String urlEncode(String value, String encoding) {
+        if (StringUtil.isEmpty(value)) return value;
+        try {
+            String result = URLEncoder.encode(value, encoding);
+            result = result.trim().replaceAll("\\+", "%20").replaceAll("\\*", "%2A").replaceAll("~", "%7E");
+            result = result.replaceAll("/", "%2F").replaceAll(" ", "%20").replaceAll("\\t", "");
+            return result;
+        } catch (UnsupportedEncodingException e) {
+            throw new IllegalArgumentException(e);
+        }
+    }
+
+    public static String paramToQueryString(Map<String, String> params) {
+        return paramToQueryString(params, CHARSET, true);
     }
 }

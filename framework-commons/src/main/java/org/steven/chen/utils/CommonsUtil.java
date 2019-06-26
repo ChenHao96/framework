@@ -18,7 +18,6 @@ package org.steven.chen.utils;
 
 import org.springframework.beans.BeanUtils;
 
-import java.io.Closeable;
 import java.net.InetAddress;
 import java.net.Socket;
 
@@ -32,19 +31,6 @@ public final class CommonsUtil {
         InetAddress inetAddress = client.getInetAddress();
         if (inetAddress == null) return null;
         return inetAddress.getHostAddress();
-    }
-
-    public static void safeClose(Closeable... closeables) {
-        if (closeables != null && closeables.length > 0) {
-            for (Closeable closeable : closeables) {
-                if (closeable == null) continue;
-                try {
-                    closeable.close();
-                } catch (Exception e) {
-                    throw new RuntimeException(e);
-                }
-            }
-        }
     }
 
     public static void safeClose(AutoCloseable... closeables) {

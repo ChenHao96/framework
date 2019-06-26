@@ -2,13 +2,16 @@ package org.steven.chen.web;
 
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.steven.chen.utils.CommonsUtil;
-import org.steven.chen.utils.StringUtil;
-import org.steven.chen.utils.URLUtils;
+import org.steven.chen.utils.IOUtils;
+import org.steven.chen.utils.RequestParamUtil;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
-import java.io.*;
+import java.io.File;
+import java.io.FileReader;
+import java.io.IOException;
+import java.io.PrintWriter;
 
 public abstract class AbstractController {
 
@@ -43,7 +46,7 @@ public abstract class AbstractController {
     }
 
     protected String getRequestBody() throws IOException {
-        return receiveRequestInput();
+        return RequestParamUtil.readRequestContent(getRequest());
     }
 
     protected String getRequestClientIP() {
@@ -54,60 +57,18 @@ public abstract class AbstractController {
         return getRequest().getRemotePort();
     }
 
-    protected String createCurrentContextUrl(String url) {
-        HttpServletRequest request = getRequest();
-        int port = request.getServerPort();
-        String protocol = request.getScheme();
-        String serverName = request.getServerName();
-        String contextPath = request.getContextPath();
-        StringBuilder sb = URLUtils.newUrl4Param(port, protocol, serverName, contextPath);
-        if (StringUtil.isNotBlank(url)) {
-            if (!url.startsWith("/")) {
-                sb.append("/");
-            }
-            sb.append(url);
-        }
-        return sb.toString();
-    }
-
-    private String receiveRequestInput() throws IOException {
-
-        int cnt;
-        byte[] buffer = new byte[1024];
-        StringBuilder sb = new StringBuilder();
-
-        InputStream inputStream = getRequest().getInputStream();
-        BufferedInputStream bis = new BufferedInputStream(inputStream);
-        while ((cnt = bis.read(buffer)) != -1) {
-            sb.append(new String(buffer, 0, cnt));
-        }
-
-        CommonsUtil.safeClose(bis, inputStream);
-        return sb.toString();
-    }
-
-    protected void responseFile(String fileType, File file) {
-
+    protected void responseFile(String contentType, String filePath) throws IOException {
         HttpServletResponse response = getResponse();
-        if (file == null || StringUtil.isEmpty(fileType)) return;
-
-        try {
-            response.setContentType(fileType);
-            FileInputStream fis = new FileInputStream(file);
-            OutputStream ops = response.getOutputStream();
-
-            int count;
-            byte[] buffer = new byte[1024 * 1024];
-            while ((count = fis.read(buffer)) != -1) {
-                ops.write(buffer, 0, count);
-                ops.flush();
-            }
-
-            CommonsUtil.safeClose(ops, fis);
-        } catch (FileNotFoundException e) {
+        File file = new File(filePath);
+        if (IOUtils.checkFile(file)) {
+            response.setContentType(contentType);
+            FileReader reader = new FileReader(file);
+            PrintWriter writer = response.getWriter();
+            IOUtils.write(reader, writer);
+            CommonsUtil.safeClose(reader);
+            CommonsUtil.safeClose(writer);
+        } else {
             response.setStatus(404);
-        } catch (Exception e) {
-            response.setStatus(500);
         }
     }
 }
