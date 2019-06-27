@@ -59,16 +59,10 @@ public class HttpUtils {
         return addParams(url, params);
     }
 
-    public static HttpResponse doService(HttpRequestBase requestBase, Map<String, String> headers, Cookie... cookies) {
-
+    public static HttpResponse doService(CloseableHttpClient httpClient, HttpRequestBase requestBase, Map<String, String> headers, Cookie... cookies) {
         HttpResponse result = new HttpResponse();
         if (requestBase == null) return result;
-
-        long start = System.currentTimeMillis();
-        String url = requestBase.getURI().toString();
-        CloseableHttpClient httpClient = createHttpClientByUrl(url);
         CloseableHttpResponse httpResponse = null;
-
         try {
             addCookies(requestBase, cookies);
             addHeaders(requestBase, headers);
@@ -89,33 +83,41 @@ public class HttpUtils {
             CommonsUtil.safeClose(httpResponse);
             CommonsUtil.safeClose(httpClient);
         }
-
-        LOGGER.info("请求url: {}, 花费时间: {} ms", url, System.currentTimeMillis() - start);
         return result;
     }
 
     public static HttpResponse doGet(String url, Map<String, String> params, Map<String, String> headers, Cookie... cookies) {
         if (StringUtils.isEmpty(url)) throw new IllegalArgumentException("url为空");
+        CloseableHttpClient httpClient = createHttpClientByUrl(url);
         url = addParams(url, params);
         HttpGet httpGet = new HttpGet(url);
-        return doService(httpGet, headers, cookies);
+        long start = System.currentTimeMillis();
+        try {
+            return doService(httpClient, httpGet, headers, cookies);
+        } finally {
+            LOGGER.info("get请求 url: {}, 花费时间: {} ms", url, System.currentTimeMillis() - start);
+        }
     }
 
     public static HttpResponse doPost(String url, Map<String, String> params, Map<String, String> headers, Cookie... cookies) {
         if (StringUtils.isEmpty(url)) throw new IllegalArgumentException("url为空");
+        CloseableHttpClient httpClient = createHttpClientByUrl(url);
         HttpPost httpPost = new HttpPost(url);
         addParams(httpPost, params);
-        return doService(httpPost, headers, cookies);
+        long start = System.currentTimeMillis();
+        try {
+            return doService(httpClient, httpPost, headers, cookies);
+        } finally {
+            LOGGER.info("post请求 url: {}, 花费时间: {} ms", url, System.currentTimeMillis() - start);
+        }
     }
 
     private static void getCookies(HttpResponse result, CloseableHttpResponse httpResponse) {
-
         if (result == null) return;
         Header[] headers = httpResponse.getHeaders(HEADER_KEY);
         if (headers == null || headers.length <= 0) {
             return;
         }
-
         Map<String, Set<String>> cookies = new HashMap<>(headers.length);
         for (Header header : headers) {
             String[] cookieValues = header.getValue().split(";");
@@ -133,7 +135,6 @@ public class HttpUtils {
                 }
             }
         }
-
         result.setCookies(cookies);
     }
 
