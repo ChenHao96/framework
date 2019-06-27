@@ -13,6 +13,12 @@
     <version>1.1.8-RELEASE</version>
     <artifactId>framework-web</artifactId>
 
+    <properties>
+        <javaee-api.version>8.0</javaee-api.version>
+        <httpclient.version>4.5.2</httpclient.version>
+        <aliyun-sdk-oss.version>3.4.2</aliyun-sdk-oss.version>
+    </properties>
+
     <dependencies>
         <dependency>
             <groupId>javax</groupId>
@@ -32,6 +38,12 @@
         <dependency>
             <groupId>org.steven.chen.game</groupId>
             <artifactId>framework-core</artifactId>
+            <exclusions>
+                <exclusion>
+                    <groupId>org.steven.chen.game</groupId>
+                    <artifactId>framework-commons</artifactId>
+                </exclusion>
+            </exclusions>
             <scope>compile</scope>
             <optional>true</optional>
         </dependency>

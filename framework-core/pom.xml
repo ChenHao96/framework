@@ -13,6 +13,10 @@
     <version>1.1.8-RELEASE</version>
     <artifactId>framework-core</artifactId>
 
+    <properties>
+        <lettuce-core.version>5.1.6.RELEASE</lettuce-core.version>
+    </properties>
+
     <dependencies>
         <dependency>
             <groupId>junit</groupId>
