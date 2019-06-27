@@ -4,6 +4,7 @@ import org.apache.commons.codec.binary.Base64;
 import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.steven.chen.utils.CommonsUtil;
 
 import javax.crypto.Cipher;
 import javax.crypto.KeyGenerator;
@@ -15,10 +16,6 @@ public class AESUtils {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(AESUtils.class);
     /**
-     * 字符集
-     */
-    private static final String ENCODING = "utf-8";
-    /**
      * 加密算法
      * DES               密钥长度必须为56
      * DESede(TripleDES) 密钥长度必须为112或168
@@ -29,15 +26,16 @@ public class AESUtils {
      **/
     private static final String ALGORITHM = "AES";
     /**
-     *  密钥长度
+     * 密钥长度
      */
     private static final int KEY_SIZE = 128;
 
     /**
-     *  将content的内容以password的密钥加密
-     * @param content   被加密码的内容
-     * @param password  密钥
-     * @return  加密后的秘串
+     * 将content的内容以password的密钥加密
+     *
+     * @param content  被加密码的内容
+     * @param password 密钥
+     * @return 加密后的秘串
      */
     public static String encrypt(String content, String password) {
 
@@ -46,7 +44,7 @@ public class AESUtils {
         try {
             SecretKeySpec e = getSecretKeySpec(password);
             Cipher cipher = Cipher.getInstance(ALGORITHM);
-            byte[] byteContent = content.getBytes(ENCODING);
+            byte[] byteContent = content.getBytes(CommonsUtil.SYSTEM_ENCODING);
             cipher.init(Cipher.ENCRYPT_MODE, e);
             byte[] result = cipher.doFinal(byteContent);
             return new Base64().encodeToString(result);
@@ -58,10 +56,11 @@ public class AESUtils {
     }
 
     /**
-     *  将content的内容以password的密钥解密
-     * @param content   被解密码的内容
-     * @param password  密钥
-     * @return  原始数据
+     * 将content的内容以password的密钥解密
+     *
+     * @param content  被解密码的内容
+     * @param password 密钥
+     * @return 原始数据
      */
     public static String decrypt(String content, String password) {
 
@@ -72,7 +71,7 @@ public class AESUtils {
             Cipher cipher = Cipher.getInstance(ALGORITHM);
             cipher.init(Cipher.DECRYPT_MODE, e);
             byte[] result = cipher.doFinal(new Base64().decode(content));
-            return new String(result, ENCODING);
+            return new String(result, CommonsUtil.SYSTEM_ENCODING);
         } catch (Exception e) {
             LOGGER.warn("string:{} decrypt fail", content, e);
             throw new IllegalStateException("字符串解密失败", e);
@@ -80,9 +79,10 @@ public class AESUtils {
     }
 
     /**
-     *  检查参数
-     * @param content   内容
-     * @param password  密钥
+     * 检查参数
+     *
+     * @param content  内容
+     * @param password 密钥
      */
     private static void checkParam(String content, String password) {
         Preconditions.checkArgument(StringUtils.isNotBlank(content), "content is empty");

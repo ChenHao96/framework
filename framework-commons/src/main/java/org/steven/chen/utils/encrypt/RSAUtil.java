@@ -1,6 +1,7 @@
 package org.steven.chen.utils.encrypt;
 
 import org.apache.commons.codec.binary.Base64;
+import org.steven.chen.utils.CommonsUtil;
 
 import java.nio.charset.Charset;
 import java.security.*;
@@ -9,7 +10,6 @@ import java.security.spec.X509EncodedKeySpec;
 
 public final class RSAUtil {
 
-    public static final String CHARSET = "UTF-8";
     public static final String MD5_KEY_TYPE = "MD5";
     public static final String SHA_KEY_TYPE = "RSA";
     public static final String SHA256_KEY_TYPE = "RSA256";
@@ -63,7 +63,7 @@ public final class RSAUtil {
             PublicKey pubKey = keyFactory.generatePublic(new X509EncodedKeySpec(encodedKey));
             Signature signature = getSignature(signType);
             signature.initVerify(pubKey);
-            signature.update(content.getBytes(Charset.forName(CHARSET)));
+            signature.update(content.getBytes(Charset.forName(CommonsUtil.SYSTEM_ENCODING)));
             return signature.verify(Base64.decodeBase64(sign));
         } catch (Exception e) {
             throw new RuntimeException(e);
@@ -77,7 +77,7 @@ public final class RSAUtil {
             PrivateKey privateK = keyFactory.generatePrivate(new PKCS8EncodedKeySpec(decodeKey));
             Signature signature = getSignature(signType);
             signature.initSign(privateK);
-            signature.update(content.getBytes(Charset.forName(CHARSET)));
+            signature.update(content.getBytes(Charset.forName(CommonsUtil.SYSTEM_ENCODING)));
             return Base64.encodeBase64String(signature.sign());
         } catch (Exception e) {
             throw new RuntimeException(e);

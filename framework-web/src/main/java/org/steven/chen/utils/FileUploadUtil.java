@@ -22,7 +22,6 @@ import java.util.UUID;
 
 public class FileUploadUtil {
 
-    private static final String SYSTEM_ENCODING = System.getProperty("file.encoding");
     private static final Logger logger = LoggerFactory.getLogger(FileUploadUtil.class);
     private static final String FILE_PATH_STATIC = System.getProperty("user.home") + "/file_upload";
 
@@ -151,7 +150,7 @@ public class FileUploadUtil {
     }
 
     public static String file2String(File file) throws IOException {
-        return IOUtils.readStream2String(new FileInputStream(file),SYSTEM_ENCODING);
+        return IOUtils.readStream2String(new FileInputStream(file), CommonsUtil.SYSTEM_ENCODING);
     }
 
     public class FileInfo {

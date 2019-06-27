@@ -16,7 +16,6 @@ import java.util.Set;
 
 public final class URLUtils {
 
-    public static final String CHARSET = "UTF-8";
     private static final Logger LOGGER = LoggerFactory.getLogger(URLUtils.class);
 
     public static String createCallBackUrl(String url, HttpServletRequest request) {
@@ -115,7 +114,7 @@ public final class URLUtils {
             for (Map.Entry<String, String> entry : entrySet) {
                 String key = entry.getKey();
                 if (key == null) continue;
-                key = urlEncode(key, CHARSET);
+                key = urlEncode(key, CommonsUtil.SYSTEM_ENCODING);
                 result.put(key, entry.getValue());
             }
         }
@@ -179,6 +178,6 @@ public final class URLUtils {
     }
 
     public static String paramToQueryString(Map<String, String> params) {
-        return paramToQueryString(params, CHARSET, true);
+        return paramToQueryString(params, CommonsUtil.SYSTEM_ENCODING, true);
     }
 }

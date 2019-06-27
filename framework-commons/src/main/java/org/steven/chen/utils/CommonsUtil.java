@@ -23,6 +23,8 @@ import java.net.Socket;
 
 public final class CommonsUtil {
 
+    public static final String SYSTEM_ENCODING = System.getProperty("file.encoding");
+
     private CommonsUtil() {
     }
 
