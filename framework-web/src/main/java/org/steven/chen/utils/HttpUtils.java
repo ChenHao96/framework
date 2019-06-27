@@ -70,11 +70,14 @@ public class HttpUtils {
             addHeaders(requestBase, headers);
             httpResponse = httpClient.execute(requestBase);
 
+            String charSet = CommonsUtil.SYSTEM_ENCODING;
             Header contentType = httpResponse.getFirstHeader(CONTENT_TYPE_KEY);
-            String contextTypeValue = contentType.getValue();
-            int index = contextTypeValue.toUpperCase().indexOf("CHARSET");
-            String charSet = contextTypeValue.substring(index);
-            charSet = charSet.substring(charSet.indexOf("=") + 1).replace(";", "");
+            if (contentType != null) {
+                String contextTypeValue = contentType.getValue();
+                int index = contextTypeValue.toUpperCase().indexOf("CHARSET");
+                charSet = contextTypeValue.substring(index);
+                charSet = charSet.substring(charSet.indexOf("=") + 1).replace(";", "");
+            }
 
             HttpEntity entity = httpResponse.getEntity();
             String responseBody = EntityUtils.toString(entity, charSet);
