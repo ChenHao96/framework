@@ -114,13 +114,13 @@ public final class URLUtils {
             for (Map.Entry<String, String> entry : entrySet) {
                 String key = entry.getKey();
                 if (key == null) continue;
-                key = urlEncode(key, CommonsUtil.SYSTEM_ENCODING);
+                key = urlEncode(key);
                 result.put(key, entry.getValue());
             }
         }
     }
 
-    public static String paramToQueryString(Map<String, String> params, String charset, boolean encode) {
+    public static String paramToQueryString(Map<String, String> params, boolean encode) {
         if (CollectionUtils.isEmpty(params)) return "";
         StringBuilder paramString = new StringBuilder();
         boolean noFirst = false;
@@ -129,10 +129,10 @@ public final class URLUtils {
             if (StringUtil.isBlank(key)) continue;
 
             String value = entry.getValue();
-            if (encode) key = urlEncode(key, charset);
+            if (encode) key = urlEncode(key);
 
             if (StringUtil.isNotBlank(value)) {
-                if (encode) value = urlEncode(value, charset);
+                if (encode) value = urlEncode(value);
                 if (noFirst) paramString.append("&");
                 paramString.append(key).append("=").append(value);
                 noFirst = true;
@@ -165,10 +165,10 @@ public final class URLUtils {
         return result;
     }
 
-    public static String urlEncode(String value, String encoding) {
+    public static String urlEncode(String value) {
         if (StringUtil.isEmpty(value)) return value;
         try {
-            String result = URLEncoder.encode(value, encoding);
+            String result = URLEncoder.encode(value, CommonsUtil.SYSTEM_ENCODING);
             result = result.trim().replaceAll("\\+", "%20").replaceAll("\\*", "%2A").replaceAll("~", "%7E");
             result = result.replaceAll("/", "%2F").replaceAll(" ", "%20").replaceAll("\\t", "");
             return result;
@@ -178,6 +178,6 @@ public final class URLUtils {
     }
 
     public static String paramToQueryString(Map<String, String> params) {
-        return paramToQueryString(params, CommonsUtil.SYSTEM_ENCODING, true);
+        return paramToQueryString(params, true);
     }
 }

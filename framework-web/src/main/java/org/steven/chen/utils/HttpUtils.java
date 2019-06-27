@@ -174,8 +174,8 @@ public class HttpUtils {
             for (Map.Entry<String, String> entry : params.entrySet()) {
                 String key = entry.getKey();
                 String value = entry.getValue();
-                key = URLUtils.urlEncode(key, URLUtils.CHARSET);
-                value = URLUtils.urlEncode(value, URLUtils.CHARSET);
+                key = URLUtils.urlEncode(key);
+                value = URLUtils.urlEncode(value);
                 paramList.add(new BasicNameValuePair(key, value));
             }
             httpPost.setEntity(new UrlEncodedFormEntity(paramList, Consts.UTF_8));
