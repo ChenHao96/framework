@@ -83,7 +83,7 @@ public class HttpUtils {
             result.setResponseBody(responseBody);
             getCookies(result, httpResponse);
         } catch (Exception e) {
-            LOGGER.warn("Http doService 异常 : {}", e.getMessage(), e);
+            throw new IllegalStateException("Http doService 异常", e);
         } finally {
             requestBase.releaseConnection();
             CommonsUtil.safeClose(httpResponse, httpClient);
