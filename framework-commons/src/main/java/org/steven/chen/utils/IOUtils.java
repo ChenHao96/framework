@@ -24,7 +24,7 @@ public class IOUtils {
         long total = 0;
 
         CharBuffer buf = CharBuffer.allocate(bufferSize);
-        while ((read = reader.read(buf)) != -1) {
+        while ((read = reader.read(buf)) > 0) {
             buf.flip();
             writer.write(buf.array(), 0, read);
             buf.clear();
@@ -44,8 +44,10 @@ public class IOUtils {
         try {
             int count;
             reader = new BufferedReader(new InputStreamReader(in, charSet));
-            while ((count = reader.read(buffer)) != -1) {
+            while ((count = reader.read(buffer)) > 0) {
+                buffer.flip();
                 writer.write(buffer.array(), 0, count);
+                buffer.clear();
             }
             return writer.toString();
         } finally {
@@ -62,7 +64,7 @@ public class IOUtils {
         byte[] buffer = new byte[BUFFER_SIZE];
 
         int count;
-        while ((count = in.read(buffer)) != -1) {
+        while ((count = in.read(buffer)) > 0) {
             output.write(buffer, 0, count);
         }
 
