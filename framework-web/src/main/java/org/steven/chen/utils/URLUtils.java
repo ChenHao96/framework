@@ -108,14 +108,13 @@ public final class URLUtils {
         return result;
     }
 
-    private static void putNewMap(Map<String, String> param, Map<String, String> result) {
+    public static void putNewMap(Map<String, String> param, Map<String, String> result) {
         if (param != null) {
             Set<Map.Entry<String, String>> entrySet = param.entrySet();
             for (Map.Entry<String, String> entry : entrySet) {
                 String key = entry.getKey();
                 if (key == null) continue;
-                key = urlEncode(key);
-                result.put(key, entry.getValue());
+                result.put(urlEncode(key), urlEncode(entry.getValue()));
             }
         }
     }
@@ -167,6 +166,7 @@ public final class URLUtils {
 
     public static String urlEncode(String value) {
         if (StringUtil.isEmpty(value)) return value;
+        //TODO:需要判断是否已经encode了
         try {
             String result = URLEncoder.encode(value, CommonsUtil.SYSTEM_ENCODING);
             result = result.trim().replaceAll("\\+", "%20").replaceAll("\\*", "%2A").replaceAll("~", "%7E");
