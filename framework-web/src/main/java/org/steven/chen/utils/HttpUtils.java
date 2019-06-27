@@ -3,6 +3,7 @@ package org.steven.chen.utils;
 import org.apache.commons.lang.StringUtils;
 import org.apache.http.Consts;
 import org.apache.http.Header;
+import org.apache.http.HttpEntity;
 import org.apache.http.client.entity.UrlEncodedFormEntity;
 import org.apache.http.client.methods.CloseableHttpResponse;
 import org.apache.http.client.methods.HttpGet;
@@ -14,6 +15,7 @@ import org.apache.http.impl.client.HttpClientBuilder;
 import org.apache.http.impl.client.HttpClients;
 import org.apache.http.message.AbstractHttpMessage;
 import org.apache.http.message.BasicNameValuePair;
+import org.apache.http.util.EntityUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -67,21 +69,24 @@ public class HttpUtils {
             addCookies(requestBase, cookies);
             addHeaders(requestBase, headers);
             httpResponse = httpClient.execute(requestBase);
-            byte[] responseByte = IOUtils.readStream2ByteArray(httpResponse.getEntity().getContent());
-            result.setResponseByte(responseByte);
+
             Header contentType = httpResponse.getFirstHeader(CONTENT_TYPE_KEY);
             String contextTypeValue = contentType.getValue();
             int index = contextTypeValue.toUpperCase().indexOf("CHARSET");
             String charSet = contextTypeValue.substring(index);
             charSet = charSet.substring(charSet.indexOf("=") + 1).replace(";", "");
-            result.setResponseBody(new String(responseByte, charSet));
+
+            HttpEntity entity = httpResponse.getEntity();
+            String responseBody = EntityUtils.toString(entity, charSet);
+            EntityUtils.consume(entity);
+
+            result.setResponseBody(responseBody);
             getCookies(result, httpResponse);
         } catch (Exception e) {
             LOGGER.warn("Http doService 异常 : {}", e.getMessage(), e);
         } finally {
             requestBase.releaseConnection();
-            CommonsUtil.safeClose(httpResponse);
-            CommonsUtil.safeClose(httpClient);
+            CommonsUtil.safeClose(httpResponse, httpClient);
         }
         return result;
     }
@@ -234,17 +239,8 @@ public class HttpUtils {
 
     public static class HttpResponse {
 
-        private byte[] responseByte;
         private String responseBody;
         private Map<String, Set<String>> cookies;
-
-        public byte[] getResponseByte() {
-            return responseByte;
-        }
-
-        public void setResponseByte(byte[] responseByte) {
-            this.responseByte = responseByte;
-        }
 
         public String getResponseBody() {
             return responseBody;
