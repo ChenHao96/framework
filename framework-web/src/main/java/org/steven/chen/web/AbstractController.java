@@ -7,13 +7,13 @@ import org.springframework.util.CollectionUtils;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.steven.chen.utils.*;
 
+import javax.servlet.ServletOutputStream;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 import java.io.File;
-import java.io.FileReader;
+import java.io.FileInputStream;
 import java.io.IOException;
-import java.io.PrintWriter;
 import java.util.Map;
 
 public abstract class AbstractController {
@@ -65,16 +65,13 @@ public abstract class AbstractController {
     protected void responseFile(String contentType, String filePath) throws IOException {
         HttpServletResponse response = getResponse();
         File file = new File(filePath);
-        if (IOUtils.checkFile(file)) {
-            response.setContentType(contentType);
-            FileReader reader = new FileReader(file);
-            PrintWriter writer = response.getWriter();
-            IOUtils.write(reader, writer);
-            CommonsUtil.safeClose(reader);
-            CommonsUtil.safeClose(writer);
-        } else {
-            response.setStatus(404);
-        }
+        if (!IOUtils.checkFile(file)) response.setStatus(404);
+        response.setContentType(contentType);
+        FileInputStream inputStream = new FileInputStream(file);
+        ServletOutputStream outputStream = response.getOutputStream();
+        IOUtils.write(inputStream, outputStream);
+        CommonsUtil.safeClose(inputStream);
+        CommonsUtil.safeClose(outputStream);
     }
 
     protected Map<String, String> param2MapStrParamJson() {

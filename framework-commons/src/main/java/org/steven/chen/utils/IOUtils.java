@@ -9,28 +9,34 @@ public class IOUtils {
 
     public static String read(Reader reader) throws IOException {
         try (StringWriter writer = new StringWriter()) {
-            write(reader, writer);
+            int read;
+            CharBuffer buf = CharBuffer.allocate(BUFFER_SIZE);
+            while ((read = reader.read(buf)) > 0) {
+                buf.flip();
+                writer.write(buf.array(), 0, read);
+                buf.clear();
+            }
             return writer.getBuffer().toString();
         }
     }
 
-    public static long write(Reader reader, Writer writer) throws IOException {
-        return write(reader, writer, BUFFER_SIZE);
+    public static long write(InputStream in, OutputStream out) throws IOException {
+        return write(in, out, BUFFER_SIZE);
     }
 
-    public static long write(Reader reader, Writer writer, int bufferSize) throws IOException {
+    public static long write(InputStream in, OutputStream out, int bufferSize) throws IOException {
 
-        int read;
+        if (in == null) return 0;
+        int count;
         long total = 0;
 
-        CharBuffer buf = CharBuffer.allocate(bufferSize);
-        while ((read = reader.read(buf)) > 0) {
-            buf.flip();
-            writer.write(buf.array(), 0, read);
-            buf.clear();
-            total += read;
+        byte[] buffer = new byte[bufferSize];
+        while ((count = in.read(buffer)) > 0) {
+            out.write(buffer, 0, count);
+            total += count;
         }
 
+        out.flush();
         return total;
     }
 
@@ -59,16 +65,8 @@ public class IOUtils {
 
     public static byte[] readStream2ByteArray(InputStream in) throws IOException {
         if (in == null) return new byte[0];
-
         ByteArrayOutputStream output = new ByteArrayOutputStream();
-        byte[] buffer = new byte[BUFFER_SIZE];
-
-        int count;
-        while ((count = in.read(buffer)) > 0) {
-            output.write(buffer, 0, count);
-        }
-
-        output.flush();
+        write(in, output);
         return output.toByteArray();
     }
 
