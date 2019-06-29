@@ -62,7 +62,7 @@ public class TaskExecutorComponent implements ComponentService, TaskExecutorServ
     @Override
     public void initialize() throws Exception {
 
-        int cachePoolSize = configProperty == null ? ConfigProperty.getThreadPoolSizeStatic() : configProperty.getThreadPoolSize();
+        int cachePoolSize = ConfigProperty.getThreadPoolSize();
         if (cachePoolSize > poolSize) {
             rebuildExecutor = true;
             poolSize = cachePoolSize;

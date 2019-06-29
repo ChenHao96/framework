@@ -23,7 +23,6 @@ import io.netty.channel.socket.nio.NioServerSocketChannel;
 import io.netty.handler.ssl.SslContext;
 import io.netty.handler.ssl.SslContextBuilder;
 import io.netty.handler.ssl.util.SelfSignedCertificate;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.steven.chen.component.ComponentService;
 import org.steven.chen.model.ConfigProperty;
 
@@ -35,9 +34,6 @@ public abstract class AbstractNettyComponent implements ComponentService {
     private EventLoopGroup bossGroup;
     private ServerBootstrap bootstrap;
     private EventLoopGroup workerGroup;
-
-    @Autowired(required = false)
-    private ConfigProperty configProperty;
 
     @Override
     public boolean initialized() {
@@ -53,7 +49,7 @@ public abstract class AbstractNettyComponent implements ComponentService {
     public void initialize() throws Exception {
         if (this.initialize) return;
         this.initialize = false;
-        if (configProperty == null ? ConfigProperty.getSocketSslStatic() : configProperty.getSocketSsl()) {
+        if (ConfigProperty.getSocketSsl()) {
             SelfSignedCertificate ssc = new SelfSignedCertificate();
             this.sslCtx = SslContextBuilder.forServer(ssc.certificate(), ssc.privateKey()).build();
         }
@@ -73,7 +69,7 @@ public abstract class AbstractNettyComponent implements ComponentService {
         if (!this.start) return;
         if (!this.initialize) return;
         this.start = false;
-        int port = configProperty == null ? ConfigProperty.getSocketPortStatic() : configProperty.getSocketPort();
+        int port = ConfigProperty.getSocketPort();
         this.bootstrap.bind(port).sync();
         this.start = true;
     }

@@ -56,9 +56,6 @@ public class ServerSocketComponent implements ComponentService {
     @Resource
     private HandlerFactory handlerFactory;
 
-    @Autowired(required = false)
-    private ConfigProperty configProperty;
-
     @Resource
     private TaskExecutorService executorService;
 
@@ -83,10 +80,10 @@ public class ServerSocketComponent implements ComponentService {
     @Override
     public void initialize() throws Exception {
 
-        this.socketPort = configProperty == null ? ConfigProperty.getSocketPortStatic() : configProperty.getSocketPort();
-        this.noDataWaitTime = configProperty == null ? ConfigProperty.getNoDataWaitTimeStatic() : configProperty.getNoDataWaitTime();
-        if (this.initialize) return;
+        this.socketPort = ConfigProperty.getSocketPort();
+        this.noDataWaitTime = ConfigProperty.getNoDataWaitTime();
 
+        if (this.initialize) return;
         this.initialize = false;
         this.handlerQueue = new ConcurrentLinkedQueue<>();
         this.processors = (Runtime.getRuntime().availableProcessors() / 2) + 1;
