@@ -43,13 +43,12 @@ public class IOUtils {
     public static String readStream2String(InputStream in, String charSet) throws IOException {
         if (in == null) return "";
 
-        BufferedReader reader = null;
         StringWriter writer = new StringWriter();
         CharBuffer buffer = CharBuffer.allocate(BUFFER_SIZE);
 
         try {
             int count;
-            reader = new BufferedReader(new InputStreamReader(in, charSet));
+            BufferedReader reader = new BufferedReader(new InputStreamReader(in, charSet));
             while ((count = reader.read(buffer)) > 0) {
                 buffer.flip();
                 writer.write(buffer.array(), 0, count);
@@ -57,8 +56,6 @@ public class IOUtils {
             }
             return writer.toString();
         } finally {
-            CommonsUtil.safeClose(in);
-            CommonsUtil.safeClose(reader);
             CommonsUtil.safeClose(writer);
         }
     }
