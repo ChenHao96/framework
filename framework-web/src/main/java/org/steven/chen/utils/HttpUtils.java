@@ -123,9 +123,7 @@ public class HttpUtils {
     private static void getCookies(HttpResponse result, CloseableHttpResponse httpResponse) {
         if (result == null) return;
         Header[] headers = httpResponse.getHeaders(HEADER_KEY);
-        if (headers == null || headers.length <= 0) {
-            return;
-        }
+        if (headers == null || headers.length <= 0) return;
         Map<String, Set<String>> cookies = new HashMap<>(headers.length);
         for (Header header : headers) {
             String[] cookieValues = header.getValue().split(";");
@@ -177,9 +175,10 @@ public class HttpUtils {
             for (Map.Entry<String, String> entry : params.entrySet()) {
                 String key = entry.getKey();
                 String value = entry.getValue();
-                key = URLUtils.urlEncode(key);
-                value = URLUtils.urlEncode(value);
-                paramList.add(new BasicNameValuePair(key, value));
+                if (value != null && !"".equals(value.trim())) {
+                    value = value.trim().replaceAll(" ", "%20").replaceAll("\t", "");
+                    paramList.add(new BasicNameValuePair(key, value));
+                }
             }
             httpPost.setEntity(new UrlEncodedFormEntity(paramList, Consts.UTF_8));
         }
