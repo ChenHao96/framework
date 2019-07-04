@@ -150,7 +150,13 @@ public class FileUploadUtil {
     }
 
     public static String file2String(File file) throws IOException {
-        return IOUtils.readStream2String(new FileInputStream(file), CommonsUtil.SYSTEM_ENCODING);
+        FileInputStream fileInputStream = null;
+        try {
+            fileInputStream = new FileInputStream(file);
+            return IOUtils.readStream2String(fileInputStream, CommonsUtil.SYSTEM_ENCODING);
+        } finally {
+            CommonsUtil.safeClose(fileInputStream);
+        }
     }
 
     public class FileInfo {

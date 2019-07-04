@@ -40,15 +40,14 @@ public class IOUtils {
         return total;
     }
 
-    public static String readStream2String(InputStream in, String charSet) throws IOException {
-        if (in == null) return "";
+    public static String readStream2String(Reader reader) throws IOException {
+        if (reader == null) return "";
 
         StringWriter writer = new StringWriter();
         CharBuffer buffer = CharBuffer.allocate(BUFFER_SIZE);
 
         try {
             int count;
-            BufferedReader reader = new BufferedReader(new InputStreamReader(in, charSet));
             while ((count = reader.read(buffer)) > 0) {
                 buffer.flip();
                 writer.write(buffer.array(), 0, count);
@@ -60,11 +59,20 @@ public class IOUtils {
         }
     }
 
+    public static String readStream2String(InputStream in, String charSet) throws IOException {
+        if (in == null) return "";
+        return readStream2String(new BufferedReader(new InputStreamReader(in, charSet)));
+    }
+
     public static byte[] readStream2ByteArray(InputStream in) throws IOException {
         if (in == null) return new byte[0];
-        ByteArrayOutputStream output = new ByteArrayOutputStream();
-        write(in, output);
-        return output.toByteArray();
+        ByteArrayOutputStream output = new ByteArrayOutputStream(BUFFER_SIZE);
+        try {
+            write(in, output);
+            return output.toByteArray();
+        } finally {
+            CommonsUtil.safeClose(output);
+        }
     }
 
     public static boolean checkFile(File file) {

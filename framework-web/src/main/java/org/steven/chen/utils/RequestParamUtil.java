@@ -62,6 +62,10 @@ public final class RequestParamUtil {
     public static String readRequestContent(HttpServletRequest request) throws IOException {
         if (request == null) return null;
         BufferedReader bufferedReader = request.getReader();
-        return IOUtils.read(bufferedReader);
+        try {
+            return IOUtils.read(bufferedReader);
+        } finally {
+            CommonsUtil.safeClose(bufferedReader);
+        }
     }
 }

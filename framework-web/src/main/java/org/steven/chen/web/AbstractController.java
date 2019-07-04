@@ -69,9 +69,12 @@ public abstract class AbstractController {
         response.setContentType(contentType);
         FileInputStream inputStream = new FileInputStream(file);
         ServletOutputStream outputStream = response.getOutputStream();
-        IOUtils.write(inputStream, outputStream);
-        CommonsUtil.safeClose(inputStream);
-        CommonsUtil.safeClose(outputStream);
+        try {
+            IOUtils.write(inputStream, outputStream);
+        } finally {
+            CommonsUtil.safeClose(inputStream);
+            CommonsUtil.safeClose(outputStream);
+        }
     }
 
     protected Map<String, String> param2MapStrParamJson() {
