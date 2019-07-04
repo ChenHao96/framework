@@ -167,7 +167,7 @@ public class HttpUtils {
                     builder.append("&").append(key).append("=").append(value);
                 }
             }
-            if (url.indexOf("?") < url.length() - 1) {
+            if (url.indexOf("?") > 0 && url.indexOf("?") < url.length() - 1) {
                 url = builder.insert(0, url).toString();
             } else {
                 url = builder.replace(0, 1, "?").insert(0, url).toString();
