@@ -34,8 +34,7 @@ public final class RequestParamUtil {
             if (values == null || values.length == 0) continue;
             String valueStr = "";
             for (int i = 0; i < values.length; i++) {
-                valueStr = (i == values.length - 1) ? valueStr + values[i]
-                        : valueStr + values[i] + ",";
+                valueStr += (i == values.length - 1) ? values[i] : values[i] + ",";
             }
             if (StringUtil.isNotEmpty(charSet)) {
                 try {

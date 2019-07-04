@@ -150,6 +150,7 @@ public class HttpUtils {
         if (headers != null && headers.size() > 0) {
             Set<Map.Entry<String, String>> entries = headers.entrySet();
             for (Map.Entry<String, String> entry : entries) {
+                if (StringUtil.isEmpty(entry.getValue())) continue;
                 request.addHeader(entry.getKey(), entry.getValue());
             }
         }
@@ -163,8 +164,7 @@ public class HttpUtils {
                 String key = entry.getKey();
                 String value = entry.getValue();
                 if (StringUtil.isNotBlank(value)) {
-                    value = value.trim().replaceAll(" ", "%20").replaceAll("\t", "");
-                    builder.append("&").append(key).append("=").append(value);
+                    builder.append("&").append(key).append("=").append(value.trim());
                 }
             }
             if (url.indexOf("?") > 0 && url.indexOf("?") < url.length() - 1) {
@@ -183,8 +183,7 @@ public class HttpUtils {
                 String key = entry.getKey();
                 String value = entry.getValue();
                 if (StringUtil.isNotBlank(value)) {
-                    value = value.trim().replaceAll(" ", "%20").replaceAll("\t", "");
-                    paramList.add(new BasicNameValuePair(key, value));
+                    paramList.add(new BasicNameValuePair(key, value.trim()));
                 }
             }
             httpPost.setEntity(new UrlEncodedFormEntity(paramList, Consts.UTF_8));

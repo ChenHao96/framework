@@ -113,8 +113,8 @@ public final class URLUtils {
             Set<Map.Entry<String, String>> entrySet = param.entrySet();
             for (Map.Entry<String, String> entry : entrySet) {
                 String key = entry.getKey();
-                if (key == null) continue;
-                result.put(urlEncode(key), urlEncode(entry.getValue()));
+                if (StringUtil.isEmpty(key)) continue;
+                result.put(key, urlEncode(entry.getValue()));
             }
         }
     }
@@ -126,10 +126,7 @@ public final class URLUtils {
         for (Map.Entry<String, String> entry : params.entrySet()) {
             String key = entry.getKey();
             if (StringUtil.isBlank(key)) continue;
-
             String value = entry.getValue();
-            if (encode) key = urlEncode(key);
-
             if (StringUtil.isNotBlank(value)) {
                 if (encode) value = urlEncode(value);
                 if (noFirst) paramString.append("&");
@@ -143,9 +140,7 @@ public final class URLUtils {
     public static Map<String, String> getQueryMap(String rawQuery) {
 
         String[] pas = null;
-        if (StringUtils.isNotEmpty(rawQuery)) {
-            pas = rawQuery.split("&");
-        }
+        if (StringUtils.isNotEmpty(rawQuery)) pas = rawQuery.split("&");
 
         Map<String, String> result = null;
         if (pas != null) {
