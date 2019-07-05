@@ -116,6 +116,7 @@ public class HttpUtils {
         if (contentType != null) {
             String contextTypeValue = contentType.getValue();
             int index = contextTypeValue.toUpperCase().indexOf("CHARSET");
+            if (index < 1) return charSet;
             charSet = contextTypeValue.substring(index);
             charSet = charSet.substring(charSet.indexOf("=") + 1).replace(";", "");
         }
