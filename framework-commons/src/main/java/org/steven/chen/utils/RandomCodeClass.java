@@ -120,7 +120,7 @@ public final class RandomCodeClass {
         return tmp;
     }
 
-    enum CodeCharArray {
+    public enum CodeCharArray {
         NUMBER("0123456789".toCharArray()),
         LESS_LETTER("abcdefghijklmnopqrstuvwxyz".toCharArray()),
         LARGE_LETTER("ABCDEFGHIJKLMNOPQRSTUVWXYZ".toCharArray()),
