@@ -65,6 +65,7 @@ public class HttpUtils {
         HttpResponse result = new HttpResponse();
         if (requestBase == null) return result;
         CloseableHttpResponse httpResponse = null;
+        long start = System.currentTimeMillis();
         try {
             addCookies(requestBase, cookies);
             addHeaders(requestBase, headers);
@@ -78,6 +79,7 @@ public class HttpUtils {
         } catch (Exception e) {
             throw new IllegalStateException("Http doService 异常", e);
         } finally {
+            LOGGER.info("请求花费时间: {} ms", System.currentTimeMillis() - start);
             requestBase.releaseConnection();
             CommonsUtil.safeClose(httpResponse, httpClient);
         }
@@ -89,11 +91,10 @@ public class HttpUtils {
         CloseableHttpClient httpClient = createHttpClientByUrl(url);
         url = addParams(url, params);
         HttpGet httpGet = new HttpGet(url);
-        long start = System.currentTimeMillis();
         try {
             return doService(httpClient, httpGet, headers, cookies);
         } finally {
-            LOGGER.info("get请求 url: {}, 花费时间: {} ms", url, System.currentTimeMillis() - start);
+            LOGGER.info("get请求 url: {}", url);
         }
     }
 
@@ -102,11 +103,10 @@ public class HttpUtils {
         CloseableHttpClient httpClient = createHttpClientByUrl(url);
         HttpPost httpPost = new HttpPost(url);
         addParams(httpPost, params);
-        long start = System.currentTimeMillis();
         try {
             return doService(httpClient, httpPost, headers, cookies);
         } finally {
-            LOGGER.info("post请求 url: {}, 花费时间: {} ms", url, System.currentTimeMillis() - start);
+            LOGGER.info("post请求 url: {}", url);
         }
     }
 
