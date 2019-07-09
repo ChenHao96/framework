@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package org.steven.chen.database.mybatis;
+package com.github.chenhao96.database.mybatis;
 
 import java.lang.annotation.*;
 
