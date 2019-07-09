@@ -37,7 +37,7 @@ public class DistributedLockServiceImpl implements DistributedLockService {
     private static final long REPLY = 0L;
     private static final int LOCK_EXPIRE_TIME_SECOND = 120;
     private static final ThreadLocal<String> threadLocal = new ThreadLocal<>();
-    private static final String LOCK_PREFIX = "org.steven.chen.java.lock.pk.%s.%s";
+    private static final String LOCK_PREFIX = "com.github.chenhao96.java.lock.pk.%s.%s";
     private static final Logger LOGGER = LoggerFactory.getLogger(DistributedLockServiceImpl.class);
     private static final String UNLOCK_SCRIPT = "  if redis.call(\"get\",KEYS[1]) == ARGV[1] then\n    return redis.call(\"del\",KEYS[1])\n  else\n        return 0\n  end\n";
     private static final String EXPIRE_LOCK_SCRIPT = "  if redis.call(\"get\",KEYS[1]) == ARGV[1] then\n    return redis.call(\"expire\",KEYS[1],ARGV[2])\n  else\n        return 0\n  end\n";
