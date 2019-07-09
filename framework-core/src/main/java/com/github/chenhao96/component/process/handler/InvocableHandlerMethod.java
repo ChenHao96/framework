@@ -17,7 +17,7 @@ package com.github.chenhao96.component.process.handler;
 
 import com.github.chenhao96.component.process.ProcessHandlerService;
 import com.github.chenhao96.component.process.ProcessInvokeService;
-import org.steven.chen.utils.mapper.Jackson2FlatMapperK;
+import com.github.chenhao96.utils.mapper.Jackson2FlatMapperK;
 
 import java.lang.reflect.Method;
 import java.util.Map;

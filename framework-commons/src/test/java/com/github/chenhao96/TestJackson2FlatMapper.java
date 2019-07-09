@@ -16,7 +16,7 @@
 
 package com.github.chenhao96;
 
-import org.steven.chen.utils.mapper.Jackson2FlatMapperK;
+import com.github.chenhao96.utils.mapper.Jackson2FlatMapperK;
 
 import java.util.Map;
 

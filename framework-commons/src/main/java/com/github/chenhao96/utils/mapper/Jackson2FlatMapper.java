@@ -15,8 +15,6 @@
  */
 package com.github.chenhao96.utils.mapper;
 
-import org.steven.chen.utils.mapper.Jackson2FlatMapperK;
-
 import java.io.IOException;
 import java.util.Map;
 
