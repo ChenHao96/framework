@@ -59,7 +59,7 @@ public abstract class AbstractController {
     }
 
     protected int getRequestClientPort() {
-        return getRequest().getRemotePort();
+        return (int) getRequest().getAttribute(CLIENT_PORT_KEY);
     }
 
     protected void responseFile(String contentType, String filePath) throws IOException {
