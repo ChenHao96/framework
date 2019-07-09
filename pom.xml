@@ -4,13 +4,14 @@
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
 
-    <groupId>org.steven.chen.game</groupId>
+    <groupId>com.github.chenhao96</groupId>
     <artifactId>framework</artifactId>
     <version>1.1.8-RELEASE</version>
     <modules>
         <module>framework-core</module>
         <module>framework-web</module>
         <module>framework-commons</module>
+        <module>framework-websocket</module>
     </modules>
     <packaging>pom</packaging>
 
@@ -26,14 +27,20 @@
     <dependencyManagement>
         <dependencies>
             <dependency>
-                <groupId>org.steven.chen.game</groupId>
+                <groupId>com.github.chenhao96</groupId>
                 <artifactId>framework-core</artifactId>
                 <version>1.1.8-RELEASE</version>
             </dependency>
 
             <dependency>
-                <groupId>org.steven.chen.game</groupId>
+                <groupId>com.github.chenhao96</groupId>
                 <artifactId>framework-commons</artifactId>
+                <version>1.1.8-RELEASE</version>
+            </dependency>
+
+            <dependency>
+                <groupId>com.github.chenhao96</groupId>
+                <artifactId>framework-web</artifactId>
                 <version>1.1.8-RELEASE</version>
             </dependency>
 
