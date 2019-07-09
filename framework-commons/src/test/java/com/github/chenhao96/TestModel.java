@@ -1,4 +1,4 @@
-package com.github.chenhao96.game;
+package com.github.chenhao96;
 
 import java.util.Arrays;
 import java.util.List;

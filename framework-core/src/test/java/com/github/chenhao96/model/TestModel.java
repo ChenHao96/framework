@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.github.chenhao96.game.model;
+package com.github.chenhao96.model;
 
 import java.util.HashSet;
 import java.util.Map;

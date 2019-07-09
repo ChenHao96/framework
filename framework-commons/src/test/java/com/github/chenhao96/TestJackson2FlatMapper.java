@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.github.chenhao96.game;
+package com.github.chenhao96;
 
 import org.steven.chen.utils.mapper.Jackson2FlatMapperK;
 

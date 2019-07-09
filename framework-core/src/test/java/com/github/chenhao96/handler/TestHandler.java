@@ -14,12 +14,12 @@
  * limitations under the License.
  */
 
-package com.github.chenhao96.game.handler;
+package com.github.chenhao96.handler;
 
 import com.github.chenhao96.component.process.HandlerMapping;
 import com.github.chenhao96.component.process.ProcessHandlerService;
 import com.github.chenhao96.component.process.handler.MapParameter;
-import com.github.chenhao96.game.model.TestModel;
+import com.github.chenhao96.model.TestModel;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;

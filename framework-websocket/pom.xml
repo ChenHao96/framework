@@ -16,7 +16,7 @@
     <dependencies>
         <dependency>
             <groupId>com.github.chenhao96</groupId>
-            <artifactId>framework-web</artifactId>
+            <artifactId>framework-core</artifactId>
         </dependency>
 
         <dependency>

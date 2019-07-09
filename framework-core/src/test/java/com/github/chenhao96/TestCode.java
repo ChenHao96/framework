@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.github.chenhao96.game;
+package com.github.chenhao96;
 
 import com.github.chenhao96.component.manager.ComponentManager;
 import com.github.chenhao96.component.process.ProcessInvokeService;
