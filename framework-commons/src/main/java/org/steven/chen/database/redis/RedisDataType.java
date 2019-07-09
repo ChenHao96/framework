@@ -20,20 +20,16 @@ import java.util.EnumSet;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
-/**
- * Enumeration of the Redis data types.
- *
- * @author Costin Leau
- */
 public enum RedisDataType {
 
     NONE("none"), STRING("string"), LIST("list"), SET("set"), ZSET("zset"), HASH("hash");
 
-    private static final Map<String, RedisDataType> codeLookup = new ConcurrentHashMap<>(6);
+    private static final Map<String, RedisDataType> codeLookup;
 
     static {
-        for (RedisDataType type : EnumSet.allOf(RedisDataType.class))
-            codeLookup.put(type.code, type);
+        EnumSet<RedisDataType> enumSet = EnumSet.allOf(RedisDataType.class);
+        codeLookup = new ConcurrentHashMap<>(enumSet.size());
+        for (RedisDataType type : enumSet) codeLookup.put(type.code, type);
 
     }
 
@@ -43,21 +39,10 @@ public enum RedisDataType {
         this.code = name;
     }
 
-    /**
-     * Returns the code associated with the current enum.
-     *
-     * @return code of this enum
-     */
     public String code() {
         return code;
     }
 
-    /**
-     * Utility method for converting an enum code to an actual enum.
-     *
-     * @param code enum code
-     * @return actual enum corresponding to the given code
-     */
     public static RedisDataType fromCode(String code) {
         RedisDataType data = codeLookup.get(code);
         if (data == null)
