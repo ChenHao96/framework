@@ -14,9 +14,9 @@ public final class RSAUtil {
     public static final String SHA_KEY_TYPE = "RSA";
     public static final String SHA256_KEY_TYPE = "RSA256";
 
-    public static final String SIGN_ALGORITHMS_MD5 = "MD5WithRSA";
-    public static final String SIGN_ALGORITHMS_SHA = "SHA1WithRSA";
-    public static final String SIGN_ALGORITHMS_SHA256 = "SHA256WithRSA";
+    private static final String SIGN_ALGORITHMS_MD5 = "MD5WithRSA";
+    private static final String SIGN_ALGORITHMS_SHA = "SHA1WithRSA";
+    private static final String SIGN_ALGORITHMS_SHA256 = "SHA256WithRSA";
 
     private KeyPair keyPair;
 
