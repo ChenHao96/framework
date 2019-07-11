@@ -45,9 +45,9 @@ public class ServerSocketComponent implements ComponentService {
 
     private int processors;
     private int socketPort;
-    private boolean started;
     private long noDataWaitTime;
     protected boolean initialize;
+    private volatile boolean started;
     private ServerSocket serverSocket;
     private Thread[] slackList;
     private final Object wait = new Object();
