@@ -16,7 +16,6 @@
 package com.github.chenhao96.web;
 
 import com.github.chenhao96.utils.StringUtil;
-import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.web.servlet.HandlerInterceptor;
@@ -41,7 +40,7 @@ public class RequestInterceptor implements HandlerInterceptor {
         String param = catalinaMap2String(request.getParameterMap());
         request.setAttribute(AbstractController.CLIENT_PORT_KEY, port);
         String callBackName = request.getParameter(CALLBACK_HTTP_PARAMETER_NAME);
-        if (StringUtil.isNotEmpty(callBackName)) MappingJackson2HttpMessageConverter.setJsonPCallBackName(callBackName);
+        if (!StringUtil.isEmpty(callBackName)) MappingJackson2HttpMessageConverter.setJsonPCallBackName(callBackName);
         LOGGER.info("request address:{}:{},requestUrl:{},param:{}", ip, port, requestUrl, param);
         return true;
     }
@@ -69,19 +68,19 @@ public class RequestInterceptor implements HandlerInterceptor {
     public String getIp(HttpServletRequest request) {
 
         String ip = request.getHeader("x-forwarded-for");
-        if (StringUtils.isEmpty(ip) || "unknown".equalsIgnoreCase(ip)) {
+        if (StringUtil.isEmpty(ip) || "unknown".equalsIgnoreCase(ip)) {
             ip = request.getHeader("Proxy-Client-IP");
         }
 
-        if (StringUtils.isEmpty(ip) || "unknown".equalsIgnoreCase(ip)) {
+        if (StringUtil.isEmpty(ip) || "unknown".equalsIgnoreCase(ip)) {
             ip = request.getHeader("WL-Proxy-Client-IP");
         }
 
-        if (StringUtils.isEmpty(ip) || "unknown".equalsIgnoreCase(ip)) {
+        if (StringUtil.isEmpty(ip) || "unknown".equalsIgnoreCase(ip)) {
             ip = request.getRemoteAddr();
         }
 
-        if (StringUtils.isEmpty(ip) || "0:0:0:0:0:0:0:1".equalsIgnoreCase(ip)) {
+        if (StringUtil.isEmpty(ip) || "0:0:0:0:0:0:0:1".equalsIgnoreCase(ip)) {
             ip = "127.0.0.1";
         }
 

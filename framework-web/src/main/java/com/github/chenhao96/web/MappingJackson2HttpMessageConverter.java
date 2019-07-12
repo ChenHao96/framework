@@ -47,7 +47,7 @@ public class MappingJackson2HttpMessageConverter extends org.springframework.htt
     @Override
     protected void writePrefix(JsonGenerator generator, Object object) throws IOException {
         String callbackName = holder.get();
-        if (StringUtil.isNotEmpty(callbackName)) {
+        if (!StringUtil.isEmpty(callbackName)) {
             generator.writeRaw(String.format("%s(", callbackName));
         }
     }
@@ -55,7 +55,7 @@ public class MappingJackson2HttpMessageConverter extends org.springframework.htt
     @Override
     protected void writeSuffix(JsonGenerator generator, Object object) throws IOException {
         String callbackName = holder.get();
-        if (StringUtil.isNotEmpty(callbackName)) {
+        if (!StringUtil.isEmpty(callbackName)) {
             generator.writeRaw(");");
         }
         holder.remove();

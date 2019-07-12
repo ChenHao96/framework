@@ -15,7 +15,6 @@
  */
 package com.github.chenhao96.utils;
 
-import org.apache.commons.lang.StringUtils;
 import org.apache.http.Consts;
 import org.apache.http.Header;
 import org.apache.http.HttpEntity;
@@ -102,7 +101,7 @@ public class HttpUtils {
     }
 
     public static HttpResponse doGet(String url, Map<String, String> params, Map<String, String> headers, Cookie... cookies) {
-        if (StringUtils.isEmpty(url)) throw new IllegalArgumentException("url为空");
+        if (StringUtil.isEmpty(url)) throw new IllegalArgumentException("url为空");
         CloseableHttpClient httpClient = createHttpClientByUrl(url);
         url = addParams(url, params);
         HttpGet httpGet = new HttpGet(url);
@@ -114,7 +113,7 @@ public class HttpUtils {
     }
 
     public static HttpResponse doPost(String url, Map<String, String> params, Map<String, String> headers, Cookie... cookies) {
-        if (StringUtils.isEmpty(url)) throw new IllegalArgumentException("url为空");
+        if (StringUtil.isEmpty(url)) throw new IllegalArgumentException("url为空");
         CloseableHttpClient httpClient = createHttpClientByUrl(url);
         HttpPost httpPost = new HttpPost(url);
         addParams(httpPost, params);
@@ -208,7 +207,7 @@ public class HttpUtils {
 
     private static void addCookies(AbstractHttpMessage httpMessage, Cookie[] cookies) {
         String cookieStr = assembleCookies(cookies);
-        if (StringUtils.isNotEmpty(cookieStr)) {
+        if (StringUtil.isNotEmpty(cookieStr)) {
             httpMessage.setHeader("Cookie", cookieStr);
         }
     }
@@ -232,7 +231,7 @@ public class HttpUtils {
     public static CloseableHttpClient createHttpClientByUrl(String url) {
 
         CloseableHttpClient client = HttpClients.createDefault();
-        if (StringUtils.equalsIgnoreCase(url.substring(0, 5), "https")) {
+        if (StringUtil.equalsIgnoreCase(url.substring(0, 5), "https")) {
             try {
                 HttpClientBuilder httpClientBuilder = HttpClients.custom();
                 TrustManager[] tm = {new X509TrustManager() {

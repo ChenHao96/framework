@@ -21,7 +21,6 @@ import com.aliyun.oss.common.auth.CredentialsProvider;
 import com.aliyun.oss.common.auth.DefaultCredentialProvider;
 import com.github.chenhao96.model.AliyunProperties;
 import org.apache.commons.codec.digest.DigestUtils;
-import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.web.multipart.MultipartFile;
@@ -37,7 +36,7 @@ import java.util.UUID;
 
 public class FileUploadUtil {
 
-    private static final Logger logger = LoggerFactory.getLogger(FileUploadUtil.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(FileUploadUtil.class);
     private static final String FILE_PATH_STATIC = System.getProperty("user.home") + "/file_upload";
 
     private boolean local;
@@ -66,10 +65,10 @@ public class FileUploadUtil {
         this.local = true;
         File file = new File(filePath);
         if (file.setWritable(true)) {
-            logger.info("filePath writable fail,create path:{}", filePath);
+            LOGGER.info("filePath writable fail,create path:{}", filePath);
         } else {
             if (!file.exists() && file.mkdirs()) {
-                logger.info("filePath not exists,create path:{}", filePath);
+                LOGGER.info("filePath not exists,create path:{}", filePath);
             }
         }
     }
@@ -109,7 +108,7 @@ public class FileUploadUtil {
     public FileInfo uploadFileOutPath(MultipartFile file, String fileName) throws IOException {
         fileName = this.checkFileGetName(file, fileName);
         File targetFile = new File(this.filePath, fileName);
-        logger.info("targetFile:{}", targetFile.toString());
+        LOGGER.info("targetFile:{}", targetFile.toString());
         if (!targetFile.exists() && !targetFile.mkdirs()) {
             throw new RuntimeException("创建目录失败");
         } else {
@@ -119,7 +118,7 @@ public class FileUploadUtil {
                 throw new RuntimeException("传输失败", var7);
             }
             String absolutePath = targetFile.getAbsolutePath();
-            logger.info("file absolutePath:{}", absolutePath);
+            LOGGER.info("file absolutePath:{}", absolutePath);
             FileInfo info = new FileInfo();
             info.fileMd5 = DigestUtils.md5Hex(file.getInputStream());
             info.filePath = (fileName).replaceAll("\\\\", "/");
@@ -130,14 +129,14 @@ public class FileUploadUtil {
 
     private String checkFileGetName(MultipartFile file, String fileName) {
         if (file != null && !file.isEmpty()) {
-            if (StringUtils.isNotBlank(file.getOriginalFilename())) {
+            if (StringUtil.isNotBlank(file.getOriginalFilename())) {
                 fileName = file.getOriginalFilename();
             }
-            logger.info("fileName:{}", fileName);
+            LOGGER.info("fileName:{}", fileName);
             String extName = fileName.substring(fileName.lastIndexOf("."));
             String uuid = UUID.randomUUID().toString().replace("-", "");
             fileName = uuid + extName;
-            logger.info("new fileName:{}", fileName);
+            LOGGER.info("new fileName:{}", fileName);
             String dateDirectory = (new SimpleDateFormat("yyyyMMdd")).format(new Date());
             String relativelyPath = File.separator + dateDirectory + File.separator;
             return relativelyPath + fileName;

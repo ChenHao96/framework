@@ -15,7 +15,6 @@
  */
 package com.github.chenhao96.utils;
 
-import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.util.CollectionUtils;
@@ -38,7 +37,7 @@ public final class URLUtils {
         if (request == null) return null;
 
         StringBuilder sb = new StringBuilder(currentServerUrl(request));
-        if (StringUtils.isNotBlank(url)) {
+        if (StringUtil.isNotBlank(url)) {
             if (!url.startsWith("/")) {
                 sb.append("/");
             }
@@ -73,14 +72,14 @@ public final class URLUtils {
                 }
             }
         }
-        if (StringUtils.isNotEmpty(contextPath)) sb.append(contextPath);
+        if (StringUtil.isNotEmpty(contextPath)) sb.append(contextPath);
         LOGGER.info("newUrl4Param:{}", sb);
         return sb;
     }
 
     public static String updateUrl(String url, Map<String, String> param, String newFragment) {
 
-        if (StringUtils.isBlank(url)) return "";
+        if (StringUtil.isBlank(url)) return "";
 
         URI uri;
         try {
@@ -97,14 +96,14 @@ public final class URLUtils {
 
         param = updateRawQueryParam(uri.getRawQuery(), param);
         String paramStr = paramToQueryString(param);
-        if (StringUtils.isNotEmpty(paramStr)) {
+        if (StringUtil.isNotEmpty(paramStr)) {
             sb.append(paramStr);
         }
 
         String fragment = uri.getFragment();
-        if (StringUtils.isNotBlank(newFragment)) {
+        if (StringUtil.isNotBlank(newFragment)) {
             sb.append("#").append(newFragment);
-        } else if (StringUtils.isNotEmpty(fragment)) {
+        } else if (StringUtil.isNotEmpty(fragment)) {
             sb.append("#").append(fragment);
         }
 
@@ -155,7 +154,7 @@ public final class URLUtils {
     public static Map<String, String> getQueryMap(String rawQuery) {
 
         String[] pas = null;
-        if (StringUtils.isNotEmpty(rawQuery)) pas = rawQuery.split("&");
+        if (StringUtil.isNotEmpty(rawQuery)) pas = rawQuery.split("&");
 
         Map<String, String> result = null;
         if (pas != null) {
