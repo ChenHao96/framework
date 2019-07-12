@@ -97,7 +97,7 @@ public final class URLUtils {
         param = updateRawQueryParam(uri.getRawQuery(), param);
         String paramStr = paramToQueryString(param);
         if (StringUtil.isNotEmpty(paramStr)) {
-            sb.append(paramStr);
+            sb.append("?").append(paramStr);
         }
 
         String fragment = uri.getFragment();
