@@ -63,6 +63,7 @@ public class StringLinkedNode<V> implements Node<String, V> {
             next.setPrevious(previous);
             if (currentNode == this.root) this.root = previous;
         }
+        this.size--;
         return currentNode.getValue();
     }
 
