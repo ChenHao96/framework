@@ -1,5 +1,5 @@
 /**
- * Copyright 2019 ChenHao96
+ * Copyright 2017-2019 ChenHao96
  * <p>
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -13,23 +13,26 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.github.chenhao96.utils.collection;
+package com.github.chenhao96.utils.collection.node;
 
-public class FastNodeCurd {
+public abstract class AbstractNodeItem<D> {
 
-    public <D> void add(FastNode<D> node, D data) {
+    private D value;
+    private int index;
 
+    public D getValue() {
+        return value;
     }
 
-    public <D> void delete(FastNode<D> node, D data) {
-
+    public void setValue(D value) {
+        this.value = value;
     }
 
-    public <D> void update(FastNode<D> node, D data) {
-
+    public int getIndex() {
+        return index;
     }
 
-    public <D> void query(FastNode<D> node, D data) {
-
+    public void setIndex(int index) {
+        this.index = index;
     }
 }

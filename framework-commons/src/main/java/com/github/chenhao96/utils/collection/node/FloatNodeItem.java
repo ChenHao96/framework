@@ -1,5 +1,5 @@
 /**
- * Copyright 2019 ChenHao96
+ * Copyright 2017-2019 ChenHao96
  * <p>
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -13,22 +13,12 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.github.chenhao96.utils.collection;
+package com.github.chenhao96.utils.collection.node;
 
-public class FastNode<D> {
+public class FloatNodeItem<D> extends AbstractNodeItem<D> {
 
-    private FastNode<D>[] array;
     private int level;
-    private int index;
-    private D data;
-
-    public FastNode<D>[] getArray() {
-        return array;
-    }
-
-    public void setArray(FastNode<D>[] array) {
-        this.array = array;
-    }
+    private FloatNodeItem<D>[] child;
 
     public int getLevel() {
         return level;
@@ -38,19 +28,11 @@ public class FastNode<D> {
         this.level = level;
     }
 
-    public int getIndex() {
-        return index;
+    public FloatNodeItem<D>[] getChild() {
+        return child;
     }
 
-    public void setIndex(int index) {
-        this.index = index;
-    }
-
-    public D getData() {
-        return data;
-    }
-
-    public void setData(D data) {
-        this.data = data;
+    public void setChild(FloatNodeItem<D>[] child) {
+        this.child = child;
     }
 }
