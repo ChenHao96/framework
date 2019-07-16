@@ -16,13 +16,13 @@
 
 package com.github.chenhao96.database.redis;
 
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.redis.connection.DataType;
 import org.springframework.data.redis.core.BoundHashOperations;
 import org.springframework.data.redis.core.BoundValueOperations;
 import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.stereotype.Service;
 
-import javax.annotation.Resource;
 import java.math.BigDecimal;
 import java.util.Date;
 import java.util.Map;
@@ -32,7 +32,7 @@ import java.util.concurrent.TimeUnit;
 @Service
 public class RedisStringCacheAdaptorImpl implements RedisStringCacheAdaptor {
 
-    @Resource
+    @Autowired
     private StringRedisTemplate redisTemplate;
 
     @Override
