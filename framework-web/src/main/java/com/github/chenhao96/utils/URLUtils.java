@@ -78,6 +78,10 @@ public final class URLUtils {
     }
 
     public static String updateUrl(String url, Map<String, String> param, String newFragment) {
+        return updateUrl(url, param, newFragment, false);
+    }
+
+    public static String updateUrl(String url, Map<String, String> param, String newFragment, boolean encode) {
 
         if (StringUtil.isBlank(url)) return "";
 
@@ -95,7 +99,7 @@ public final class URLUtils {
         StringBuilder sb = newUrl4Param(port, protocol, serverName, contextPath);
 
         param = updateRawQueryParam(uri.getRawQuery(), param);
-        String paramStr = paramToQueryString(param);
+        String paramStr = paramToQueryString(param, encode);
         if (StringUtil.isNotEmpty(paramStr)) {
             sb.append("?").append(paramStr);
         }
