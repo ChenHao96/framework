@@ -39,10 +39,10 @@ public class RequestInterceptor implements HandlerInterceptor {
         int port = request.getRemotePort();
         String requestUrl = request.getServletPath();
         if(StringUtil.isEmpty(requestUrl)){
-            String uri = request.getRequestURI();
+            requestUrl = request.getRequestURI();
             String contextPath = request.getContextPath();
             if (StringUtils.length(contextPath) > 0) {
-                requestUrl = StringUtils.substring(uri, contextPath.length());
+                requestUrl = StringUtils.substring(requestUrl, contextPath.length());
             }
         }
         request.setAttribute(AbstractController.CLIENT_IP_KEY, ip);
