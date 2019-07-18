@@ -16,6 +16,7 @@
 package com.github.chenhao96.web;
 
 import com.github.chenhao96.utils.StringUtil;
+import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.web.servlet.HandlerInterceptor;
@@ -29,6 +30,7 @@ import java.util.Set;
 public class RequestInterceptor implements HandlerInterceptor {
 
     private static final String CALLBACK_HTTP_PARAMETER_NAME = "callback";
+    private static final String SERVLET_PATH_PARAMETER_NAME = "servlet_path_key";
     private static final Logger LOGGER = LoggerFactory.getLogger(RequestInterceptor.class);
 
     @Override
@@ -36,8 +38,16 @@ public class RequestInterceptor implements HandlerInterceptor {
         String ip = getIp(request);
         int port = request.getRemotePort();
         String requestUrl = request.getServletPath();
+        if(StringUtil.isEmpty(requestUrl)){
+            String uri = request.getRequestURI();
+            String contextPath = request.getContextPath();
+            if (StringUtils.length(contextPath) > 0) {
+                requestUrl = StringUtils.substring(uri, contextPath.length());
+            }
+        }
         request.setAttribute(AbstractController.CLIENT_IP_KEY, ip);
         String param = catalinaMap2String(request.getParameterMap());
+        request.setAttribute(SERVLET_PATH_PARAMETER_NAME, requestUrl);
         request.setAttribute(AbstractController.CLIENT_PORT_KEY, port);
         String callBackName = request.getParameter(CALLBACK_HTTP_PARAMETER_NAME);
         if (!StringUtil.isEmpty(callBackName)) MappingJackson2HttpMessageConverter.setJsonPCallBackName(callBackName);
