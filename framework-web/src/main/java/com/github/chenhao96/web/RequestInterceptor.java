@@ -35,7 +35,7 @@ public class RequestInterceptor implements HandlerInterceptor {
     public boolean preHandle(HttpServletRequest request, HttpServletResponse response, Object handler) throws Exception {
         String ip = getIp(request);
         int port = request.getRemotePort();
-        String requestUrl = request.getRequestURI();
+        String requestUrl = request.getServletPath();
         request.setAttribute(AbstractController.CLIENT_IP_KEY, ip);
         String param = catalinaMap2String(request.getParameterMap());
         request.setAttribute(AbstractController.CLIENT_PORT_KEY, port);
