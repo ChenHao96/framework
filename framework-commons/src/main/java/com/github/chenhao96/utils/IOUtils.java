@@ -23,6 +23,7 @@ public class IOUtils {
     private static final int BUFFER_SIZE = 1024;
 
     public static String read(Reader reader) throws IOException {
+        if (reader == null) return null;
         try (StringWriter writer = new StringWriter()) {
             int read;
             CharBuffer buf = CharBuffer.allocate(BUFFER_SIZE);
@@ -55,28 +56,14 @@ public class IOUtils {
         return total;
     }
 
+    @Deprecated
     public static String readStream2String(Reader reader) throws IOException {
-        if (reader == null) return "";
-
-        StringWriter writer = new StringWriter();
-        CharBuffer buffer = CharBuffer.allocate(BUFFER_SIZE);
-
-        try {
-            int count;
-            while ((count = reader.read(buffer)) > 0) {
-                buffer.flip();
-                writer.write(buffer.array(), 0, count);
-                buffer.clear();
-            }
-            return writer.toString();
-        } finally {
-            CommonsUtil.safeClose(writer);
-        }
+        return read(reader);
     }
 
     public static String readStream2String(InputStream in, String charSet) throws IOException {
         if (in == null) return "";
-        return readStream2String(new BufferedReader(new InputStreamReader(in, charSet)));
+        return read(new BufferedReader(new InputStreamReader(in, charSet)));
     }
 
     public static byte[] readStream2ByteArray(InputStream in) throws IOException {
