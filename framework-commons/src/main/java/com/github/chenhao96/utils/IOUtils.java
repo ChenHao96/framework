@@ -66,6 +66,10 @@ public class IOUtils {
         return read(new BufferedReader(new InputStreamReader(in, charSet)));
     }
 
+    public static String readStream2String(InputStream in) throws IOException {
+        return readStream2String(in, CommonsUtil.SYSTEM_ENCODING);
+    }
+
     public static byte[] readStream2ByteArray(InputStream in) throws IOException {
         if (in == null) return new byte[0];
         ByteArrayOutputStream output = new ByteArrayOutputStream(BUFFER_SIZE);
