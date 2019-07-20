@@ -18,7 +18,7 @@ package com.github.chenhao96.utils.collection.node;
 public class StringLinkedNode<V> implements Node<String, V> {
 
     private int size;
-    private LinkedNodeItem<V> root;
+    private LinkedNodeItem root;
 
     @Override
     public int size() {
@@ -26,11 +26,11 @@ public class StringLinkedNode<V> implements Node<String, V> {
     }
 
     @Override
-    public V get(String key) {
+    public V get(Object key) {
         if (key == null) throw new IllegalArgumentException("key is required! can not be null.");
         if (this.root == null) return null;
         int hashCode = key.hashCode();
-        LinkedNodeItem<V> node = getNodeByIndex(this.root, hashCode, 0);
+        LinkedNodeItem node = getNodeByIndex(this.root, hashCode, 0);
         return node == null ? null : node.getValue();
     }
 
@@ -38,22 +38,20 @@ public class StringLinkedNode<V> implements Node<String, V> {
     public V put(String key, V value) {
         if (key == null) throw new IllegalArgumentException("key is required! can not be null.");
         int hashCode = key.hashCode();
-        if (this.root == null) this.root = new LinkedNodeItem<>();
-        add(this.root, hashCode, value, 0);
+        if (this.root == null) this.root = new LinkedNodeItem();
         this.size++;
-        return value;
+        return add(this.root, hashCode, value, 0);
     }
 
     @Override
-    public V remove(String key) {
+    public V remove(Object key) {
         if (key == null) throw new IllegalArgumentException("key is required! can not be null.");
         if (this.root == null) return null;
         int hashCode = key.hashCode();
-        LinkedNodeItem<V> currentNode = getNodeByIndex(this.root, hashCode, 0);
+        LinkedNodeItem currentNode = getNodeByIndex(this.root, hashCode, 0);
         if (currentNode == null) return null;
-
-        LinkedNodeItem<V> previous = currentNode.getPrevious();
-        LinkedNodeItem<V> next = currentNode.getNext();
+        LinkedNodeItem previous = currentNode.getPrevious();
+        LinkedNodeItem next = currentNode.getNext();
         if (previous == null) {
             if (currentNode == this.root) this.root = next;
         } else if (next == null) {
@@ -67,14 +65,14 @@ public class StringLinkedNode<V> implements Node<String, V> {
         return currentNode.getValue();
     }
 
-    private void add(LinkedNodeItem<V> node, int index, V value, int state) {
+    private V add(LinkedNodeItem node, int index, V value, int state) {
         if (node.getIndex() > index) {
-            LinkedNodeItem<V> previous = node.getPrevious();
+            LinkedNodeItem previous = node.getPrevious();
             if (previous != null) {
                 if (state != -1) {
-                    add(previous, index, value, 1);
+                    return add(previous, index, value, 1);
                 } else {
-                    LinkedNodeItem<V> newNode = new LinkedNodeItem<>();
+                    LinkedNodeItem newNode = new LinkedNodeItem();
                     newNode.setPrevious(previous);
                     newNode.setIndex(index);
                     newNode.setValue(value);
@@ -82,19 +80,19 @@ public class StringLinkedNode<V> implements Node<String, V> {
                     node.setPrevious(newNode);
                 }
             } else {
-                previous = new LinkedNodeItem<>();
+                previous = new LinkedNodeItem();
                 previous.setIndex(index);
                 previous.setValue(value);
                 previous.setNext(node);
                 node.setPrevious(previous);
             }
         } else if (node.getIndex() < index) {
-            LinkedNodeItem<V> next = node.getNext();
+            LinkedNodeItem next = node.getNext();
             if (next != null) {
                 if (state != 1) {
-                    add(next, index, value, -1);
+                    return add(next, index, value, -1);
                 } else {
-                    LinkedNodeItem<V> newNode = new LinkedNodeItem<>();
+                    LinkedNodeItem newNode = new LinkedNodeItem();
                     newNode.setPrevious(node);
                     newNode.setIndex(index);
                     newNode.setValue(value);
@@ -102,31 +100,73 @@ public class StringLinkedNode<V> implements Node<String, V> {
                     node.setNext(newNode);
                 }
             } else {
-                next = new LinkedNodeItem<>();
+                next = new LinkedNodeItem();
                 next.setIndex(index);
                 next.setValue(value);
                 next.setPrevious(node);
                 node.setNext(next);
             }
         } else {
+            V result = node.getValue();
             node.setValue(value);
+            return result;
         }
+        return null;
     }
 
-    private LinkedNodeItem<V> getNodeByIndex(LinkedNodeItem<V> node, int index, int state) {
+    private LinkedNodeItem getNodeByIndex(LinkedNodeItem node, int index, int state) {
         if (node.getIndex() > index) {
-            LinkedNodeItem<V> previous = node.getPrevious();
+            LinkedNodeItem previous = node.getPrevious();
             if (previous != null) {
                 if (state != -1) return getNodeByIndex(previous, index, 1);
             }
             return null;
         } else if (node.getIndex() < index) {
-            LinkedNodeItem<V> next = node.getNext();
+            LinkedNodeItem next = node.getNext();
             if (next != null) {
                 if (state != 1) return getNodeByIndex(next, index, -1);
             }
             return null;
         }
         return node;
+    }
+
+    public class LinkedNodeItem {
+        private V value;
+        private int index;
+        private LinkedNodeItem next;
+        private LinkedNodeItem previous;
+
+        public LinkedNodeItem getPrevious() {
+            return previous;
+        }
+
+        public void setPrevious(LinkedNodeItem previous) {
+            this.previous = previous;
+        }
+
+        public LinkedNodeItem getNext() {
+            return next;
+        }
+
+        public void setNext(LinkedNodeItem next) {
+            this.next = next;
+        }
+
+        public V getValue() {
+            return value;
+        }
+
+        public void setValue(V value) {
+            this.value = value;
+        }
+
+        public int getIndex() {
+            return index;
+        }
+
+        public void setIndex(int index) {
+            this.index = index;
+        }
     }
 }

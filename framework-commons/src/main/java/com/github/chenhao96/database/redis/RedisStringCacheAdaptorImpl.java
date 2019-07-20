@@ -16,6 +16,7 @@
 
 package com.github.chenhao96.database.redis;
 
+import com.github.chenhao96.utils.StringUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.redis.connection.DataType;
@@ -45,8 +46,7 @@ public class RedisStringCacheAdaptorImpl implements RedisStringCacheAdaptor {
 
     @Override
     public boolean delete(String key) {
-        redisTemplate.delete(newKey(key));
-        return true;
+        return redisTemplate.delete(newKey(key));
     }
 
     @Override
@@ -72,7 +72,7 @@ public class RedisStringCacheAdaptorImpl implements RedisStringCacheAdaptor {
 
     @Override
     public void setExpire(String key, long duration) {
-        redisTemplate.boundValueOps(newKey(key)).expire(duration, TimeUnit.MILLISECONDS);
+        setExpire(key, duration, TimeUnit.MILLISECONDS);
     }
 
     @Override
@@ -83,6 +83,13 @@ public class RedisStringCacheAdaptorImpl implements RedisStringCacheAdaptor {
     @Override
     public void setExpire(String key, long duration, TimeUnit timeUnit) {
         redisTemplate.boundValueOps(newKey(key)).expire(duration, timeUnit);
+    }
+
+    @Override
+    public void set(String key, String value, Date date) {
+        BoundValueOperations<String, String> operations = redisTemplate.boundValueOps(newKey(key));
+        operations.set(value);
+        operations.expireAt(date);
     }
 
     @Override
@@ -99,8 +106,7 @@ public class RedisStringCacheAdaptorImpl implements RedisStringCacheAdaptor {
 
     @Override
     public void set(String key, String value, long duration) {
-        BoundValueOperations<String, String> operations = redisTemplate.boundValueOps(newKey(key));
-        operations.set(value, duration, TimeUnit.MILLISECONDS);
+        set(key, value, duration, TimeUnit.MILLISECONDS);
     }
 
     @Override
@@ -111,26 +117,26 @@ public class RedisStringCacheAdaptorImpl implements RedisStringCacheAdaptor {
 
     @Override
     public void increment(String key) {
-        BoundValueOperations<String, String> operations = redisTemplate.boundValueOps(newKey(key));
-        operations.increment();
+        increment(key, BigDecimal.ONE);
     }
 
     @Override
     public void increment(String key, BigDecimal delta) {
+        if (StringUtil.isEmpty(key) || delta == null) return;
         BoundValueOperations<String, String> operations = redisTemplate.boundValueOps(newKey(key));
         operations.increment(delta.doubleValue());
     }
 
     @Override
     public void decrement(String key) {
-        BoundValueOperations<String, String> operations = redisTemplate.boundValueOps(newKey(key));
-        operations.decrement();
+        decrement(key, BigDecimal.ONE);
     }
 
     @Override
-    public void decrement(String key, Long delta) {
+    public void decrement(String key, BigDecimal delta) {
+        if (StringUtil.isEmpty(key) || delta == null) return;
         BoundValueOperations<String, String> operations = redisTemplate.boundValueOps(newKey(key));
-        operations.decrement(delta);
+        operations.increment(delta.multiply(BigDecimal.valueOf(-1)).doubleValue());
     }
 
     @Override
@@ -153,14 +159,25 @@ public class RedisStringCacheAdaptorImpl implements RedisStringCacheAdaptor {
 
     @Override
     public void hashIncrement(String key, String field) {
-        BoundHashOperations<String, String, String> operations = redisTemplate.boundHashOps(newKey(key));
-        operations.increment(field, 1);
+        hashIncrement(key, field, BigDecimal.ONE);
     }
 
     @Override
     public void hashIncrement(String key, String field, BigDecimal delta) {
+        if (StringUtil.isEmpty(key) || StringUtil.isEmpty(field) || delta == null) return;
         BoundHashOperations<String, String, String> operations = redisTemplate.boundHashOps(newKey(key));
         operations.increment(field, delta.doubleValue());
+    }
+
+    @Override
+    public void hashDecrement(String key, String field) {
+        hashIncrement(key, field, BigDecimal.valueOf(-1));
+    }
+
+    @Override
+    public void hashDecrement(String key, String field, BigDecimal delta) {
+        if (delta == null) return;
+        hashIncrement(key, field, delta.multiply(BigDecimal.valueOf(-1)));
     }
 
     @Override
@@ -185,5 +202,35 @@ public class RedisStringCacheAdaptorImpl implements RedisStringCacheAdaptor {
     public void hashDelField(String key, String... fields) {
         BoundHashOperations<String, String, String> operations = redisTemplate.boundHashOps(newKey(key));
         operations.delete(fields);
+    }
+
+    @Override
+    public void listLeftPush(String key, String value) {
+        if (StringUtil.isEmpty(key) || StringUtil.isEmpty(value)) return;
+        redisTemplate.boundListOps(newKey(key)).leftPush(value);
+    }
+
+    @Override
+    public void listRightPush(String key, String value) {
+        if (StringUtil.isEmpty(key) || StringUtil.isEmpty(value)) return;
+        redisTemplate.boundListOps(newKey(key)).rightPush(value);
+    }
+
+    @Override
+    public String listLeftPop(String key) {
+        if (StringUtil.isEmpty(key)) return null;
+        return redisTemplate.boundListOps(newKey(key)).leftPop();
+    }
+
+    @Override
+    public String listRightPop(String key) {
+        if (StringUtil.isEmpty(key)) return null;
+        return redisTemplate.boundListOps(newKey(key)).rightPop();
+    }
+
+    @Override
+    public long listSize(String key) {
+        if (StringUtil.isEmpty(key)) return 0;
+        return redisTemplate.boundListOps(newKey(key)).size();
     }
 }

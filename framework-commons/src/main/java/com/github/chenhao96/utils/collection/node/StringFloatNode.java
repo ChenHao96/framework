@@ -15,36 +15,111 @@
  */
 package com.github.chenhao96.utils.collection.node;
 
+import java.util.Random;
+
 public class StringFloatNode<V> implements Node<String, V> {
 
     private int size;
-    private FloatNodeItem<V> root;
+    private FloatLevelNode root;
 
-    @Override
-    public int size() {
-        return size;
+    private final int maxLevel;
+    private final Random random = new Random();
+    private static final int DEFAULT_MAX_LEVEL = 16;
+
+    public StringFloatNode() {
+        this(DEFAULT_MAX_LEVEL);
+    }
+
+    public StringFloatNode(int maxLevel) {
+        if (maxLevel < 1) {
+            throw new IllegalArgumentException("maxLevel param must be greater than 1.");
+        }
+        this.maxLevel = maxLevel;
     }
 
     @Override
-    public V get(String key) {
+    public int size() {
+        return this.size;
+    }
+
+    @Override
+    public V get(Object key) {
         if (key == null) throw new IllegalArgumentException("key is required! can not be null.");
-        if (this.root == null) return null;
-        //TODO:
-        throw new AbstractMethodError();
+        FloatNode node = queryHashValue(this.root, key.hashCode());
+        return node == null ? null : node.currentNode.value;
     }
 
     @Override
     public V put(String key, V value) {
         if (key == null) throw new IllegalArgumentException("key is required! can not be null.");
-        //TODO:
-        throw new AbstractMethodError();
+        if (this.size >= Integer.MAX_VALUE)
+            throw new IllegalArgumentException("container element reaches the upper limit.");
+        int hashCode = key.hashCode();
+        FloatLevelNode levelNode = this.root;
+        if (levelNode == null) this.root = levelNode = new FloatLevelNode();
+        FloatNode queryNode = queryHashValue(levelNode, hashCode);
+        V result = null;
+        if (queryNode != null) {
+            result = queryNode.currentNode.value;
+            queryNode.currentNode.value = value;
+        } else {
+            this.size++;
+            int levelCode = randomLevel();
+            //TODO:insert value
+        }
+        return result;
     }
 
     @Override
-    public V remove(String key) {
+    public V remove(Object key) {
         if (key == null) throw new IllegalArgumentException("key is required! can not be null.");
-        if (this.root == null) return null;
-        //TODO:
-        throw new AbstractMethodError();
+        FloatNode node = queryHashValue(this.root, key.hashCode());
+        if (node != null) {
+            this.size--;
+            node.previousNode.dataNext = node.currentNode.dataNext;
+            return node.currentNode.value;
+        }
+        return null;
+    }
+
+    private FloatNode queryHashValue(FloatLevelNode level, int hashCode) {
+        if (level == null) return null;
+        FloatLevelNode nextData = level.dataNext;
+        if (nextData == null || nextData.index > hashCode) {
+            FloatLevelNode nextLevel = level.levelNext;
+            if (nextLevel != null) {
+                return queryHashValue(nextLevel, hashCode);
+            }
+            return null;
+        } else if (nextData.index < hashCode) {
+            return queryHashValue(nextData, hashCode);
+        }
+        return new FloatNode(level, nextData);
+    }
+
+    private int randomLevel() {
+        int result = random.nextInt(maxLevel);
+        int size = random.nextInt(maxLevel);
+        for (int i = 0; i < size; i++) {
+            result += random.nextInt(maxLevel);
+        }
+        return result % maxLevel;
+    }
+
+    private class FloatNode {
+        private FloatLevelNode previousNode;
+        private FloatLevelNode currentNode;
+        public FloatNode(FloatLevelNode previousNode, FloatLevelNode currentNode) {
+            this.previousNode = previousNode;
+            this.currentNode = currentNode;
+        }
+    }
+
+    private class FloatLevelNode {
+        private V value;
+        private int index;
+        private int level;
+        private FloatLevelNode dataNext;
+        private FloatLevelNode levelNext;
     }
 }

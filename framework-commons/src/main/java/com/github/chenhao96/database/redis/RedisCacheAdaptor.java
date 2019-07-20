@@ -38,6 +38,8 @@ public interface RedisCacheAdaptor<V> extends CacheAdaptor<String, V> {
 
     void setExpire(String key, long duration, TimeUnit timeUnit);
 
+    void set(String key, V value, Date date);
+
     void set(String key, V value, long duration);
 
     void set(String key, V value, long duration, TimeUnit timeUnit);
@@ -48,7 +50,7 @@ public interface RedisCacheAdaptor<V> extends CacheAdaptor<String, V> {
 
     void decrement(String key);
 
-    void decrement(String key, Long delta);
+    void decrement(String key, BigDecimal delta);
 
     V hashGet(String key, String field);
 
@@ -60,6 +62,10 @@ public interface RedisCacheAdaptor<V> extends CacheAdaptor<String, V> {
 
     void hashIncrement(String key, String field, BigDecimal delta);
 
+    void hashDecrement(String key, String field);
+
+    void hashDecrement(String key, String field, BigDecimal delta);
+
     void hashSet(String key, Map<String, V> values);
 
     Set<String> hashFields(String key);
@@ -67,4 +73,14 @@ public interface RedisCacheAdaptor<V> extends CacheAdaptor<String, V> {
     boolean hashFieldExist(String key, String field);
 
     void hashDelField(String key, String... fields);
+
+    void listLeftPush(String key, V value);
+
+    void listRightPush(String key, V value);
+
+    V listLeftPop(String key);
+
+    V listRightPop(String key);
+
+    long listSize(String key);
 }

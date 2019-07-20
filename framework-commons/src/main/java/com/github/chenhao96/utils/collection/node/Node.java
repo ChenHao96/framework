@@ -15,13 +15,13 @@
  */
 package com.github.chenhao96.utils.collection.node;
 
-public interface Node<K,V> {
+public interface Node<K, V> {
 
     int size();
 
-    V get(K key);
+    V get(Object key);
 
     V put(K key, V value);
 
-    V remove(K key);
+    V remove(Object key);
 }
