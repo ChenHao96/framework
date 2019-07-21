@@ -76,36 +76,6 @@ public class StringFloatNode<V> implements Node<String, V> {
         return result;
     }
 
-    private FloatLevelNode putLevelNode(FloatLevelNode current, FloatLevelNode root) {
-        if (root == null) return current;
-        if (current.level < root.level) {
-            current.levelNext = root;
-            return current;
-        } else if (current.level > root.level) {
-            root.levelNext = putLevelNode(current, root.levelNext);
-        } else {
-            if (current.index > root.index) {
-                root.dataNext = putLevelNode(current, root.dataNext);
-            } else {
-                current.dataNext = root;
-                return current;
-            }
-        }
-        return root;
-    }
-
-    private boolean initRoot(V value, int hashCode, int levelCode) {
-        if (this.root == null) {
-            this.root = new FloatLevelNode();
-            this.root.level = levelCode;
-            this.root.index = hashCode;
-            this.root.value = value;
-            this.size = 1;
-            return true;
-        }
-        return false;
-    }
-
     @Override
     public V remove(Object key) {
         if (key == null) throw new IllegalArgumentException("key is required! can not be null.");
@@ -124,6 +94,36 @@ public class StringFloatNode<V> implements Node<String, V> {
             return node.currentNode.value;
         }
         return null;
+    }
+
+    private FloatLevelNode putLevelNode(FloatLevelNode node, FloatLevelNode current) {
+        if (current == null) return node;
+        if (node.level < current.level) {
+            node.levelNext = current;
+            return node;
+        } else if (node.level > current.level) {
+            current.levelNext = putLevelNode(node, current.levelNext);
+        } else {
+            if (node.index > current.index) {
+                current.dataNext = putLevelNode(node, current.dataNext);
+            } else {
+                node.dataNext = current;
+                return node;
+            }
+        }
+        return current;
+    }
+
+    private boolean initRoot(V value, int hashCode, int levelCode) {
+        if (this.root == null) {
+            this.root = new FloatLevelNode();
+            this.root.level = levelCode;
+            this.root.index = hashCode;
+            this.root.value = value;
+            this.size = 1;
+            return true;
+        }
+        return false;
     }
 
     private FloatNode queryHashValue(FloatLevelNode previousLevel, FloatLevelNode previous, FloatLevelNode current, int hashCode) {
@@ -152,7 +152,6 @@ public class StringFloatNode<V> implements Node<String, V> {
         private FloatLevelNode previousLevel;
         private FloatLevelNode previousNode;
         private FloatLevelNode currentNode;
-
         public FloatNode(FloatLevelNode previousLevel, FloatLevelNode previousNode, FloatLevelNode currentNode) {
             this.previousLevel = previousLevel;
             this.previousNode = previousNode;
