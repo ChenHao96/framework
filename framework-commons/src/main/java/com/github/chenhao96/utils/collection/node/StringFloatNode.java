@@ -96,6 +96,7 @@ public class StringFloatNode<V> implements Node<String, V> {
         return null;
     }
 
+    //TODO:应该相比较数据在比较层级
     private FloatLevelNode putLevelNode(FloatLevelNode node, FloatLevelNode current) {
         if (current == null) return node;
         if (node.level < current.level) {
@@ -152,6 +153,7 @@ public class StringFloatNode<V> implements Node<String, V> {
         private FloatLevelNode previousLevel;
         private FloatLevelNode previousNode;
         private FloatLevelNode currentNode;
+
         public FloatNode(FloatLevelNode previousLevel, FloatLevelNode previousNode, FloatLevelNode currentNode) {
             this.previousLevel = previousLevel;
             this.previousNode = previousNode;
