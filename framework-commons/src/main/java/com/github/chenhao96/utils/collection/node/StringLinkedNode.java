@@ -26,6 +26,11 @@ public class StringLinkedNode<V> implements Node<String, V> {
     }
 
     @Override
+    public boolean isEmpty() {
+        return size == 0;
+    }
+
+    @Override
     public V get(Object key) {
         if (key == null) throw new IllegalArgumentException("key is required! can not be null.");
         if (this.root == null) return null;
@@ -62,7 +67,13 @@ public class StringLinkedNode<V> implements Node<String, V> {
             if (currentNode == this.root) this.root = previous;
         }
         this.size--;
+        //TODO:bug
         return currentNode.getValue();
+    }
+
+    @Override
+    public void clear() {
+        this.root = null;
     }
 
     private V add(LinkedNodeItem node, int index, V value, int state) {

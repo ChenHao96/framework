@@ -15,17 +15,11 @@
  */
 package com.github.chenhao96.utils;
 
-import java.util.HashSet;
-import java.util.Random;
-import java.util.Set;
+import java.util.*;
 
 public final class RandomCodeClass {
 
     private char[] characterSet;
-
-    private RandomCodeClass() {
-        this(CodeCharArray.NUMBER);
-    }
 
     private RandomCodeClass(CodeCharArray... characterSets) {
 
@@ -33,7 +27,6 @@ public final class RandomCodeClass {
             throw new IllegalArgumentException("argument can not null or nothing.");
         }
 
-        int index = 0;
         int length = 0;
         for (CodeCharArray characterSet : characterSets) {
             if (characterSet == null || characterSet.length == 0) {
@@ -46,38 +39,28 @@ public final class RandomCodeClass {
             throw new IllegalArgumentException("argument can not nothing.");
         }
 
+        int index = 0;
         char[] tmp = new char[length];
         for (CodeCharArray characterSet : characterSets) {
-            if (characterSet == null || characterSet.length == 0) {
-                continue;
-            }
-            for (char c : characterSet.body) {
-                tmp[index++] = c;
-            }
+            if (characterSet == null || characterSet.length == 0) continue;
+            for (char c : characterSet.body) tmp[index++] = c;
         }
 
         this.characterSet = tmp;
     }
 
     private RandomCodeClass(char[] characterSets) {
-
         if (characterSets == null || characterSets.length == 0) {
             throw new IllegalArgumentException("argument can not null or nothing.");
         }
-
-        int index = 0;
-        int length = characterSets.length;
-        char[] tmp = new char[length];
-        for (char c : characterSet) {
-            tmp[index++] = c;
-        }
-
+        char[] tmp = new char[characterSets.length];
+        System.arraycopy(characterSets, 0, tmp, 0, characterSets.length);
         this.characterSet = tmp;
     }
 
     public static RandomCodeClass getInstance(CodeCharArray... codeChars) {
         if (codeChars == null || codeChars.length == 0) {
-            return new RandomCodeClass();
+            return new RandomCodeClass(CodeCharArray.NUMBER);
         } else {
             return new RandomCodeClass(codeChars);
         }
@@ -85,53 +68,52 @@ public final class RandomCodeClass {
 
     public static RandomCodeClass getInstance(char[] chars) {
         if (chars == null || chars.length == 0) {
-            return new RandomCodeClass();
+            return new RandomCodeClass(CodeCharArray.NUMBER);
         } else {
             return new RandomCodeClass(chars);
         }
     }
 
     public String createCode(int length) {
-        Set<String> result = createCode(length, 1);
+        Set<String> result = createSetCode(length, 1);
         return result.iterator().next();
     }
 
-    public Set<String> createCode(int length, int size) {
+    public Set<String> createSetCode(int length, int size) {
         characterSet = exchangeCode(characterSet, new Random());
-        char[] tmp = characterSet;
-        return createCode(length, size, tmp);
+        Set<String> result = new HashSet<>(size);
+        createCode(result, length, size, characterSet);
+        return result;
     }
 
-    private static Set<String> createCode(int length, int size, char[] tmp) {
+    public List<String> createListCode(int length, int size) {
+        characterSet = exchangeCode(characterSet, new Random());
+        List<String> result = new ArrayList<>(size);
+        createCode(result, length, size, characterSet);
+        return result;
+    }
 
+    private static void createCode(Collection<String> collection, int length, int size, char[] tmp) {
         Random random = new Random();
-        Set<String> strings = new HashSet<>(size);
-        while (strings.size() < size) {
-
+        while (collection.size() < size) {
             tmp = exchangeCode(tmp, random);
             StringBuilder sb = new StringBuilder(length);
             for (int i = 0; i < length; i++) {
                 sb.append(tmp[random.nextInt(tmp.length)]);
             }
-
-            strings.add(sb.toString());
+            collection.add(sb.toString());
         }
-
-        return strings;
     }
 
     private static char[] exchangeCode(char[] tmp, Random random) {
-
         int index;
         char swap;
         for (int i = 0; i < tmp.length; i++) {
-
             index = random.nextInt(tmp.length - i);
             swap = tmp[index];
             tmp[index] = tmp[tmp.length - i - 1];
             tmp[tmp.length - i - 1] = swap;
         }
-
         return tmp;
     }
 

@@ -17,24 +17,34 @@ package com.github.chenhao96.utils.collection.node;
 
 import java.util.Random;
 
-public class StringFloatNode<V> implements Node<String, V> {
+public class StringSkipNode<V> implements Node<String, V> {
 
-    private int size;
-    private FloatLevelNode root;
+    protected int size;
+    protected NodeItem root;
 
     private final int maxLevel;
     private final Random random = new Random();
     private static final int DEFAULT_MAX_LEVEL = 16;
 
-    public StringFloatNode() {
+    public StringSkipNode() {
         this(DEFAULT_MAX_LEVEL);
     }
 
-    public StringFloatNode(int maxLevel) {
+    public StringSkipNode(int maxLevel) {
         if (maxLevel < 1) {
             throw new IllegalArgumentException("maxLevel param must be greater than 1.");
         }
         this.maxLevel = maxLevel;
+    }
+
+    @Override
+    public boolean isEmpty() {
+        return this.root == null;
+    }
+
+    @Override
+    public void clear() {
+        this.root = null;
     }
 
     @Override
@@ -45,7 +55,7 @@ public class StringFloatNode<V> implements Node<String, V> {
     @Override
     public V get(Object key) {
         if (key == null) throw new IllegalArgumentException("key is required! can not be null.");
-        FloatNode node = queryHashValue(null, null, this.root, key.hashCode());
+        ResultNode node = queryHashValue(null, null, this.root, key.hashCode());
         return node == null ? null : node.currentNode == null ? null : node.currentNode.value;
     }
 
@@ -61,13 +71,13 @@ public class StringFloatNode<V> implements Node<String, V> {
         if (initRoot(value, hashCode, levelCode)) return null;
 
         V result = null;
-        FloatNode queryNode = queryHashValue(null, null, this.root, key.hashCode());
+        ResultNode queryNode = queryHashValue(null, null, this.root, key.hashCode());
         if (queryNode != null) {
             result = queryNode.currentNode.value;
             queryNode.currentNode.value = value;
         } else {
             this.size++;
-            FloatLevelNode current = new FloatLevelNode();
+            NodeItem current = new NodeItem();
             current.level = levelCode;
             current.index = hashCode;
             current.value = value;
@@ -80,7 +90,7 @@ public class StringFloatNode<V> implements Node<String, V> {
     @Override
     public V remove(Object key) {
         if (key == null) throw new IllegalArgumentException("key is required! can not be null.");
-        FloatNode node = queryHashValue(null, null, this.root, key.hashCode());
+        ResultNode node = queryHashValue(null, null, this.root, key.hashCode());
         if (node != null) {
             this.size--;
             if (node.previousNode == null) {
@@ -108,7 +118,7 @@ public class StringFloatNode<V> implements Node<String, V> {
 
     private boolean initRoot(V value, int hashCode, int levelCode) {
         if (this.root == null) {
-            this.root = new FloatLevelNode();
+            this.root = new NodeItem();
             this.root.level = levelCode;
             this.root.index = hashCode;
             this.root.value = value;
@@ -118,7 +128,7 @@ public class StringFloatNode<V> implements Node<String, V> {
         return false;
     }
 
-    private FloatLevelNode putLevelNode(FloatLevelNode current, FloatLevelNode node) {
+    private NodeItem putLevelNode(NodeItem current, NodeItem node) {
         if (node == null) return current;
         if (current == null) return node;
         if (current.index < node.index) {
@@ -140,35 +150,36 @@ public class StringFloatNode<V> implements Node<String, V> {
         return node;
     }
 
-    private FloatNode queryHashValue(FloatLevelNode previousLevel, FloatLevelNode previous, FloatLevelNode current, int hashCode) {
+    private ResultNode queryHashValue(NodeItem previousLevel, NodeItem previous, NodeItem current, int hashCode) {
         if (current != null) {
             if (current.index > hashCode) {
-                FloatLevelNode nextLevel = current.levelNext;
+                NodeItem nextLevel = current.levelNext;
                 return queryHashValue(current, previous, nextLevel, hashCode);
             } else if (current.index < hashCode) {
                 return queryHashValue(previousLevel, current, current.dataNext, hashCode);
             }
-            return new FloatNode(previousLevel, previous, current);
+            return new ResultNode(previousLevel, previous, current);
         }
         return null;
     }
 
-    private class FloatNode {
-        private FloatLevelNode previousLevel;
-        private FloatLevelNode previousNode;
-        private FloatLevelNode currentNode;
-        public FloatNode(FloatLevelNode previousLevel, FloatLevelNode previousNode, FloatLevelNode currentNode) {
+    private class ResultNode {
+        private NodeItem previousLevel;
+        private NodeItem previousNode;
+        private NodeItem currentNode;
+
+        public ResultNode(NodeItem previousLevel, NodeItem previousNode, NodeItem currentNode) {
             this.previousLevel = previousLevel;
             this.previousNode = previousNode;
             this.currentNode = currentNode;
         }
     }
 
-    private class FloatLevelNode {
+    private class NodeItem {
         private V value;
         private int index;
         private int level;
-        private FloatLevelNode dataNext;
-        private FloatLevelNode levelNext;
+        private NodeItem dataNext;
+        private NodeItem levelNext;
     }
 }
