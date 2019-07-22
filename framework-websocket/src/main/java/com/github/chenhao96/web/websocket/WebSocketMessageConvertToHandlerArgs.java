@@ -16,7 +16,6 @@
 
 package com.github.chenhao96.web.websocket;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.github.chenhao96.component.net.CommonsMessage;
 import com.github.chenhao96.component.net.DefaultMessageConvertToHandlerArgs;
@@ -35,7 +34,7 @@ public class WebSocketMessageConvertToHandlerArgs extends DefaultMessageConvertT
         if (message == null) return null;
         String requestBody = new String(message.getData(), StandardCharsets.UTF_8);
         try {
-            JsonNode jsonNode = JsonUtils.jsonStr2JsonNode(requestBody);
+            JsonNode jsonNode = JsonUtils.jsonStr2JsonNodeStatic(requestBody);
             return object2FlatMapper.toFlatMapper(jsonNode);
         } catch (IOException e) {
             throw new RuntimeException(e);
@@ -48,11 +47,11 @@ public class WebSocketMessageConvertToHandlerArgs extends DefaultMessageConvertT
         message.setData(null);
         if (obj != null) {
             try {
-                String responseBody = JsonUtils.object2Json(obj);
+                String responseBody = JsonUtils.object2JsonStatic(obj);
                 if (StringUtil.isNotEmpty(responseBody)) {
                     message.setData(responseBody.getBytes(StandardCharsets.UTF_8));
                 }
-            } catch (JsonProcessingException e) {
+            } catch (IOException e) {
                 throw new RuntimeException(e);
             }
         }

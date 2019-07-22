@@ -46,7 +46,7 @@ public class WebSocket extends TextWebSocketHandler {
     @Override
     protected void handleTextMessage(WebSocketSession session, TextMessage message) throws Exception {
         String requestStr = message.getPayload();
-        JsonNode jsonNode = JsonUtils.jsonStr2JsonNode(requestStr);
+        JsonNode jsonNode = JsonUtils.jsonStr2JsonNodeStatic(requestStr);
         if (jsonNode != null && jsonNode.has(CommonsMessage.MASTER_CODE_NAME) && jsonNode.has(CommonsMessage.SLAVE_CODE_NAME)) {
             byte slaveCode = (byte) jsonNode.get(CommonsMessage.SLAVE_CODE_NAME).asInt();
             byte masterCode = (byte) jsonNode.get(CommonsMessage.MASTER_CODE_NAME).asInt();

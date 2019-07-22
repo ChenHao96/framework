@@ -15,7 +15,7 @@
  */
 package com.github.chenhao96.component.process.handler
 
-import com.github.chenhao96.utils.BaseDataTypeUtil
+import com.github.chenhao96.component.process.handler.BaseDataTypeUtil
 import com.github.chenhao96.utils.JsonUtils
 import com.github.chenhao96.utils.StringUtil
 import org.springframework.beans.BeanUtils
@@ -65,7 +65,7 @@ class InvocableHandlerMethodK(bean: Any, method: Method) : HandlerMethod(bean, m
         val parameterName = parameter.parameterName
         val parameterValue = providedArgs[parameterName] ?: return null
         if (parameter.parameterType.isInterface) {
-            return JsonUtils.jsonStr2Object(JsonUtils.object2Json(parameterValue), parameter.parameterType)
+            return JsonUtils.jsonStr2ObjectStatic(JsonUtils.object2JsonStatic(parameterValue), parameter.parameterType)
         }
         try {
             val inputBean = BeanUtils.instantiateClass(parameter.parameterType)
@@ -79,7 +79,7 @@ class InvocableHandlerMethodK(bean: Any, method: Method) : HandlerMethod(bean, m
     private fun paramBind(inputBean: Any, parameterValue: Any, providedArgs: Map<String, Any>): Any {
         var resultBean = inputBean
         if (resultBean is Collection<Any?>) {
-            resultBean = JsonUtils.jsonStr2Object(JsonUtils.object2Json(parameterValue), resultBean.javaClass)
+            resultBean = JsonUtils.jsonStr2ObjectStatic(JsonUtils.object2JsonStatic(parameterValue), resultBean.javaClass)
         } else {
             val beanInfo = Introspector.getBeanInfo(resultBean.javaClass)
             val propertyDescriptors = beanInfo.propertyDescriptors
@@ -90,7 +90,7 @@ class InvocableHandlerMethodK(bean: Any, method: Method) : HandlerMethod(bean, m
                 var value: Any? = providedArgs[propertyName] ?: continue
                 val parameterType = setter.parameterTypes[0]
                 if (!parameterType.isInstance(value)) {
-                    value = JsonUtils.jsonStr2Object(JsonUtils.object2Json(value), parameterType)
+                    value = JsonUtils.jsonStr2ObjectStatic(JsonUtils.object2JsonStatic(value), parameterType)
                 }
                 setter.invoke(resultBean, value)
             }

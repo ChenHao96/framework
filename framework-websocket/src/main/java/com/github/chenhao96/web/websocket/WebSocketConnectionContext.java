@@ -86,8 +86,8 @@ public class WebSocketConnectionContext implements ConnectionContext {
             content.put("slaveCode", message.getSlaveCode());
             content.put("masterCode", message.getMasterCode());
             String response = new String(message.getData(), StandardCharsets.UTF_8);
-            content.put("data", JsonUtils.jsonStr2JsonNode(response));
-            response = JsonUtils.object2Json(content);
+            content.put("data", JsonUtils.jsonStr2JsonNodeStatic(response));
+            response = JsonUtils.object2JsonStatic(content);
             session.sendMessage(new TextMessage(response));
         } catch (IOException e) {
             LOGGER.warn("sendMessage", e);

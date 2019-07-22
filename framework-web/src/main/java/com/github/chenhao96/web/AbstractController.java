@@ -97,7 +97,7 @@ public abstract class AbstractController {
             String jsonParam = RequestParamUtil.readRequestContent(getRequest());
             LOGGER.info("param2MapStrParamJson :{}", jsonParam);
             if (StringUtil.isEmpty(jsonParam)) return null;
-            JsonNode jsonNode = JsonUtils.jsonStr2JsonNode(jsonParam);
+            JsonNode jsonNode = JsonUtils.jsonStr2JsonNodeStatic(jsonParam);
             return BeanMapConvertUtil.bean2StringMap(jsonNode);
         } catch (IOException e) {
             LOGGER.warn("param2MapStrParamJson", e);

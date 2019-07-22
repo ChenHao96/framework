@@ -73,6 +73,7 @@ public class StringFloatNode<V> implements Node<String, V> {
             current.value = value;
             this.root = putLevelNode(current, this.root);
         }
+
         return result;
     }
 
@@ -96,23 +97,13 @@ public class StringFloatNode<V> implements Node<String, V> {
         return null;
     }
 
-    //TODO:应该相比较数据在比较层级
-    private FloatLevelNode putLevelNode(FloatLevelNode node, FloatLevelNode current) {
-        if (current == null) return node;
-        if (node.level < current.level) {
-            node.levelNext = current;
-            return node;
-        } else if (node.level > current.level) {
-            current.levelNext = putLevelNode(node, current.levelNext);
-        } else {
-            if (node.index > current.index) {
-                current.dataNext = putLevelNode(node, current.dataNext);
-            } else {
-                node.dataNext = current;
-                return node;
-            }
+    private int randomLevel() {
+        int result = random.nextInt(maxLevel);
+        int size = random.nextInt(maxLevel);
+        for (int i = 0; i < size; i++) {
+            result += random.nextInt(maxLevel);
         }
-        return current;
+        return result % maxLevel;
     }
 
     private boolean initRoot(V value, int hashCode, int levelCode) {
@@ -125,6 +116,28 @@ public class StringFloatNode<V> implements Node<String, V> {
             return true;
         }
         return false;
+    }
+
+    private FloatLevelNode putLevelNode(FloatLevelNode current, FloatLevelNode node) {
+        if (node == null) return current;
+        if (current == null) return node;
+        if (current.index < node.index) {
+            if (current.level > node.level) {
+                node.levelNext = putLevelNode(current, node.levelNext);
+            } else {
+                if (current.level < node.level) {
+                    current.levelNext = node;
+                } else {
+                    current.dataNext = node;
+                }
+                return current;
+            }
+        } else if (current.index > node.index) {
+            node.dataNext = putLevelNode(current, node.dataNext);
+        } else {
+            node.value = current.value;
+        }
+        return node;
     }
 
     private FloatNode queryHashValue(FloatLevelNode previousLevel, FloatLevelNode previous, FloatLevelNode current, int hashCode) {
@@ -140,20 +153,10 @@ public class StringFloatNode<V> implements Node<String, V> {
         return null;
     }
 
-    private int randomLevel() {
-        int result = random.nextInt(maxLevel);
-        int size = random.nextInt(maxLevel);
-        for (int i = 0; i < size; i++) {
-            result += random.nextInt(maxLevel);
-        }
-        return result % maxLevel;
-    }
-
     private class FloatNode {
         private FloatLevelNode previousLevel;
         private FloatLevelNode previousNode;
         private FloatLevelNode currentNode;
-
         public FloatNode(FloatLevelNode previousLevel, FloatLevelNode previousNode, FloatLevelNode currentNode) {
             this.previousLevel = previousLevel;
             this.previousNode = previousNode;

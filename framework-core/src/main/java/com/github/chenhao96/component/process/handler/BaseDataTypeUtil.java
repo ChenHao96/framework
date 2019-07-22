@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.github.chenhao96.utils;
+package com.github.chenhao96.component.process.handler;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -36,11 +36,11 @@ public final class BaseDataTypeUtil {
         return result;
     }
 
-    public static boolean isBaseDataType(Class<?> clazz) {
+    protected static boolean isBaseDataType(Class<?> clazz) {
         return baseDataType.get(clazz) != null;
     }
 
-    public static Class<?> baseDataType2BoxDataType(Class<?> clazz) {
+    protected static Class<?> baseDataType2BoxDataType(Class<?> clazz) {
         Class result = baseDataType.get(clazz);
         return result == null ? clazz : result;
     }
