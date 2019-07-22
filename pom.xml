@@ -6,7 +6,7 @@
 
     <groupId>com.github.chenhao96</groupId>
     <artifactId>framework</artifactId>
-    <version>1.1.8-RELEASE</version>
+    <version>1.1.9-RELEASE</version>
     <modules>
         <module>framework-core</module>
         <module>framework-web</module>
@@ -53,7 +53,7 @@
             <dependency>
                 <groupId>com.github.chenhao96</groupId>
                 <artifactId>framework-core</artifactId>
-                <version>1.1.8-RELEASE</version>
+                <version>1.1.9-RELEASE</version>
             </dependency>
 
             <dependency>
@@ -65,7 +65,7 @@
             <dependency>
                 <groupId>com.github.chenhao96</groupId>
                 <artifactId>framework-web</artifactId>
-                <version>1.1.8-RELEASE</version>
+                <version>1.1.9-RELEASE</version>
             </dependency>
 
             <dependency>

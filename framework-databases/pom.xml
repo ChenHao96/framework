@@ -5,7 +5,7 @@
     <parent>
         <artifactId>framework</artifactId>
         <groupId>com.github.chenhao96</groupId>
-        <version>1.1.8-RELEASE</version>
+        <version>1.1.9-RELEASE</version>
     </parent>
     <modelVersion>4.0.0</modelVersion>
 
