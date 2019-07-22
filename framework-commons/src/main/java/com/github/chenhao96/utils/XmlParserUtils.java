@@ -15,7 +15,6 @@
  */
 package com.github.chenhao96.utils;
 
-import org.apache.commons.lang.StringUtils;
 import org.w3c.dom.Document;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
@@ -65,7 +64,7 @@ public final class XmlParserUtils {
     }
 
     public static Map<String, String> xmlToMap(String strXML) throws Exception {
-        if (StringUtils.isEmpty(strXML)) return null;
+        if (StringUtil.isEmpty(strXML)) return null;
         Map<String, String> data = null;
         InputStream stream = null;
         try {

@@ -17,10 +17,7 @@
 
         <logback.version>1.2.3</logback.version>
         <pinyin4j.version>2.5.0</pinyin4j.version>
-        <org.slf4j.version>1.7.9</org.slf4j.version>
         <commons-lang.version>2.6</commons-lang.version>
-        <commons-codec.version>1.12</commons-codec.version>
-        <com.fasterxml.version>2.9.8</com.fasterxml.version>
     </properties>
 
     <dependencies>
@@ -28,46 +25,30 @@
             <groupId>org.springframework</groupId>
             <artifactId>spring-context</artifactId>
             <version>${spring.version}</version>
+            <scope>compile</scope>
+            <optional>true</optional>
         </dependency>
 
         <!--log记录-->
         <dependency>
             <groupId>org.slf4j</groupId>
             <artifactId>slf4j-api</artifactId>
-            <version>${org.slf4j.version}</version>
-        </dependency>
-        <dependency>
-            <groupId>org.slf4j</groupId>
-            <artifactId>jcl-over-slf4j</artifactId>
-            <version>${org.slf4j.version}</version>
-        </dependency>
-
-        <dependency>
-            <groupId>ch.qos.logback</groupId>
-            <artifactId>logback-classic</artifactId>
-            <version>${logback.version}</version>
-        </dependency>
-        <dependency>
-            <groupId>ch.qos.logback</groupId>
-            <artifactId>logback-core</artifactId>
-            <version>${logback.version}</version>
+            <scope>compile</scope>
+            <optional>true</optional>
         </dependency>
 
         <dependency>
             <groupId>com.fasterxml.jackson.core</groupId>
             <artifactId>jackson-databind</artifactId>
-            <version>${com.fasterxml.version}</version>
+            <scope>compile</scope>
+            <optional>true</optional>
         </dependency>
 
         <dependency>
-            <groupId>commons-lang</groupId>
-            <artifactId>commons-lang</artifactId>
-            <version>${commons-lang.version}</version>
-        </dependency>
-        <dependency>
             <groupId>commons-codec</groupId>
             <artifactId>commons-codec</artifactId>
-            <version>${commons-codec.version}</version>
+            <scope>compile</scope>
+            <optional>true</optional>
         </dependency>
 
         <dependency>

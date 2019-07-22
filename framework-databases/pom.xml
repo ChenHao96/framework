@@ -25,11 +25,15 @@
             <groupId>org.springframework</groupId>
             <artifactId>spring-jdbc</artifactId>
             <version>${spring.version}</version>
+            <scope>compile</scope>
+            <optional>true</optional>
         </dependency>
         <dependency>
             <groupId>org.springframework.data</groupId>
             <artifactId>spring-data-redis</artifactId>
             <version>${spring-redis.version}</version>
+            <scope>compile</scope>
+            <optional>true</optional>
         </dependency>
 
         <!-- redis -->
@@ -37,6 +41,8 @@
             <groupId>redis.clients</groupId>
             <artifactId>jedis</artifactId>
             <version>${jedis.version}</version>
+            <scope>compile</scope>
+            <optional>true</optional>
         </dependency>
 
         <!-- mybatis -->
@@ -44,16 +50,22 @@
             <groupId>org.mybatis</groupId>
             <artifactId>mybatis</artifactId>
             <version>${mybatis.version}</version>
+            <scope>compile</scope>
+            <optional>true</optional>
         </dependency>
         <dependency>
             <groupId>org.mybatis</groupId>
             <artifactId>mybatis-spring</artifactId>
             <version>${mybatis-spring.version}</version>
+            <scope>compile</scope>
+            <optional>true</optional>
         </dependency>
 
         <dependency>
             <groupId>com.github.chenhao96</groupId>
             <artifactId>framework-commons</artifactId>
+            <scope>compile</scope>
+            <optional>true</optional>
         </dependency>
     </dependencies>
 </project>

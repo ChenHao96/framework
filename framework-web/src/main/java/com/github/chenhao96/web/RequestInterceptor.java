@@ -16,7 +16,6 @@
 package com.github.chenhao96.web;
 
 import com.github.chenhao96.utils.StringUtil;
-import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.web.servlet.HandlerInterceptor;
@@ -38,11 +37,11 @@ public class RequestInterceptor implements HandlerInterceptor {
         String ip = getIp(request);
         int port = request.getRemotePort();
         String requestUrl = request.getServletPath();
-        if(StringUtil.isEmpty(requestUrl)){
+        if (StringUtil.isEmpty(requestUrl)) {
             requestUrl = request.getRequestURI();
             String contextPath = request.getContextPath();
-            if (StringUtils.length(contextPath) > 0) {
-                requestUrl = StringUtils.substring(requestUrl, contextPath.length());
+            if (contextPath != null && contextPath.length() > 0) {
+                requestUrl = requestUrl.substring(contextPath.length());
             }
         }
         request.setAttribute(AbstractController.CLIENT_IP_KEY, ip);

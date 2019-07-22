@@ -21,7 +21,10 @@
 
     <properties>
         <java.version>1.8</java.version>
+        <org.slf4j.version>1.7.9</org.slf4j.version>
         <spring.version>5.1.6.RELEASE</spring.version>
+        <commons-codec.version>1.12</commons-codec.version>
+        <com.fasterxml.version>2.9.8</com.fasterxml.version>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     </properties>
 
@@ -72,6 +75,24 @@
                 <groupId>org.jetbrains.kotlin</groupId>
                 <artifactId>kotlin-stdlib</artifactId>
                 <version>1.2.71</version>
+            </dependency>
+
+            <dependency>
+                <groupId>org.slf4j</groupId>
+                <artifactId>slf4j-api</artifactId>
+                <version>${org.slf4j.version}</version>
+            </dependency>
+
+            <dependency>
+                <groupId>commons-codec</groupId>
+                <artifactId>commons-codec</artifactId>
+                <version>${commons-codec.version}</version>
+            </dependency>
+
+            <dependency>
+                <groupId>com.fasterxml.jackson.core</groupId>
+                <artifactId>jackson-databind</artifactId>
+                <version>${com.fasterxml.version}</version>
             </dependency>
         </dependencies>
     </dependencyManagement>

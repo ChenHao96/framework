@@ -1,8 +1,8 @@
 package com.github.chenhao96.utils.encrypt;
 
 import com.github.chenhao96.utils.CommonsUtil;
+import com.github.chenhao96.utils.StringUtil;
 import org.apache.commons.codec.binary.Base64;
-import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -85,8 +85,8 @@ public class AESUtils {
      * @param password 密钥
      */
     private static void checkParam(String content, String password) {
-        Preconditions.checkArgument(StringUtils.isNotBlank(content), "content is empty");
-        Preconditions.checkArgument(StringUtils.isNotBlank(password), "password is empty");
+        Preconditions.checkArgument(StringUtil.isNotBlank(content), "content is empty");
+        Preconditions.checkArgument(StringUtil.isNotBlank(password), "password is empty");
     }
 
     private static SecretKeySpec getSecretKeySpec(String password) throws Exception {
