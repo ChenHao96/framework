@@ -41,19 +41,28 @@ public class NodeCollection {
 
     @Test
     public void testSkipNode() {
+        int count;
         final int beginLevel = 16;
         Record insertMin = new Record(), queryMin = new Record();
         long insertMinTime = System.currentTimeMillis(), queryMinTime = insertMinTime;
         for (int y = 0; y < forSize; y++) {
             for (int i = beginLevel; i < levelSize + beginLevel; i++) {
-
+                count = 0;
                 long startTime = System.currentTimeMillis();
-                StringSkipNode<String> map = new StringSkipNode<>(i);
-                for (String key : keys) map.put(key, key);
+                StringSkipNode<Integer> map = new StringSkipNode<>(i);
+                for (int k = 0; k < keys.size(); k++) {
+                    Integer value = map.put(keys.get(k), k);
+                    if (value != null) count++;
+                }
                 long endTime = System.currentTimeMillis();
                 long insertTime = endTime - startTime;
-                keys.forEach(map::get);
+                for (int k = 0; k < keys.size(); k++) {
+                    Integer value = map.get(keys.get(k));
+                    if (value != null && value == k) count++;
+                }
                 long queryTime = System.currentTimeMillis() - endTime;
+
+                if (count != keys.size()) { System.out.println("fail"); return; }
                 System.out.printf("%d,%d, put use time:%d, query use time:%d\n", y, i, insertTime, queryTime);
 
                 if (insertTime < insertMinTime) {
@@ -79,7 +88,7 @@ public class NodeCollection {
     private class Record {
         private long queryMinTime;
         private long insertMinTime;
-        private StringSkipNode<String> node;
+        private StringSkipNode<Integer> node;
 
         @Override
         public String toString() {

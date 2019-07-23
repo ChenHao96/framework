@@ -135,6 +135,7 @@ public class StringSkipNode<V> implements Node<String, V> {
         return false;
     }
 
+    //TODO:bug
     private NodeItem putLevelNode(NodeItem current, NodeItem node) {
         if (node == null) return current;
         if (current == null) return node;
@@ -157,6 +158,7 @@ public class StringSkipNode<V> implements Node<String, V> {
         return node;
     }
 
+    //TODO:bug
     private ResultNode queryHashValue(int hashCode) {
         NodeItem previousLevel = null, previous = null, current = this.root;
         while (true) {
