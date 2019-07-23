@@ -22,6 +22,7 @@ public class StringSkipNode<V> implements Node<String, V> {
     protected int size;
     protected NodeItem root;
 
+    private final int[] levelArray;//TODO:test
     private final int maxLevel;
     private final Random random = new Random();
     private static final int DEFAULT_MAX_LEVEL = 16;
@@ -35,6 +36,7 @@ public class StringSkipNode<V> implements Node<String, V> {
             throw new IllegalArgumentException("maxLevel param must be greater than 1.");
         }
         this.maxLevel = maxLevel;
+        this.levelArray = new int[maxLevel];
     }
 
     @Override
@@ -55,8 +57,13 @@ public class StringSkipNode<V> implements Node<String, V> {
     @Override
     public V get(Object key) {
         if (key == null) throw new IllegalArgumentException("key is required! can not be null.");
-        ResultNode node = queryHashValue(null, null, this.root, key.hashCode());
+        ResultNode node = queryHashValue(key.hashCode());
         return node == null ? null : node.currentNode == null ? null : node.currentNode.value;
+    }
+
+    //TODO:test
+    public int[] getLevelArray() {
+        return levelArray;
     }
 
     @Override
@@ -68,10 +75,11 @@ public class StringSkipNode<V> implements Node<String, V> {
 
         int hashCode = key.hashCode();
         int levelCode = randomLevel();
+        this.levelArray[levelCode]++;
         if (initRoot(value, hashCode, levelCode)) return null;
 
         V result = null;
-        ResultNode queryNode = queryHashValue(null, null, this.root, key.hashCode());
+        ResultNode queryNode = queryHashValue(key.hashCode());
         if (queryNode != null) {
             result = queryNode.currentNode.value;
             queryNode.currentNode.value = value;
@@ -83,14 +91,13 @@ public class StringSkipNode<V> implements Node<String, V> {
             current.value = value;
             this.root = putLevelNode(current, this.root);
         }
-
         return result;
     }
 
     @Override
     public V remove(Object key) {
         if (key == null) throw new IllegalArgumentException("key is required! can not be null.");
-        ResultNode node = queryHashValue(null, null, this.root, key.hashCode());
+        ResultNode node = queryHashValue(key.hashCode());
         if (node != null) {
             this.size--;
             if (node.previousNode == null) {
@@ -150,17 +157,20 @@ public class StringSkipNode<V> implements Node<String, V> {
         return node;
     }
 
-    private ResultNode queryHashValue(NodeItem previousLevel, NodeItem previous, NodeItem current, int hashCode) {
-        if (current != null) {
+    private ResultNode queryHashValue(int hashCode) {
+        NodeItem previousLevel = null, previous = null, current = this.root;
+        while (true) {
+            if (current == null) return null;
             if (current.index > hashCode) {
-                NodeItem nextLevel = current.levelNext;
-                return queryHashValue(current, previous, nextLevel, hashCode);
+                previousLevel = current;//@1
+                current = current.levelNext;//@2
             } else if (current.index < hashCode) {
-                return queryHashValue(previousLevel, current, current.dataNext, hashCode);
+                previous = current;//@1
+                current = current.dataNext;//@2
+            } else {
+                return new ResultNode(previousLevel, previous, current);
             }
-            return new ResultNode(previousLevel, previous, current);
         }
-        return null;
     }
 
     private class ResultNode {

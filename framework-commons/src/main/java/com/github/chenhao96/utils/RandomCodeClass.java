@@ -21,6 +21,8 @@ public final class RandomCodeClass {
 
     private char[] characterSet;
 
+    private Random random = new Random();
+
     private RandomCodeClass(CodeCharArray... characterSets) {
 
         if (characterSets == null || characterSets.length == 0) {
@@ -80,21 +82,20 @@ public final class RandomCodeClass {
     }
 
     public Set<String> createSetCode(int length, int size) {
-        characterSet = exchangeCode(characterSet, new Random());
         Set<String> result = new HashSet<>(size);
-        createCode(result, length, size, characterSet);
+        this.characterSet = exchangeCode(this.characterSet, this.random);
+        createCode(result, this.random, length, size, this.characterSet);
         return result;
     }
 
     public List<String> createListCode(int length, int size) {
-        characterSet = exchangeCode(characterSet, new Random());
         List<String> result = new ArrayList<>(size);
-        createCode(result, length, size, characterSet);
+        this.characterSet = exchangeCode(this.characterSet, this.random);
+        createCode(result, this.random, length, size, this.characterSet);
         return result;
     }
 
-    private static void createCode(Collection<String> collection, int length, int size, char[] tmp) {
-        Random random = new Random();
+    private static void createCode(Collection<String> collection, Random random, int length, int size, char[] tmp) {
         while (collection.size() < size) {
             tmp = exchangeCode(tmp, random);
             StringBuilder sb = new StringBuilder(length);
