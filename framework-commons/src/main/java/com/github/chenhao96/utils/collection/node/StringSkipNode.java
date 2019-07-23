@@ -75,7 +75,7 @@ public class StringSkipNode<V> implements Node<String, V> {
 
         int hashCode = key.hashCode();
         int levelCode = randomLevel();
-        this.levelArray[levelCode]++;
+        this.levelArray[levelCode]++;//TODO:test
         if (initRoot(value, hashCode, levelCode)) return null;
 
         V result = null;
