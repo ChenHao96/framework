@@ -28,7 +28,7 @@ public class NodeCollection {
     private List<String> keys;
     private static final int forSize = 3;
     private static final int keyLength = 100;
-    private static final int keySize = 100000;
+    private static final int keySize = 10000;
     private static final int levelSize = keySize / 100;
 
     @Before

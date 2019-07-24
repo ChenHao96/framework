@@ -96,6 +96,8 @@ public class StringSkipNode<V> implements Node<String, V> {
         if (node != null) {
             this.size--;
             //TODO:
+
+
             return node.currentNode.value;
         }
         return null;
@@ -134,7 +136,7 @@ public class StringSkipNode<V> implements Node<String, V> {
         }
     }
 
-    //TODO:有待觀察
+    //TODO:
     private V putLevelNode(NodeItem value) {
         V result = null;
         NodeItem current = this.root, root = this.root, previousLevel = null;
