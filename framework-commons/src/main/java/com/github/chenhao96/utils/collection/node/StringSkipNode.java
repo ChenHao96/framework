@@ -15,6 +15,7 @@
  */
 package com.github.chenhao96.utils.collection.node;
 
+import java.util.Map;
 import java.util.Random;
 
 public class StringSkipNode<V> implements Node<String, V> {
@@ -22,8 +23,8 @@ public class StringSkipNode<V> implements Node<String, V> {
     protected int size;
     protected NodeItem root;
 
-    private final int[] levelArray;//TODO:test
     private final int maxLevel;
+    private final int[] levelArray;
     private final Random random = new Random();
     private static final int DEFAULT_MAX_LEVEL = 16;
 
@@ -41,7 +42,7 @@ public class StringSkipNode<V> implements Node<String, V> {
 
     @Override
     public boolean isEmpty() {
-        return this.root == null;
+        return this.size == 0;
     }
 
     @Override
@@ -57,13 +58,14 @@ public class StringSkipNode<V> implements Node<String, V> {
     @Override
     public V get(Object key) {
         if (key == null) throw new IllegalArgumentException("key is required! can not be null.");
-        ResultNode node = queryHashValue(key.hashCode());
+        ResultNode node = queryHashKey(key.hashCode());
         return node == null ? null : node.currentNode == null ? null : node.currentNode.value;
     }
 
-    //TODO:test
     public int[] getLevelArray() {
-        return levelArray;
+        int[] result = new int[levelArray.length];
+        System.arraycopy(levelArray, 0, result, 0, result.length);
+        return result;
     }
 
     @Override
@@ -73,42 +75,27 @@ public class StringSkipNode<V> implements Node<String, V> {
         if (this.size >= Integer.MAX_VALUE)
             throw new IllegalArgumentException("container element reaches the upper limit.");
 
-        int hashCode = key.hashCode();
+        int keyHash = key.hashCode();
         int levelCode = randomLevel();
-        this.levelArray[levelCode]++;//TODO:test
-        if (initRoot(value, hashCode, levelCode)) return null;
+        this.levelArray[levelCode]++;
+        if (initRoot(key, value, keyHash, levelCode)) return null;
 
-        V result = null;
-        ResultNode queryNode = queryHashValue(key.hashCode());
-        if (queryNode != null) {
-            result = queryNode.currentNode.value;
-            queryNode.currentNode.value = value;
-        } else {
-            this.size++;
-            NodeItem current = new NodeItem();
-            current.level = levelCode;
-            current.index = hashCode;
-            current.value = value;
-            this.root = putLevelNode(current, this.root);
-        }
-        return result;
+        this.size++;
+        NodeItem current = new NodeItem();
+        current.level = levelCode;
+        current.index = keyHash;
+        current.value = value;
+        current.key = key;
+        return putLevelNode(current);
     }
 
     @Override
     public V remove(Object key) {
         if (key == null) throw new IllegalArgumentException("key is required! can not be null.");
-        ResultNode node = queryHashValue(key.hashCode());
+        ResultNode node = queryHashKey(key.hashCode());
         if (node != null) {
             this.size--;
-            if (node.previousNode == null) {
-                if (node.previousLevel == null) {
-                    this.root = node.currentNode.dataNext;
-                } else {
-                    node.previousLevel.levelNext = node.currentNode.dataNext;
-                }
-            } else {
-                node.previousNode.dataNext = node.currentNode.dataNext;
-            }
+            //TODO:
             return node.currentNode.value;
         }
         return null;
@@ -123,54 +110,88 @@ public class StringSkipNode<V> implements Node<String, V> {
         return result % maxLevel;
     }
 
-    private boolean initRoot(V value, int hashCode, int levelCode) {
+    private boolean initRoot(String key, V value, int keyHash, int levelCode) {
         if (this.root == null) {
             this.root = new NodeItem();
             this.root.level = levelCode;
-            this.root.index = hashCode;
+            this.root.index = keyHash;
             this.root.value = value;
+            this.root.key = key;
             this.size = 1;
             return true;
         }
         return false;
     }
 
-    //TODO:bug
-    private NodeItem putLevelNode(NodeItem current, NodeItem node) {
-        if (node == null) return current;
-        if (current == null) return node;
-        if (current.index < node.index) {
-            if (current.level > node.level) {
-                node.levelNext = putLevelNode(current, node.levelNext);
-            } else {
-                if (current.level < node.level) {
-                    current.levelNext = node;
-                } else {
-                    current.dataNext = node;
-                }
-                return current;
+    private NodeItem findLessCurrent(int hash, NodeItem current) {
+        while (true) {
+            if (current.index > hash) return null;
+            if (current.index == hash) return current;
+            if (current.index < hash) {
+                if (current.dataNext == null || current.dataNext.index > hash) return current;
+                current = current.dataNext;
             }
-        } else if (current.index > node.index) {
-            node.dataNext = putLevelNode(current, node.dataNext);
-        } else {
-            node.value = current.value;
         }
-        return node;
     }
 
-    //TODO:bug
-    private ResultNode queryHashValue(int hashCode) {
+    //TODO:有待觀察
+    private V putLevelNode(NodeItem value) {
+        V result = null;
+        NodeItem current = this.root, root = this.root, previousLevel = null;
+        while (current != null) {
+            NodeItem tmp = findLessCurrent(value.index, current);
+            if (tmp == null) {
+                if (value.level == current.level) {
+                    value.dataNext = current;
+                    root = value;
+                } else {
+                    value.levelNext = current;
+                    if (previousLevel != null) {
+                        previousLevel.levelNext = value;
+                    } else {
+                        root = value;
+                    }
+                }
+                break;
+            } else {
+                if (tmp.index == value.index) {
+                    result = tmp.value;
+                    tmp.value = value.value;
+                    break;
+                } else if (tmp.index < value.index) {
+                    if (tmp.level == value.level) {
+                        value.dataNext = tmp.dataNext;
+                        tmp.dataNext = value;
+                        break;
+                    }
+                    if (tmp.levelNext != null) {
+                        current = tmp.levelNext;
+                        previousLevel = tmp;
+                    } else {
+                        tmp.levelNext = value;
+                        break;
+                    }
+                }
+            }
+        }
+        this.root = root;
+        return result;
+    }
+
+    private ResultNode queryHashKey(int hashCode) {
         NodeItem previousLevel = null, previous = null, current = this.root;
         while (true) {
             if (current == null) return null;
-            if (current.index > hashCode) {
-                previousLevel = current;//@1
-                current = current.levelNext;//@2
-            } else if (current.index < hashCode) {
-                previous = current;//@1
-                current = current.dataNext;//@2
-            } else {
-                return new ResultNode(previousLevel, previous, current);
+            if (hashCode < current.index) return null;
+            if (hashCode == current.index) return new ResultNode(previousLevel, previous, current);
+            NodeItem nextData = current.dataNext;
+            if (nextData == null || hashCode < nextData.index) {
+                previous = null;
+                previousLevel = current;
+                current = current.levelNext;
+            } else if (hashCode > nextData.index) {
+                previous = current;
+                current = nextData;
             }
         }
     }
@@ -187,11 +208,29 @@ public class StringSkipNode<V> implements Node<String, V> {
         }
     }
 
-    private class NodeItem {
+    protected class NodeItem implements Map.Entry<String, V> {
         private V value;
         private int index;
         private int level;
+        private String key;
         private NodeItem dataNext;
         private NodeItem levelNext;
+
+        @Override
+        public String getKey() {
+            return key;
+        }
+
+        @Override
+        public V getValue() {
+            return value;
+        }
+
+        @Override
+        public V setValue(V value) {
+            V result = this.value;
+            this.value = value;
+            return result;
+        }
     }
 }
