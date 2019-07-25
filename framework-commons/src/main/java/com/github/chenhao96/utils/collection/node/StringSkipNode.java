@@ -15,13 +15,12 @@
  */
 package com.github.chenhao96.utils.collection.node;
 
-import java.util.Map;
 import java.util.Random;
 
 public class StringSkipNode<V> implements Node<String, V> {
 
     protected int size;
-    protected NodeItem root;
+    protected NodeItem<V> root;
 
     private final int maxLevel;
     private final int[] levelArray;
@@ -81,7 +80,7 @@ public class StringSkipNode<V> implements Node<String, V> {
         if (initRoot(key, value, keyHash, levelCode)) return null;
 
         this.size++;
-        NodeItem current = new NodeItem();
+        NodeItem<V> current = new NodeItem<>();
         current.level = levelCode;
         current.index = keyHash;
         current.value = value;
@@ -95,9 +94,19 @@ public class StringSkipNode<V> implements Node<String, V> {
         ResultNode node = queryHashKey(key.hashCode());
         if (node != null) {
             this.size--;
-            //TODO:
-
-
+            if (node.currentNode.levelNext == null) {
+                if (node.previousNode == null) {
+                    node.previousLevel.levelNext = node.currentNode.dataNext;
+                } else {
+                    node.previousNode.dataNext = node.currentNode.dataNext;
+                }
+            } else {
+                if (node.previousNode == null) {
+                    //TODO:
+                } else {
+                    //TODO:
+                }
+            }
             return node.currentNode.value;
         }
         return null;
@@ -114,7 +123,7 @@ public class StringSkipNode<V> implements Node<String, V> {
 
     private boolean initRoot(String key, V value, int keyHash, int levelCode) {
         if (this.root == null) {
-            this.root = new NodeItem();
+            this.root = new NodeItem<>();
             this.root.level = levelCode;
             this.root.index = keyHash;
             this.root.value = value;
@@ -125,55 +134,63 @@ public class StringSkipNode<V> implements Node<String, V> {
         return false;
     }
 
-    private NodeItem findLessCurrent(int hash, NodeItem current) {
+    private NodeItem<V> findLessCurrent(int hash, NodeItem<V> current) {
         while (true) {
-            if (current.index > hash) return null;
-            if (current.index == hash) return current;
-            if (current.index < hash) {
-                if (current.dataNext == null || current.dataNext.index > hash) return current;
-                current = current.dataNext;
+            if (hash < current.index) return null;
+            if (hash == current.index) return current;
+            if (hash > current.index) {
+                if (current.dataNext == null) return current;
+                if (hash > current.dataNext.index) {
+                    current = current.dataNext;
+                } else if (hash == current.dataNext.index) {
+                    return current.dataNext;
+                } else {
+                    return current;
+                }
             }
         }
     }
 
-    //TODO:
-    private V putLevelNode(NodeItem value) {
+    private V putLevelNode(NodeItem<V> value) {
         V result = null;
-        NodeItem current = this.root, root = this.root, previousLevel = null;
-        while (current != null) {
-            NodeItem tmp = findLessCurrent(value.index, current);
-            if (tmp == null) {
-                if (value.level == current.level) {
-                    value.dataNext = current;
-                    root = value;
-                } else {
-                    value.levelNext = current;
-                    if (previousLevel != null) {
-                        previousLevel.levelNext = value;
-                    } else {
-                        root = value;
-                    }
-                }
-                break;
-            } else {
+        NodeItem<V> current = this.root, root = this.root;
+        while (true) {
+            NodeItem<V> tmp = findLessCurrent(value.index, current);
+            if (tmp != null) {
                 if (tmp.index == value.index) {
                     result = tmp.value;
                     tmp.value = value.value;
                     break;
-                } else if (tmp.index < value.index) {
-                    if (tmp.level == value.level) {
-                        value.dataNext = tmp.dataNext;
+                } else {
+                    if (tmp.dataNext != null) {
+                        if (tmp.levelNext != null) {
+                            if (tmp.levelNext.index < value.index) {
+                                current = tmp.levelNext;
+                            } else {
+                                if (tmp.levelNext.index > value.index) {
+                                    value.dataNext = tmp.dataNext;//@1
+                                    tmp.dataNext = value;//@2
+                                    value.levelNext = tmp.levelNext;//@3
+                                    tmp.levelNext = null;//@4
+                                } else {
+                                    result = tmp.levelNext.value;
+                                    tmp.levelNext.value = value.value;
+                                }
+                                break;
+                            }
+                        } else {
+                            tmp.levelNext = value;
+                            break;
+                        }
+                    } else {
                         tmp.dataNext = value;
                         break;
                     }
-                    if (tmp.levelNext != null) {
-                        current = tmp.levelNext;
-                        previousLevel = tmp;
-                    } else {
-                        tmp.levelNext = value;
-                        break;
-                    }
                 }
+            } else {
+                value.dataNext = current;
+                root = value;
+                break;
             }
         }
         this.root = root;
@@ -181,58 +198,58 @@ public class StringSkipNode<V> implements Node<String, V> {
     }
 
     private ResultNode queryHashKey(int hashCode) {
-        NodeItem previousLevel = null, previous = null, current = this.root;
-        while (true) {
-            if (current == null) return null;
-            if (hashCode < current.index) return null;
+        NodeItem<V> previousLevel = null, previous = null, current = this.root;
+        while (current != null && hashCode >= current.index) {
             if (hashCode == current.index) return new ResultNode(previousLevel, previous, current);
-            NodeItem nextData = current.dataNext;
+            NodeItem<V> nextData = current.dataNext;
             if (nextData == null || hashCode < nextData.index) {
                 previous = null;
                 previousLevel = current;
                 current = current.levelNext;
-            } else if (hashCode > nextData.index) {
+            } else {
                 previous = current;
                 current = nextData;
             }
         }
+        return null;
     }
 
     private class ResultNode {
-        private NodeItem previousLevel;
-        private NodeItem previousNode;
-        private NodeItem currentNode;
+        private NodeItem<V> previousLevel;
+        private NodeItem<V> previousNode;
+        private NodeItem<V> currentNode;
 
-        public ResultNode(NodeItem previousLevel, NodeItem previousNode, NodeItem currentNode) {
+        public ResultNode(NodeItem<V> previousLevel, NodeItem<V> previousNode, NodeItem<V> currentNode) {
             this.previousLevel = previousLevel;
             this.previousNode = previousNode;
             this.currentNode = currentNode;
         }
     }
 
-    protected class NodeItem implements Map.Entry<String, V> {
-        private V value;
-        private int index;
-        private int level;
-        private String key;
-        private NodeItem dataNext;
-        private NodeItem levelNext;
-
-        @Override
-        public String getKey() {
-            return key;
-        }
-
-        @Override
-        public V getValue() {
-            return value;
-        }
-
-        @Override
-        public V setValue(V value) {
-            V result = this.value;
-            this.value = value;
-            return result;
-        }
-    }
+//    public class NodeItem implements Map.Entry<String, V> {
+//
+//        public V value;
+//        public int index;
+//        public int level;
+//        public String key;
+//        public NodeItem dataNext;
+//        public NodeItem levelNext;
+//
+//        @Override
+//        public String getKey() {
+//            return key;
+//        }
+//
+//        @Override
+//        public V getValue() {
+//            return value;
+//        }
+//
+//        @Override
+//        public V setValue(V value) {
+//            V result = this.value;
+//            this.value = value;
+//            return result;
+//        }
+//    }
 }

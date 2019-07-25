@@ -27,9 +27,9 @@ public class NodeCollection {
 
     private List<String> keys;
     private static final int forSize = 3;
-    private static final int keyLength = 100;
-    private static final int keySize = 10000;
-    private static final int levelSize = keySize / 100;
+    private static final int keyLength = 10;
+    private static final int keySize = 10;
+    private static final int levelSize = keySize;// / 100;
 
     @Before
     public void before() {
@@ -56,14 +56,18 @@ public class NodeCollection {
                 }
                 long endTime = System.currentTimeMillis();
                 long insertTime = endTime - startTime;
+                System.out.printf("%d,%d, put use time:%d\n", y, i, insertTime);
                 for (int k = 0; k < keys.size(); k++) {
-                    Integer value = map.get(keys.get(k));
+                    String key = keys.get(k);
+                    Integer value = map.get(key);
                     if (value != null && value == k) count++;
                 }
                 long queryTime = System.currentTimeMillis() - endTime;
-
-                if (count != keys.size()) { System.out.println("fail"); return; }
-                System.out.printf("%d,%d, put use time:%d, query use time:%d\n", y, i, insertTime, queryTime);
+                System.out.printf("%d,%d,query use time:%d\n", y, i, queryTime);
+                if (count != keys.size()) {
+                    System.out.printf("count:%d fail.\n",count);
+                    return;
+                }
 
                 if (insertTime < insertMinTime) {
                     insertMinTime = insertTime;
