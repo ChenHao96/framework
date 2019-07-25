@@ -27,9 +27,9 @@ public class NodeCollection {
 
     private List<String> keys;
     private static final int forSize = 3;
-    private static final int keyLength = 10;
-    private static final int keySize = 10;
-    private static final int levelSize = keySize;// / 100;
+    private static final int keyLength = 1000;
+    private static final int keySize = 100000;
+    private static final int levelSize = keySize/1000;
 
     @Before
     public void before() {
@@ -72,6 +72,7 @@ public class NodeCollection {
                 if (insertTime < insertMinTime) {
                     insertMinTime = insertTime;
                     insertMin.node = map;
+                    insertMin.level = i;
                     insertMin.insertMinTime = insertTime;
                     insertMin.queryMinTime = queryTime;
                 }
@@ -79,6 +80,7 @@ public class NodeCollection {
                 if (queryTime < queryMinTime) {
                     queryMinTime = queryTime;
                     queryMin.node = map;
+                    queryMin.level = i;
                     queryMin.insertMinTime = insertTime;
                     queryMin.queryMinTime = queryTime;
                 }
@@ -92,13 +94,15 @@ public class NodeCollection {
     private class Record {
         private long queryMinTime;
         private long insertMinTime;
+        private int level;
         private StringSkipNode<Integer> node;
 
         @Override
         public String toString() {
             final StringBuilder sb = new StringBuilder("Record{");
-            sb.append("insertMinTime=").append(insertMinTime);
-            sb.append(", queryMinTime=").append(queryMinTime);
+            sb.append("queryMinTime=").append(queryMinTime);
+            sb.append(", insertMinTime=").append(insertMinTime);
+            sb.append(", level=").append(level);
             sb.append(", node=").append(Arrays.toString(node.getLevelArray()));
             sb.append('}');
             return sb.toString();
