@@ -16,7 +16,6 @@
 package com.github.chenhao96;
 
 import com.github.chenhao96.utils.RandomCodeClass;
-import com.github.chenhao96.utils.collection.node.Node;
 import com.github.chenhao96.utils.collection.node.StringSkipNode;
 import org.junit.Before;
 import org.junit.Test;
@@ -26,9 +25,9 @@ import java.util.List;
 public class NodeCollection {
 
     private List<String> keys;
-    private static final int forSize = 10;
+    private static final int forSize = 3;
     private static final int keyLength = 100;
-    private static final int keySize = 100000;
+    private static final int keySize = 10;
 
     @Before
     public void before() {
@@ -47,10 +46,10 @@ public class NodeCollection {
 
             count = 0;
             long startTime = System.currentTimeMillis();
-            Node<String, Integer> map = new StringSkipNode<>();
+            StringSkipNode<Integer> map = new StringSkipNode<>();
             for (int k = 0; k < keys.size(); k++) {
                 Integer value = map.put(keys.get(k), k);
-                if (value != null) count++;
+                if (value == null) count++;
             }
             long insertTime = System.currentTimeMillis() - startTime;
             System.out.printf("%d, put use time:%d\n", y, insertTime);
@@ -58,11 +57,11 @@ public class NodeCollection {
             startTime = System.currentTimeMillis();
             for (int k = 0; k < keys.size(); k++) {
                 Integer value = map.get(keys.get(k));
-                if (value != null && value == k) count++;
+                if (value != null && value == k) count--;
             }
             long queryTime = System.currentTimeMillis() - startTime;
             System.out.printf("%d,query use time:%d\n", y, queryTime);
-            if (count != keys.size()) {
+            if (count != 0) {
                 System.out.printf("count:%d fail.\n", count);
                 return;
             }
@@ -103,8 +102,8 @@ public class NodeCollection {
         }
 
         System.out.printf("queryMin:%s\n", queryMin);
-        System.out.printf("queryMin:%s\n", removeMin);
         System.out.printf("insertMin:%s\n", insertMin);
+        System.out.printf("removeMin:%s\n", removeMin);
     }
 
     private class Record {
