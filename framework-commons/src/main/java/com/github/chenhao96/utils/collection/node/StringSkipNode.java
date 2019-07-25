@@ -16,29 +16,11 @@
 package com.github.chenhao96.utils.collection.node;
 
 import java.util.Map;
-import java.util.Random;
 
 public class StringSkipNode<V> implements Node<String, V> {
 
-    protected int size;
-    protected NodeItem root;
-
-    private final int maxLevel;
-    private final int[] levelArray;
-    private final Random random = new Random();
-    private static final int DEFAULT_MAX_LEVEL = 16;
-
-    public StringSkipNode() {
-        this(DEFAULT_MAX_LEVEL);
-    }
-
-    public StringSkipNode(int maxLevel) {
-        if (maxLevel < 1) {
-            throw new IllegalArgumentException("maxLevel param must be greater than 1.");
-        }
-        this.maxLevel = maxLevel;
-        this.levelArray = new int[maxLevel];
-    }
+    private int size;
+    private NodeItem root;
 
     @Override
     public boolean isEmpty() {
@@ -62,27 +44,15 @@ public class StringSkipNode<V> implements Node<String, V> {
         return node == null ? null : node.currentNode == null ? null : node.currentNode.value;
     }
 
-    public int[] getLevelArray() {
-        int[] result = new int[levelArray.length];
-        System.arraycopy(levelArray, 0, result, 0, result.length);
-        return result;
-    }
-
     @Override
     public V put(String key, V value) {
-
         if (key == null) throw new IllegalArgumentException("key is required! can not be null.");
         if (this.size >= Integer.MAX_VALUE)
             throw new IllegalArgumentException("container element reaches the upper limit.");
-
         int keyHash = key.hashCode();
-        int levelCode = randomLevel();
-        this.levelArray[levelCode]++;
-        if (initRoot(key, value, keyHash, levelCode)) return null;
-
+        if (initRoot(key, value, keyHash)) return null;
         this.size++;
         NodeItem current = new NodeItem();
-        current.level = levelCode;
         current.index = keyHash;
         current.value = value;
         current.key = key;
@@ -97,15 +67,18 @@ public class StringSkipNode<V> implements Node<String, V> {
             this.size--;
             if (node.currentNode.levelNext == null) {
                 if (node.previousNode == null) {
-                    node.previousLevel.levelNext = node.currentNode.dataNext;
+                    if (node.previousLevel == null) {
+                        this.root = node.currentNode.dataNext;
+                    } else {
+                        node.previousLevel.levelNext = node.currentNode.dataNext;
+                    }
                 } else {
                     node.previousNode.dataNext = node.currentNode.dataNext;
                 }
             } else {
+                //TODO:
                 if (node.previousNode == null) {
-                    //TODO:
                 } else {
-                    //TODO:
                 }
             }
             return node.currentNode.value;
@@ -113,19 +86,9 @@ public class StringSkipNode<V> implements Node<String, V> {
         return null;
     }
 
-    private int randomLevel() {
-        int result = random.nextInt(maxLevel);
-        int size = random.nextInt(maxLevel);
-        for (int i = 0; i < size; i++) {
-            result += random.nextInt(maxLevel);
-        }
-        return result % maxLevel;
-    }
-
-    private boolean initRoot(String key, V value, int keyHash, int levelCode) {
+    private boolean initRoot(String key, V value, int keyHash) {
         if (this.root == null) {
             this.root = new NodeItem();
-            this.root.level = levelCode;
             this.root.index = keyHash;
             this.root.value = value;
             this.root.key = key;
@@ -152,7 +115,6 @@ public class StringSkipNode<V> implements Node<String, V> {
         }
     }
 
-    //TODO:没有判断层
     private V putLevelNode(NodeItem value) {
         V result = null;
         NodeItem current = this.root, root = this.root, previousLevel = null;
@@ -224,7 +186,6 @@ public class StringSkipNode<V> implements Node<String, V> {
 
         public V value;
         public int index;
-        public int level;
         public String key;
         public NodeItem dataNext;
         public NodeItem levelNext;
