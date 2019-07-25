@@ -25,9 +25,9 @@ import java.util.List;
 public class NodeCollection {
 
     private List<String> keys;
-    private static final int forSize = 3;
+    private static final int forSize = 10;
     private static final int keyLength = 100;
-    private static final int keySize = 10;
+    private static final int keySize = 1000000;
 
     @Before
     public void before() {
