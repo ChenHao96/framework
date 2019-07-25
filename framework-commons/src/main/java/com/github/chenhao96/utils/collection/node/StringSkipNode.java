@@ -29,6 +29,7 @@ public class StringSkipNode<V> implements Node<String, V> {
 
     @Override
     public void clear() {
+        this.size = 0;
         this.root = null;
     }
 
@@ -50,12 +51,12 @@ public class StringSkipNode<V> implements Node<String, V> {
         if (this.size >= Integer.MAX_VALUE)
             throw new IllegalArgumentException("container element reaches the upper limit.");
         int keyHash = key.hashCode();
-        if (initRoot(key, value, keyHash)) return null;
-        this.size++;
         NodeItem current = new NodeItem();
-        current.index = keyHash;
-        current.value = value;
+        if (initRoot(current)) return null;
+        this.size++;
         current.key = key;
+        current.value = value;
+        current.index = keyHash;
         return putLevelNode(current);
     }
 
@@ -86,12 +87,9 @@ public class StringSkipNode<V> implements Node<String, V> {
         return null;
     }
 
-    private boolean initRoot(String key, V value, int keyHash) {
+    private boolean initRoot(NodeItem valueNode) {
         if (this.root == null) {
-            this.root = new NodeItem();
-            this.root.index = keyHash;
-            this.root.value = value;
-            this.root.key = key;
+            this.root = valueNode;
             this.size = 1;
             return true;
         }
@@ -163,8 +161,18 @@ public class StringSkipNode<V> implements Node<String, V> {
                 previousLevel = current;
                 current = current.levelNext;
             } else {
-                previous = current;
-                current = nextData;
+                //TODO:
+                if (nextData.dataNext == null) break;
+                if (hashCode < nextData.dataNext.index) {
+                    previous = null;
+                    previousLevel = nextData;
+                    current = nextData.levelNext;
+                } else if (hashCode > nextData.dataNext.index) {
+                    previous = nextData.dataNext;
+                    current = nextData.dataNext.dataNext;
+                } else {
+                    return new ResultNode(previousLevel, nextData, nextData.dataNext);
+                }
             }
         }
         return null;
