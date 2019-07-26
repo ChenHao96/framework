@@ -15,13 +15,12 @@
  */
 package com.github.chenhao96.utils.collection.node;
 
-import java.util.Map;
 import java.util.Random;
 
 public class StringSkipNode<V> implements Node<String, V> {
 
-    protected int size;
-    protected NodeItem root;
+    private int size;
+    private NodeItem root;
 
     private final int maxLevel;
     private final int[] levelArray;
@@ -95,17 +94,28 @@ public class StringSkipNode<V> implements Node<String, V> {
         ResultNode node = queryHashKey(key.hashCode());
         if (node != null) {
             this.size--;
-            if (node.currentNode.levelNext == null) {
-                if (node.previousNode == null) {
-                    node.previousLevel.levelNext = node.currentNode.dataNext;
+            NodeItem tmpNode;
+            NodeItem currentNextLevel = node.currentNode.levelNext;
+            if (currentNextLevel != null) {
+                tmpNode = currentNextLevel;
+                while (tmpNode.dataNext != null) {
+                    tmpNode = tmpNode.dataNext;
+                }
+                tmpNode.dataNext = node.currentNode.dataNext;
+                if (node.previousNode != null) {
+                    node.previousNode.dataNext = currentNextLevel;
+                } else if (node.previousLevel != null) {
+                    node.previousLevel.levelNext = currentNextLevel;
                 } else {
-                    node.previousNode.dataNext = node.currentNode.dataNext;
+                    this.root = currentNextLevel;
                 }
             } else {
-                if (node.previousNode == null) {
-                    //TODO:
+                if (node.previousNode != null) {
+                    node.previousNode.dataNext = node.currentNode.dataNext;
+                } else if (node.previousLevel != null) {
+                    node.previousLevel.levelNext = node.currentNode.dataNext;
                 } else {
-                    //TODO:
+                    this.root = node.currentNode.dataNext;
                 }
             }
             return node.currentNode.value;
@@ -219,7 +229,7 @@ public class StringSkipNode<V> implements Node<String, V> {
         }
     }
 
-    public class NodeItem implements Map.Entry<String, V> {
+    public class NodeItem {//implements Map.Entry<String, V> {
 
         public V value;
         public int index;
@@ -228,17 +238,14 @@ public class StringSkipNode<V> implements Node<String, V> {
         public NodeItem dataNext;
         public NodeItem levelNext;
 
-        @Override
         public String getKey() {
             return key;
         }
 
-        @Override
         public V getValue() {
             return value;
         }
 
-        @Override
         public V setValue(V value) {
             V result = this.value;
             this.value = value;

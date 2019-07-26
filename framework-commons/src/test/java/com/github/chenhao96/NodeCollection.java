@@ -21,11 +21,12 @@ import org.junit.Before;
 import org.junit.Test;
 
 import java.util.List;
+import java.util.Random;
 
 public class NodeCollection {
 
     private List<String> keys;
-    private static final int forSize = 10;
+    private static final int forSize = 100;
     private static final int keyLength = 100;
     private static final int keySize = 1000000;
 
@@ -38,46 +39,79 @@ public class NodeCollection {
     }
 
     @Test
+    public void testSkipNode2() {
+
+        StringSkipNode<Integer> map = new StringSkipNode<>();
+        for (int k = 0; k < keys.size(); k++) {
+            map.put(keys.get(k), k);
+        }
+
+        Random random = new Random();
+        for (int i = 0; i < forSize; i++) {
+            int index = random.nextInt(keySize);
+            String key = keys.remove(index);
+            long startTime = System.currentTimeMillis();
+            if(map.get(key)!=null){
+                System.out.printf("%d, query use time:%d\n", i, System.currentTimeMillis() - startTime);
+            }
+        }
+        System.out.println();
+        for (int i = 0; i < forSize; i++) {
+            int index = random.nextInt(keySize);
+            String key = keys.remove(index);
+            long startTime = System.currentTimeMillis();
+            if(map.remove(key)!=null){
+                System.out.printf("%d, remove use time:%d\n", i, System.currentTimeMillis() - startTime);
+            }
+        }
+    }
+
+    @Test
     public void testSkipNode() {
         int count;
         Record insertMin = new Record(), queryMin = new Record(), removeMin = new Record();
         long insertMinTime = System.currentTimeMillis(), queryMinTime = insertMinTime, removeMinTime = insertMinTime;
         for (int y = 0; y < forSize; y++) {
 
-            count = 0;
+            int size = 0;
             long startTime = System.currentTimeMillis();
             StringSkipNode<Integer> map = new StringSkipNode<>();
             for (int k = 0; k < keys.size(); k++) {
                 Integer value = map.put(keys.get(k), k);
-                if (value == null) count++;
+                if (value != null) size++;
             }
             long insertTime = System.currentTimeMillis() - startTime;
             System.out.printf("%d, put use time:%d\n", y, insertTime);
 
+            count = size;
             startTime = System.currentTimeMillis();
             for (int k = 0; k < keys.size(); k++) {
                 Integer value = map.get(keys.get(k));
-                if (value != null && value == k) count--;
+                if (value != null && value == k) count++;
             }
             long queryTime = System.currentTimeMillis() - startTime;
-            System.out.printf("%d,query use time:%d\n", y, queryTime);
-            if (count != 0) {
-                System.out.printf("count:%d fail.\n", count);
-                return;
+            System.out.printf("%d, query use time:%d\n", y, queryTime);
+            if (count != keys.size()) {
+                System.out.printf("query count:%d fail.\n", count);
+                break;
             }
 
-//            count = 0;
+            count = size;
             startTime = System.currentTimeMillis();
-//            for (int k = 0; k < keys.size(); k++) {
-//                Integer value = map.remove(keys.get(k));
-//                if (value != null && value == k) count++;
-//            }
+            for (int k = 0; k < keys.size(); k++) {
+                Integer value = map.remove(keys.get(k));
+                if (value != null && value == k) count++;
+            }
             long removeTime = System.currentTimeMillis() - startTime;
-//            System.out.printf("%d,remove use time:%d\n", y, removeTime);
-//            if (count != keys.size()) {
-//                System.out.printf("count:%d fail.\n", count);
-//                return;
-//            }
+            System.out.printf("%d, remove use time:%d\n", y, removeTime);
+            if (count != keys.size()) {
+                System.out.printf("remove count:%d fail.\n", count);
+                break;
+            }
+            if (map.size() > 0) {
+                System.out.printf("remove map.size:%d fail.\n", map.size());
+                break;
+            }
 
             if (insertTime < insertMinTime) {
                 insertMinTime = insertTime;
