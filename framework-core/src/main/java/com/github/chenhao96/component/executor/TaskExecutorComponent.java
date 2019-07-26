@@ -28,6 +28,7 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
 
+//TODO：bug
 @Component
 public class TaskExecutorComponent implements ComponentService, TaskExecutorService {
 

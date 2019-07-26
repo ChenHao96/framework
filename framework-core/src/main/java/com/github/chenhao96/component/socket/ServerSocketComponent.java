@@ -35,8 +35,8 @@ import java.io.IOException;
 import java.net.ServerSocket;
 import java.net.Socket;
 import java.net.SocketException;
-import java.util.Queue;
-import java.util.concurrent.ConcurrentLinkedQueue;
+import java.util.concurrent.LinkedBlockingQueue;
+import java.util.concurrent.TimeUnit;
 
 public class ServerSocketComponent implements ComponentService {
 
@@ -45,13 +45,12 @@ public class ServerSocketComponent implements ComponentService {
 
     private int processors;
     private int socketPort;
+    private Thread[] slackList;
     private long noDataWaitTime;
-    protected boolean initialize;
+    private boolean initialize;
     private volatile boolean started;
     private ServerSocket serverSocket;
-    private Thread[] slackList;
-    private final Object wait = new Object();
-    private Queue<SocketConnectionContext> handlerQueue;
+    private LinkedBlockingQueue<SocketConnectionContext> handlerQueue;
 
     @Resource
     private HandlerFactory handlerFactory;
@@ -85,7 +84,7 @@ public class ServerSocketComponent implements ComponentService {
 
         if (this.initialize) return;
         this.initialize = false;
-        this.handlerQueue = new ConcurrentLinkedQueue<>();
+        this.handlerQueue = new LinkedBlockingQueue<>();
         this.processors = (Runtime.getRuntime().availableProcessors() / 2) + 1;
         this.slackList = new Thread[this.processors];
         if (this.messageConvertToHandlerArgs == null) {
@@ -117,10 +116,6 @@ public class ServerSocketComponent implements ComponentService {
 
         if (!this.started) return;
         this.started = false;
-        synchronized (wait) {
-            wait.notifyAll();
-        }
-
         boolean listenerRunning = false;
         do {
             for (Thread thread : slackList) {
@@ -140,13 +135,6 @@ public class ServerSocketComponent implements ComponentService {
         }
     }
 
-    private void incrementHandler(SocketConnectionContext handler) {
-        this.handlerQueue.add(handler);
-        synchronized (wait) {
-            wait.notify();
-        }
-    }
-
     private class SocketAcceptListener implements Runnable {
 
         @Override
@@ -154,10 +142,13 @@ public class ServerSocketComponent implements ComponentService {
             do {
                 try {
                     Socket client = serverSocket.accept();
-                    if (!started) break;
+                    if (!started) {
+                        CommonsUtil.safeClose(client);
+                        break;
+                    }
                     SocketServerConnectionContext frameHandler = new SocketServerConnectionContext(client, noDataWaitTime);
                     frameHandler.setMessageConvertToHandlerArgs(messageConvertToHandlerArgs);
-                    incrementHandler(frameHandler);
+                    handlerQueue.add(frameHandler);
                 } catch (IOException e) {
                     LOGGER.warn("serverSocket accept exception.", e);
                 }
@@ -173,20 +164,12 @@ public class ServerSocketComponent implements ComponentService {
                 SocketConnectionContext handler = pollHandler();
                 if (handler == null) {
                     if (!started) break;
-                    synchronized (wait) {
-                        try {
-                            wait.wait();
-                        } catch (InterruptedException e) {
-                            e.printStackTrace();
-                            LOGGER.warn("pollHandler wait.", e);
-                        }
-                    }
                     continue;
                 }
 
                 if (started) {
                     if (!handler.isClose()) {
-                        incrementHandler(handler);
+                        handlerQueue.add(handler);
                     }
                 } else {
                     try {
@@ -200,7 +183,12 @@ public class ServerSocketComponent implements ComponentService {
 
         private SocketConnectionContext pollHandler() {
 
-            SocketConnectionContext handler = handlerQueue.poll();
+            SocketConnectionContext handler = null;
+            try {
+                handler = handlerQueue.poll(200, TimeUnit.MILLISECONDS);
+            } catch (InterruptedException e) {
+                LOGGER.warn("pollHandler.", e);
+            }
             if (handler == null) return null;
 
             CommonsMessage message = null;
@@ -209,7 +197,7 @@ public class ServerSocketComponent implements ComponentService {
             } catch (SocketException close) {
                 CommonsUtil.safeClose(handler);
             } catch (IOException e) {
-                LOGGER.warn("SocketHandlerListener pollHandler.", e);
+                LOGGER.warn("receiveMessage.", e);
             }
 
             return addHandler(handler, message);
