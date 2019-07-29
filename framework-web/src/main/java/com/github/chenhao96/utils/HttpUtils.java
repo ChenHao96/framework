@@ -15,7 +15,6 @@
  */
 package com.github.chenhao96.utils;
 
-import org.apache.http.Consts;
 import org.apache.http.Header;
 import org.apache.http.HttpEntity;
 import org.apache.http.client.entity.UrlEncodedFormEntity;
@@ -37,6 +36,8 @@ import javax.net.ssl.SSLContext;
 import javax.net.ssl.TrustManager;
 import javax.net.ssl.X509TrustManager;
 import javax.servlet.http.Cookie;
+import java.io.UnsupportedEncodingException;
+import java.net.URLEncoder;
 import java.security.cert.CertificateException;
 import java.security.cert.X509Certificate;
 import java.util.*;
@@ -47,37 +48,63 @@ public class HttpUtils {
     private static final String CONTENT_TYPE_KEY = "Content-Type";
     private static final Logger LOGGER = LoggerFactory.getLogger(HttpUtils.class);
 
-    public static String doGet(String url) {
+    private String charSet;
+    private String responseBody;
+    private final boolean encode;
+    private Map<String, Set<String>> cookies;
+
+    public HttpUtils(boolean encode) {
+        this.encode = encode;
+    }
+
+    public String getCharSet() {
+        return charSet;
+    }
+
+    public void setCharSet(String charSet) {
+        this.charSet = charSet;
+    }
+
+    public String getResponseBody() {
+        return responseBody;
+    }
+
+    public Map<String, Set<String>> getCookies() {
+        return cookies;
+    }
+
+    public String doGet(String url) {
         return doGet(url, null);
     }
 
-    public static String doPost(String url) {
+    public String doPost(String url) {
         return doPost(url, null);
     }
 
-    public static String doGet(String url, Map<String, String> params) {
+    public String doGet(String url, Map<String, String> params) {
         return doGet(url, params, null);
     }
 
-    public static String doPost(String url, Map<String, String> params) {
+    public String doPost(String url, Map<String, String> params) {
         return doPost(url, params, null);
     }
 
-    public static String doGet(String url, Map<String, String> params, Map<String, String> headers) {
-        return doGet(url, params, headers, new Cookie[0]).getResponseBody();
+    public String doGet(String url, Map<String, String> params, Map<String, String> headers) {
+        return doGet(url, params, headers, new Cookie[0]).responseBody;
     }
 
-    public static String doPost(String url, Map<String, String> params, Map<String, String> headers) {
-        return doPost(url, params, headers, new Cookie[0]).getResponseBody();
+    public String doPost(String url, Map<String, String> params, Map<String, String> headers) {
+        return doPost(url, params, headers, new Cookie[0]).responseBody;
     }
 
-    public static String toGetUrl(String url, Map<String, String> params) {
+    public String toGetUrl(String url, Map<String, String> params) {
         return addParams(url, params);
     }
 
-    public static HttpResponse doService(CloseableHttpClient httpClient, HttpRequestBase requestBase, Map<String, String> headers, Cookie... cookies) {
-        HttpResponse result = new HttpResponse();
-        if (requestBase == null) return result;
+    public HttpUtils doService(CloseableHttpClient httpClient, HttpRequestBase requestBase, Map<String, String> headers, Cookie... cookies) {
+        if (requestBase == null) return this;
+        this.cookies = null;
+        this.responseBody = null;
         CloseableHttpResponse httpResponse = null;
         long start = System.currentTimeMillis();
         try {
@@ -88,8 +115,8 @@ public class HttpUtils {
             HttpEntity entity = httpResponse.getEntity();
             String responseBody = EntityUtils.toString(entity, charSet);
             EntityUtils.consume(entity);
-            result.setResponseBody(responseBody);
-            getCookies(result, httpResponse);
+            this.responseBody = responseBody;
+            putCookies(httpResponse);
         } catch (Exception e) {
             throw new IllegalStateException("Http doService 异常", e);
         } finally {
@@ -97,10 +124,10 @@ public class HttpUtils {
             requestBase.releaseConnection();
             CommonsUtil.safeClose(httpResponse, httpClient);
         }
-        return result;
+        return this;
     }
 
-    public static HttpResponse doGet(String url, Map<String, String> params, Map<String, String> headers, Cookie... cookies) {
+    public HttpUtils doGet(String url, Map<String, String> params, Map<String, String> headers, Cookie... cookies) {
         if (StringUtil.isEmpty(url)) throw new IllegalArgumentException("url为空");
         CloseableHttpClient httpClient = createHttpClientByUrl(url);
         url = addParams(url, params);
@@ -112,7 +139,7 @@ public class HttpUtils {
         }
     }
 
-    public static HttpResponse doPost(String url, Map<String, String> params, Map<String, String> headers, Cookie... cookies) {
+    public HttpUtils doPost(String url, Map<String, String> params, Map<String, String> headers, Cookie... cookies) {
         if (StringUtil.isEmpty(url)) throw new IllegalArgumentException("url为空");
         CloseableHttpClient httpClient = createHttpClientByUrl(url);
         HttpPost httpPost = new HttpPost(url);
@@ -124,21 +151,7 @@ public class HttpUtils {
         }
     }
 
-    private static String getResponseCharSet(CloseableHttpResponse httpResponse) {
-        String charSet = CommonsUtil.SYSTEM_ENCODING;
-        Header contentType = httpResponse.getFirstHeader(CONTENT_TYPE_KEY);
-        if (contentType != null) {
-            String contextTypeValue = contentType.getValue();
-            int index = contextTypeValue.toUpperCase().indexOf("CHARSET");
-            if (index < 1) return charSet;
-            charSet = contextTypeValue.substring(index);
-            charSet = charSet.substring(charSet.indexOf("=") + 1).replace(";", "");
-        }
-        return charSet;
-    }
-
-    private static void getCookies(HttpResponse result, CloseableHttpResponse httpResponse) {
-        if (result == null) return;
+    private void putCookies(CloseableHttpResponse httpResponse) {
         Header[] headers = httpResponse.getHeaders(HEADER_KEY);
         if (headers == null || headers.length <= 0) return;
         Map<String, Set<String>> cookies = new HashMap<>(headers.length);
@@ -158,7 +171,52 @@ public class HttpUtils {
                 }
             }
         }
-        result.setCookies(cookies);
+        this.cookies = cookies;
+    }
+
+    private String addParams(String url, Map<String, String> params) {
+        if (params != null && params.size() > 0) {
+            StringBuilder builder = new StringBuilder(url.length());
+            Set<Map.Entry<String, String>> entries = params.entrySet();
+            for (Map.Entry<String, String> entry : entries) {
+                String key = entry.getKey();
+                String value = entry.getValue();
+                if (StringUtil.isNotBlank(value)) {
+                    builder.append("&").append(key).append("=");
+                    value = value.trim();
+                    try {
+                        if (encode) value = URLEncoder.encode(value, charSet);
+                    } catch (UnsupportedEncodingException e) {
+                        throw new RuntimeException(e);
+                    }
+                    builder.append(value);
+                }
+            }
+            if (url.indexOf("?") > 0 && url.indexOf("?") < url.length() - 1) {
+                url = builder.insert(0, url).toString();
+            } else {
+                url = builder.replace(0, 1, "?").insert(0, url).toString();
+            }
+        }
+        return url;
+    }
+
+    private void addParams(HttpPost httpPost, Map<String, String> params) {
+        if (params != null && params.size() > 0) {
+            List<BasicNameValuePair> paramList = new ArrayList<>();
+            for (Map.Entry<String, String> entry : params.entrySet()) {
+                String key = entry.getKey();
+                String value = entry.getValue();
+                if (StringUtil.isNotBlank(value)) {
+                    paramList.add(new BasicNameValuePair(key, value.trim()));
+                }
+            }
+            try {
+                if (encode) httpPost.setEntity(new UrlEncodedFormEntity(paramList, charSet));
+            } catch (UnsupportedEncodingException e) {
+                throw new RuntimeException(e);
+            }
+        }
     }
 
     private static void addHeaders(HttpRequestBase request, Map<String, String> headers) {
@@ -171,38 +229,17 @@ public class HttpUtils {
         }
     }
 
-    private static String addParams(String url, Map<String, String> params) {
-        if (params != null && params.size() > 0) {
-            StringBuilder builder = new StringBuilder(url.length());
-            Set<Map.Entry<String, String>> entries = params.entrySet();
-            for (Map.Entry<String, String> entry : entries) {
-                String key = entry.getKey();
-                String value = entry.getValue();
-                if (StringUtil.isNotBlank(value)) {
-                    builder.append("&").append(key).append("=").append(value.trim());
-                }
-            }
-            if (url.indexOf("?") > 0 && url.indexOf("?") < url.length() - 1) {
-                url = builder.insert(0, url).toString();
-            } else {
-                url = builder.replace(0, 1, "?").insert(0, url).toString();
-            }
+    private static String getResponseCharSet(CloseableHttpResponse httpResponse) {
+        String charSet = CommonsUtil.SYSTEM_ENCODING;
+        Header contentType = httpResponse.getFirstHeader(CONTENT_TYPE_KEY);
+        if (contentType != null) {
+            String contextTypeValue = contentType.getValue();
+            int index = contextTypeValue.toUpperCase().indexOf("CHARSET");
+            if (index < 1) return charSet;
+            charSet = contextTypeValue.substring(index);
+            charSet = charSet.substring(charSet.indexOf("=") + 1).replace(";", "");
         }
-        return url;
-    }
-
-    private static void addParams(HttpPost httpPost, Map<String, String> params) {
-        if (params != null && params.size() > 0) {
-            List<BasicNameValuePair> paramList = new ArrayList<>();
-            for (Map.Entry<String, String> entry : params.entrySet()) {
-                String key = entry.getKey();
-                String value = entry.getValue();
-                if (StringUtil.isNotBlank(value)) {
-                    paramList.add(new BasicNameValuePair(key, value.trim()));
-                }
-            }
-            httpPost.setEntity(new UrlEncodedFormEntity(paramList, Consts.UTF_8));
-        }
+        return charSet;
     }
 
     private static void addCookies(AbstractHttpMessage httpMessage, Cookie[] cookies) {
@@ -258,27 +295,5 @@ public class HttpUtils {
         }
 
         return client;
-    }
-
-    public static class HttpResponse {
-
-        private String responseBody;
-        private Map<String, Set<String>> cookies;
-
-        public String getResponseBody() {
-            return responseBody;
-        }
-
-        public void setResponseBody(String responseBody) {
-            this.responseBody = responseBody;
-        }
-
-        public Map<String, Set<String>> getCookies() {
-            return cookies;
-        }
-
-        public void setCookies(Map<String, Set<String>> cookies) {
-            this.cookies = cookies;
-        }
     }
 }
