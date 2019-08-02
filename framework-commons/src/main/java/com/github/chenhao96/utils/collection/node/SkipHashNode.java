@@ -18,7 +18,7 @@ package com.github.chenhao96.utils.collection.node;
 public class SkipHashNode<K, V> implements Node<K, V> {
 
     private int size;
-    private NodeItem root;
+    protected NodeItem root;
 
     @Override
     public boolean isEmpty() {
@@ -27,6 +27,7 @@ public class SkipHashNode<K, V> implements Node<K, V> {
 
     @Override
     public void clear() {
+        this.size = 0;
         this.root = null;
     }
 
@@ -44,14 +45,14 @@ public class SkipHashNode<K, V> implements Node<K, V> {
 
     @Override
     public V put(K key, V value) {
-
         if (key == null) throw new IllegalArgumentException("key is required! can not be null.");
         if (this.size >= Integer.MAX_VALUE)
             throw new IllegalArgumentException("container element reaches the upper limit.");
+        return putValue(key, value, key.hashCode());
+    }
 
-        int keyHash = key.hashCode();
+    protected V putValue(K key, V value, int keyHash) {
         if (initRoot(key, value, keyHash)) return null;
-
         this.size++;
         NodeItem current = new NodeItem();
         current.index = keyHash;
@@ -63,7 +64,10 @@ public class SkipHashNode<K, V> implements Node<K, V> {
     @Override
     public V remove(Object key) {
         if (key == null) throw new IllegalArgumentException("key is required! can not be null.");
-        ResultNode node = queryHashKey(key.hashCode());
+        return remove(queryHashKey(key.hashCode()));
+    }
+
+    protected V remove(ResultNode node) {
         if (node != null) {
             this.size--;
             //TODO:bug
@@ -163,7 +167,7 @@ public class SkipHashNode<K, V> implements Node<K, V> {
         return result;
     }
 
-    private ResultNode queryHashKey(int hashCode) {
+    protected ResultNode queryHashKey(int hashCode) {
         NodeItem previousLevel = null, previous = null, current = this.root;
         while (current != null && hashCode >= current.index) {
             if (hashCode == current.index) return new ResultNode(previousLevel, previous, current);
@@ -180,7 +184,7 @@ public class SkipHashNode<K, V> implements Node<K, V> {
         return null;
     }
 
-    private class ResultNode {
+    protected class ResultNode {
         private NodeItem previousLevel;
         private NodeItem previousNode;
         private NodeItem currentNode;
@@ -190,53 +194,21 @@ public class SkipHashNode<K, V> implements Node<K, V> {
             this.previousNode = previousNode;
             this.currentNode = currentNode;
         }
+
+        public NodeItem getCurrentNode() {
+            return currentNode;
+        }
     }
 
-    public class NodeItem  {
+    protected class NodeItem {
         private K key;
         private V value;
         private int index;
         private NodeItem dataNext;
         private NodeItem levelNext;
 
-        public K getKey() {
-            return key;
-        }
-
-        public void setKey(K key) {
-            this.key = key;
-        }
-
         public V getValue() {
             return value;
-        }
-
-        public void setValue(V value) {
-            this.value = value;
-        }
-
-        public int getIndex() {
-            return index;
-        }
-
-        public void setIndex(int index) {
-            this.index = index;
-        }
-
-        public NodeItem getDataNext() {
-            return dataNext;
-        }
-
-        public void setDataNext(NodeItem dataNext) {
-            this.dataNext = dataNext;
-        }
-
-        public NodeItem getLevelNext() {
-            return levelNext;
-        }
-
-        public void setLevelNext(NodeItem levelNext) {
-            this.levelNext = levelNext;
         }
     }
 }

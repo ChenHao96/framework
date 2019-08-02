@@ -15,6 +15,6 @@
  */
 package com.github.chenhao96.utils.collection.node;
 
-public class StringSkipNode<V> extends SkipHashNode<String, V> implements Node<String, V> {
+public final class StringSkipNode<V> extends SkipHashNode<String, V> implements Node<String, V> {
 
 }
