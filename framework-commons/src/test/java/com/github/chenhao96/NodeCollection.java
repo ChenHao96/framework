@@ -16,13 +16,13 @@
 package com.github.chenhao96;
 
 import com.github.chenhao96.utils.RandomCodeClass;
-import com.github.chenhao96.utils.collection.node.StringSkipNode;
+import com.github.chenhao96.utils.collection.node.Node;
+import com.github.chenhao96.utils.collection.node.SkipHashNode;
 import org.junit.Before;
 import org.junit.Test;
 
 import java.util.List;
 import java.util.Map;
-import java.util.Random;
 import java.util.TreeMap;
 
 public class NodeCollection {
@@ -41,35 +41,7 @@ public class NodeCollection {
     }
 
     @Test
-    public void testSkipNode2() {
-
-        StringSkipNode<Integer> map = new StringSkipNode<>();
-        for (int k = 0; k < keys.size(); k++) {
-            map.put(keys.get(k), k);
-        }
-
-        Random random = new Random();
-        for (int i = 0; i < forSize; i++) {
-            int index = random.nextInt(keySize);
-            String key = keys.remove(index);
-            long startTime = System.currentTimeMillis();
-            if(map.get(key)!=null){
-                System.out.printf("%d, query use time:%d\n", i, System.currentTimeMillis() - startTime);
-            }
-        }
-        System.out.println();
-        for (int i = 0; i < forSize; i++) {
-            int index = random.nextInt(keySize);
-            String key = keys.remove(index);
-            long startTime = System.currentTimeMillis();
-            if(map.remove(key)!=null){
-                System.out.printf("%d, remove use time:%d\n", i, System.currentTimeMillis() - startTime);
-            }
-        }
-    }
-
-    @Test
-    public void testMap() {
+    public void testSkipNode() {
         int count;
         Record insertMin = new Record(), queryMin = new Record(), removeMin = new Record();
         long insertMinTime = System.currentTimeMillis(), queryMinTime = insertMinTime, removeMinTime = insertMinTime;
@@ -77,7 +49,7 @@ public class NodeCollection {
 
             int size = 0;
             long startTime = System.currentTimeMillis();
-            Map<String,Integer> map = new TreeMap<>();
+            Node<String, Integer> map = new SkipHashNode<>();
             for (int k = 0; k < keys.size(); k++) {
                 Integer value = map.put(keys.get(k), k);
                 if (value != null) size++;
@@ -143,7 +115,7 @@ public class NodeCollection {
     }
 
     @Test
-    public void testSkipNode() {
+    public void testMap() {
         int count;
         Record insertMin = new Record(), queryMin = new Record(), removeMin = new Record();
         long insertMinTime = System.currentTimeMillis(), queryMinTime = insertMinTime, removeMinTime = insertMinTime;
@@ -151,7 +123,7 @@ public class NodeCollection {
 
             int size = 0;
             long startTime = System.currentTimeMillis();
-            StringSkipNode<Integer> map = new StringSkipNode<>();
+            Map<String, Integer> map = new TreeMap<>();
             for (int k = 0; k < keys.size(); k++) {
                 Integer value = map.put(keys.get(k), k);
                 if (value != null) size++;

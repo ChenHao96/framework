@@ -18,6 +18,7 @@ package com.github.chenhao96.utils.collection.node;
 public class SkipArrayHashNode<K, V> extends SkipHashNode<K, V> {
 
     private final int arraySize;
+    private final int[] arrayCount;
     private final NodeItem[] arrayRoot;
 
     private static final int DEFAULT_ARRAY_SIZE = 10;
@@ -30,6 +31,7 @@ public class SkipArrayHashNode<K, V> extends SkipHashNode<K, V> {
     public SkipArrayHashNode(int arraySize) {
         if (arraySize < 1) throw new IllegalArgumentException("the arraySize parameter cannot be less than 1.");
         this.arraySize = arraySize;
+        this.arrayCount = new int[arraySize];
         this.arrayRoot = new SkipHashNode.NodeItem[arraySize];
     }
 
@@ -39,8 +41,8 @@ public class SkipArrayHashNode<K, V> extends SkipHashNode<K, V> {
         int hashCode = key.hashCode();
         NodeItem tmp = getNodeItemByHash(hashCode);
         if (tmp == null) return null;
-        super.root = tmp;
-        ResultNode node = queryHashKey(hashCode);
+        //TODO:bug
+        ResultNode node = super.queryHashKey(tmp, hashCode);
         return node == null ? null : node.getCurrentNode() == null ? null : node.getCurrentNode().getValue();
     }
 
@@ -53,20 +55,30 @@ public class SkipArrayHashNode<K, V> extends SkipHashNode<K, V> {
         if (tmp == null) super.root = null;
         V result = super.putValue(key, value, hashCode);
         this.arrayRoot[index] = super.root;
+        this.arrayCount[index]++;
         return result;
     }
 
     @Override
     public V remove(Object key) {
         int hashCode = key.hashCode();
-        NodeItem tmp = getNodeItemByHash(hashCode);
-        if (tmp == null) return null;
-        super.root = tmp;
-        return remove(queryHashKey(hashCode));
+        int index = getNodeIndex(hashCode);
+        NodeItem tmp = getNodeItemByIndex(index);
+        if (tmp != null && this.arrayCount[index] > 0) {
+            V result = super.remove(super.queryHashKey(tmp, hashCode));
+            if (result != null) {
+                this.arrayCount[index]--;
+                if (this.arrayCount[index] == 0) {
+                    this.arrayRoot[index] = null;
+                }
+            }
+            return result;
+        }
+        return null;
     }
 
     private int getNodeIndex(int hashCode) {
-        return this.arraySize % (this.arraySize + (this.arraySize % hashCode));
+        return (this.arraySize + (hashCode % this.arraySize)) % this.arraySize;
     }
 
     private NodeItem getNodeItemByHash(int hashCode) {
@@ -83,6 +95,7 @@ public class SkipArrayHashNode<K, V> extends SkipHashNode<K, V> {
     @Override
     public void clear() {
         for (int i = 0; i < arrayRoot.length; i++) {
+            arrayCount[i] = 0;
             arrayRoot[i] = null;
         }
         super.clear();

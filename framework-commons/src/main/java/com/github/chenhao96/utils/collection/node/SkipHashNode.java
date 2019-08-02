@@ -39,7 +39,7 @@ public class SkipHashNode<K, V> implements Node<K, V> {
     @Override
     public V get(Object key) {
         if (key == null) throw new IllegalArgumentException("key is required! can not be null.");
-        ResultNode node = queryHashKey(key.hashCode());
+        ResultNode node = queryHashKey(this.root, key.hashCode());
         return node == null ? null : node.currentNode == null ? null : node.currentNode.value;
     }
 
@@ -64,7 +64,7 @@ public class SkipHashNode<K, V> implements Node<K, V> {
     @Override
     public V remove(Object key) {
         if (key == null) throw new IllegalArgumentException("key is required! can not be null.");
-        return remove(queryHashKey(key.hashCode()));
+        return remove(queryHashKey(this.root, key.hashCode()));
     }
 
     protected V remove(ResultNode node) {
@@ -167,8 +167,8 @@ public class SkipHashNode<K, V> implements Node<K, V> {
         return result;
     }
 
-    protected ResultNode queryHashKey(int hashCode) {
-        NodeItem previousLevel = null, previous = null, current = this.root;
+    protected ResultNode queryHashKey(NodeItem root, int hashCode) {
+        NodeItem previousLevel = null, previous = null, current = root;
         while (current != null && hashCode >= current.index) {
             if (hashCode == current.index) return new ResultNode(previousLevel, previous, current);
             NodeItem nextData = current.dataNext;
