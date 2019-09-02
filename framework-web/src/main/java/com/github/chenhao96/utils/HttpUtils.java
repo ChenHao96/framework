@@ -37,7 +37,6 @@ import javax.net.ssl.TrustManager;
 import javax.net.ssl.X509TrustManager;
 import javax.servlet.http.Cookie;
 import java.io.UnsupportedEncodingException;
-import java.net.URLEncoder;
 import java.security.cert.CertificateException;
 import java.security.cert.X509Certificate;
 import java.util.*;
@@ -48,14 +47,9 @@ public class HttpUtils {
     private static final String CONTENT_TYPE_KEY = "Content-Type";
     private static final Logger LOGGER = LoggerFactory.getLogger(HttpUtils.class);
 
-    private String charSet;
     private String responseBody;
-    private final boolean encode;
     private Map<String, Set<String>> cookies;
-
-    public HttpUtils(boolean encode) {
-        this.encode = encode;
-    }
+    private String charSet = CommonsUtil.SYSTEM_ENCODING;
 
     public String getCharSet() {
         return charSet;
@@ -176,27 +170,7 @@ public class HttpUtils {
 
     private String addParams(String url, Map<String, String> params) {
         if (params != null && params.size() > 0) {
-            StringBuilder builder = new StringBuilder(url.length());
-            Set<Map.Entry<String, String>> entries = params.entrySet();
-            for (Map.Entry<String, String> entry : entries) {
-                String key = entry.getKey();
-                String value = entry.getValue();
-                if (StringUtil.isNotBlank(value)) {
-                    builder.append("&").append(key).append("=");
-                    value = value.trim();
-                    try {
-                        if (encode) value = URLEncoder.encode(value, charSet);
-                    } catch (UnsupportedEncodingException e) {
-                        throw new RuntimeException(e);
-                    }
-                    builder.append(value);
-                }
-            }
-            if (url.indexOf("?") > 0 && url.indexOf("?") < url.length() - 1) {
-                url = builder.insert(0, url).toString();
-            } else {
-                url = builder.replace(0, 1, "?").insert(0, url).toString();
-            }
+            return URLUtils.updateUrl(url, params, null, charSet);
         }
         return url;
     }
@@ -212,7 +186,7 @@ public class HttpUtils {
                 }
             }
             try {
-                if (encode) httpPost.setEntity(new UrlEncodedFormEntity(paramList, charSet));
+                httpPost.setEntity(new UrlEncodedFormEntity(paramList, charSet));
             } catch (UnsupportedEncodingException e) {
                 throw new RuntimeException(e);
             }

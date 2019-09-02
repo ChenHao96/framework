@@ -23,6 +23,7 @@ import javax.servlet.http.HttpServletRequest;
 import java.io.UnsupportedEncodingException;
 import java.net.URI;
 import java.net.URISyntaxException;
+import java.net.URLDecoder;
 import java.net.URLEncoder;
 import java.util.HashMap;
 import java.util.Map;
@@ -49,13 +50,33 @@ public final class URLUtils {
         return callBackUrl;
     }
 
-    public static String currentServerUrl(HttpServletRequest request) {
+    public static String createCallBackUrl(String url, String serverUrl) {
+        StringBuilder sb = new StringBuilder(serverUrl);
+        if (StringUtil.isNotBlank(url)) {
+            if (!url.startsWith("/")) {
+                sb.append("/");
+            }
+            sb.append(url);
+        }
+
+        String callBackUrl = sb.toString();
+        LOGGER.info("createCallBackUrl callBackUrl:{}", callBackUrl);
+        return callBackUrl;
+    }
+
+    public static String currentServerUrl(HttpServletRequest request, String defaultServerUrl) {
+        if (StringUtil.isNotEmpty(defaultServerUrl)) return defaultServerUrl;
         if (request == null) return "";
         int port = request.getServerPort();
         String protocol = request.getScheme();
         String serverName = request.getServerName();
         String contextPath = request.getContextPath();
         return newUrl4Param(port, protocol, serverName, contextPath).toString();
+    }
+
+
+    public static String currentServerUrl(HttpServletRequest request) {
+        return currentServerUrl(request, null);
     }
 
     private static StringBuilder newUrl4Param(int port, String protocol, String serverName, String contextPath) {
@@ -78,10 +99,10 @@ public final class URLUtils {
     }
 
     public static String updateUrl(String url, Map<String, String> param, String newFragment) {
-        return updateUrl(url, param, newFragment, false);
+        return updateUrl(url, param, newFragment, CommonsUtil.SYSTEM_ENCODING);
     }
 
-    public static String updateUrl(String url, Map<String, String> param, String newFragment, boolean encode) {
+    public static String updateUrl(String url, Map<String, String> param, String newFragment, String charSet) {
 
         if (StringUtil.isBlank(url)) return "";
 
@@ -98,8 +119,14 @@ public final class URLUtils {
         String contextPath = uri.getPath();
         StringBuilder sb = newUrl4Param(port, protocol, serverName, contextPath);
 
-        param = updateRawQueryParam(uri.getRawQuery(), param);
-        String paramStr = paramToQueryString(param, encode);
+        String paramStr;
+        try {
+            param = updateRawQueryParam(uri.getRawQuery(), param, charSet);
+            paramStr = paramToQueryString(param, charSet);
+        } catch (UnsupportedEncodingException e) {
+            throw new RuntimeException(e);
+        }
+
         if (StringUtil.isNotEmpty(paramStr)) {
             sb.append("?").append(paramStr);
         }
@@ -115,29 +142,30 @@ public final class URLUtils {
         return sb.toString();
     }
 
-    private static Map<String, String> updateRawQueryParam(String rawQuery, Map<String, String> param) {
-        Map<String, String> queryMap = getQueryMap(rawQuery);
+    private static Map<String, String> updateRawQueryParam(String rawQuery, Map<String, String> param, String charSet) throws UnsupportedEncodingException {
+        Map<String, String> queryMap = getQueryMap(rawQuery, charSet);
         int paramCount = queryMap == null ? 0 : queryMap.size();
         paramCount += param == null ? 0 : param.size();
         if (paramCount == 0) return null;
         Map<String, String> result = new HashMap<>(paramCount);
-        putNewMap(param, result);
-        putNewMap(queryMap, result);
+        putNewMap(param, result, charSet);
+        putNewMap(queryMap, result, charSet);
         return result;
     }
 
-    public static void putNewMap(Map<String, String> param, Map<String, String> result) {
+    public static void putNewMap(Map<String, String> param, Map<String, String> result, String charSet) throws UnsupportedEncodingException {
         if (param != null) {
             Set<Map.Entry<String, String>> entrySet = param.entrySet();
             for (Map.Entry<String, String> entry : entrySet) {
                 String key = entry.getKey();
                 if (StringUtil.isEmpty(key)) continue;
-                result.put(key, urlEncode(entry.getValue()));
+                String value = URLEncoder.encode(entry.getValue(), charSet);
+                result.put(key, value);
             }
         }
     }
 
-    public static String paramToQueryString(Map<String, String> params, boolean encode) {
+    public static String paramToQueryString(Map<String, String> params, String charSet) throws UnsupportedEncodingException {
         if (CollectionUtils.isEmpty(params)) return "";
         StringBuilder paramString = new StringBuilder();
         boolean noFirst = false;
@@ -146,7 +174,7 @@ public final class URLUtils {
             if (StringUtil.isBlank(key)) continue;
             String value = entry.getValue();
             if (StringUtil.isNotBlank(value)) {
-                if (encode) value = urlEncode(value);
+                value = URLEncoder.encode(value, charSet);
                 if (noFirst) paramString.append("&");
                 paramString.append(key).append("=").append(value);
                 noFirst = true;
@@ -155,7 +183,7 @@ public final class URLUtils {
         return paramString.toString();
     }
 
-    public static Map<String, String> getQueryMap(String rawQuery) {
+    public static Map<String, String> getQueryMap(String rawQuery, String charSet) throws UnsupportedEncodingException {
 
         String[] pas = null;
         if (StringUtil.isNotEmpty(rawQuery)) pas = rawQuery.split("&");
@@ -169,6 +197,9 @@ public final class URLUtils {
                 if (kv.length == 2) {
                     String key = kv[0];
                     String value = kv[1];
+                    if (StringUtil.isNotEmpty(value)) {
+                        value = URLDecoder.decode(value, charSet);
+                    }
                     result.put(key, value);
                 }
             }
@@ -177,20 +208,7 @@ public final class URLUtils {
         return result;
     }
 
-    public static String urlEncode(String value) {
-        if (StringUtil.isEmpty(value)) return value;
-        //TODO:需要判断是否已经encode了
-        try {
-            String result = URLEncoder.encode(value, CommonsUtil.SYSTEM_ENCODING);
-            result = result.trim().replaceAll("\\+", "%20").replaceAll("\\*", "%2A").replaceAll("~", "%7E");
-            result = result.replaceAll("/", "%2F").replaceAll(" ", "%20").replaceAll("\\t", "");
-            return result;
-        } catch (UnsupportedEncodingException e) {
-            throw new IllegalArgumentException(e);
-        }
-    }
-
-    public static String paramToQueryString(Map<String, String> params) {
-        return paramToQueryString(params, true);
+    public static String paramToQueryString(Map<String, String> params) throws UnsupportedEncodingException {
+        return paramToQueryString(params, CommonsUtil.SYSTEM_ENCODING);
     }
 }
