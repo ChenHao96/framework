@@ -17,6 +17,7 @@
 package com.github.chenhao96.database.redis;
 
 import com.github.chenhao96.utils.StringUtil;
+import com.github.chenhao96.utils.encrypt.MD5Utils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.redis.connection.DataType;
@@ -232,5 +233,10 @@ public class RedisStringCacheAdaptorImpl implements RedisStringCacheAdaptor {
     public long listSize(String key) {
         if (StringUtil.isEmpty(key)) return 0;
         return redisTemplate.boundListOps(newKey(key)).size();
+    }
+
+    @Override
+    public String getRandomId() {
+        return MD5Utils.getMD5Hex(redisTemplate.randomKey());
     }
 }

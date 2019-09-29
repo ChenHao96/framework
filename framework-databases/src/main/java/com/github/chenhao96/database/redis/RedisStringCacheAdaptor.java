@@ -17,4 +17,6 @@
 package com.github.chenhao96.database.redis;
 
 public interface RedisStringCacheAdaptor extends RedisCacheAdaptor<String> {
+
+    String getRandomId();
 }
