@@ -16,12 +16,15 @@
 package com.github.chenhao96.utils;
 
 import java.util.*;
+import java.util.concurrent.locks.ReentrantLock;
 
 public final class RandomCodeClass {
 
     private char[] characterSet;
 
     private Random random = new Random();
+
+    private ReentrantLock lock = new ReentrantLock();
 
     private RandomCodeClass(CodeCharArray... characterSets) {
 
@@ -83,14 +86,18 @@ public final class RandomCodeClass {
 
     public Set<String> createSetCode(int length, int size) {
         Set<String> result = new HashSet<>(size);
+        lock.lock();
         this.characterSet = exchangeCode(this.characterSet, this.random);
+        lock.unlock();
         createCode(result, this.random, length, size, this.characterSet);
         return result;
     }
 
     public List<String> createListCode(int length, int size) {
         List<String> result = new ArrayList<>(size);
+        lock.lock();
         this.characterSet = exchangeCode(this.characterSet, this.random);
+        lock.unlock();
         createCode(result, this.random, length, size, this.characterSet);
         return result;
     }
