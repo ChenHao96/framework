@@ -19,22 +19,21 @@ package com.github.chenhao96.database.redis.distributedlock;
 import com.github.chenhao96.database.redis.RedisAdaptor;
 import com.github.chenhao96.utils.CommonsUtil;
 import com.github.chenhao96.utils.StringUtil;
+import io.lettuce.core.ScriptOutputType;
+import io.lettuce.core.SetArgs;
+import io.lettuce.core.api.sync.RedisCommands;
+import io.lettuce.core.api.sync.RedisScriptingCommands;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
-import redis.clients.jedis.commands.JedisClusterScriptingCommands;
-import redis.clients.jedis.commands.JedisCommands;
-import redis.clients.jedis.params.SetParams;
 
 import javax.annotation.Resource;
-import java.util.Arrays;
-import java.util.Collections;
 import java.util.UUID;
 
 @Service
 public class DistributedLockServiceImpl implements DistributedLockService {
 
-    private static final long REPLY = 0L;
+    private static final int REPLY = 0;
     private static final int LOCK_EXPIRE_TIME_SECOND = 120;
     private static final ThreadLocal<String> threadLocal = new ThreadLocal<>();
     private static final String LOCK_PREFIX = "com.github.chenhao96.java.lock.pk.%s.%s";
@@ -70,8 +69,8 @@ public class DistributedLockServiceImpl implements DistributedLockService {
 
         try {
             String result = redisAdaptor.execute(connection -> {
-                JedisCommands commands = (JedisCommands) connection.getNativeConnection();
-                return commands.set(key, token, new SetParams().nx().ex(expireTimeSeconds));
+                RedisCommands<String, String> command = (RedisCommands<String, String>) connection.getNativeConnection();
+                return command.set(key, token, SetArgs.Builder.nx().ex(expireTimeSeconds));
             });
             if (StringUtil.isNotEmpty(result)) {
                 LOGGER.info("get Lock success , key: {}, thread name: {}", key, Thread.currentThread().getName());
@@ -112,12 +111,16 @@ public class DistributedLockServiceImpl implements DistributedLockService {
 
     private boolean compareTokenAndExpireKey(String key, String token, int expireTimeSeconds) {
         if (StringUtil.isNotBlank(token)) {
-            Long result = redisAdaptor.execute(connection -> {
+            Integer result = redisAdaptor.execute(connection -> {
                 Object nativeConnection = connection.getNativeConnection();
-                if (CommonsUtil.isInstanceProperty(JedisClusterScriptingCommands.class, nativeConnection)) {
-                    JedisClusterScriptingCommands commands = (JedisClusterScriptingCommands) nativeConnection;
-                    return (Long) commands.eval(EXPIRE_LOCK_SCRIPT, Collections.singletonList(key), Arrays.asList(token, String.valueOf(expireTimeSeconds)));
+                if (CommonsUtil.isInstanceProperty(RedisScriptingCommands.class, nativeConnection)) {
+                    RedisScriptingCommands<String, String> commands = (RedisScriptingCommands<String, String>) nativeConnection;
+                    return commands.eval(EXPIRE_LOCK_SCRIPT, ScriptOutputType.INTEGER, new String[]{key}, token, String.valueOf(expireTimeSeconds));
                 }
+//                if (CommonsUtil.isInstanceProperty(JedisClusterScriptingCommands.class, nativeConnection)) {
+//                    JedisClusterScriptingCommands commands = (JedisClusterScriptingCommands) nativeConnection;
+//                    return (Long) commands.eval(EXPIRE_LOCK_SCRIPT, Collections.singletonList(key), Collections.singletonList(token));
+//                }
 //                if (nativeConnection instanceof JedisCluster) {// 集群模式
 //                    return (Long) ((JedisCluster) nativeConnection).eval(EXPIRE_LOCK_SCRIPT, Collections.singletonList(key), Arrays.asList(token, String.valueOf(expireTimeSeconds)));
 //                } else if (nativeConnection instanceof Jedis) {// 单机模式
@@ -135,12 +138,16 @@ public class DistributedLockServiceImpl implements DistributedLockService {
 
     private void compareTokenAndDelKey(String key, String token) {
         if (StringUtil.isNotBlank(token)) {
-            Long result = redisAdaptor.execute(connection -> {
+            Integer result = redisAdaptor.execute(connection -> {
                 Object nativeConnection = connection.getNativeConnection();
-                if (CommonsUtil.isInstanceProperty(JedisClusterScriptingCommands.class, nativeConnection)) {
-                    JedisClusterScriptingCommands commands = (JedisClusterScriptingCommands) nativeConnection;
-                    return (Long) commands.eval(UNLOCK_SCRIPT, Collections.singletonList(key), Collections.singletonList(token));
+                if (CommonsUtil.isInstanceProperty(RedisScriptingCommands.class, nativeConnection)) {
+                    RedisScriptingCommands<String, String> commands = (RedisScriptingCommands<String, String>) nativeConnection;
+                    return commands.eval(UNLOCK_SCRIPT, ScriptOutputType.INTEGER, new String[]{key}, token);
                 }
+//                if (CommonsUtil.isInstanceProperty(JedisClusterScriptingCommands.class, nativeConnection)) {
+//                    JedisClusterScriptingCommands commands = (JedisClusterScriptingCommands) nativeConnection;
+//                    return (Long) commands.eval(UNLOCK_SCRIPT, Collections.singletonList(key), Collections.singletonList(token));
+//                }
 //                if (nativeConnection instanceof JedisCluster) {// 集群模式
 //                    return (Long) ((JedisCluster) nativeConnection).eval(UNLOCK_SCRIPT, Collections.singletonList(key), Collections.singletonList(token));
 //                } else if (nativeConnection instanceof Jedis) {// 单机模式

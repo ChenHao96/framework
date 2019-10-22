@@ -37,10 +37,18 @@
         </dependency>
 
         <!-- redis -->
+        <!--<dependency>-->
+            <!--<groupId>redis.clients</groupId>-->
+            <!--<artifactId>jedis</artifactId>-->
+            <!--<version>${jedis.version}</version>-->
+            <!--<scope>compile</scope>-->
+            <!--<optional>true</optional>-->
+        <!--</dependency>-->
+
         <dependency>
-            <groupId>redis.clients</groupId>
-            <artifactId>jedis</artifactId>
-            <version>${jedis.version}</version>
+            <groupId>io.lettuce</groupId>
+            <artifactId>lettuce-core</artifactId>
+            <version>5.1.7.RELEASE</version>
             <scope>compile</scope>
             <optional>true</optional>
         </dependency>
