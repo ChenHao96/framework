@@ -28,7 +28,7 @@ import java.util.Set;
 
 public class RequestInterceptor implements HandlerInterceptor {
 
-    private static final String CALLBACK_HTTP_PARAMETER_NAME = "callback";
+    public static final String CALLBACK_HTTP_PARAMETER_NAME = "callback";
     public static final String SERVLET_PATH_PARAMETER_NAME = "servlet_path_key";
     private static final Logger LOGGER = LoggerFactory.getLogger(RequestInterceptor.class);
 
