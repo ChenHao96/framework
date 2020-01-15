@@ -19,7 +19,6 @@ package com.github.chenhao96.database.redis;
 import com.github.chenhao96.utils.StringUtil;
 import com.github.chenhao96.utils.encrypt.MD5Utils;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.redis.connection.DataType;
 import org.springframework.data.redis.core.BoundHashOperations;
 import org.springframework.data.redis.core.BoundValueOperations;
@@ -38,11 +37,11 @@ public class RedisStringCacheAdaptorImpl implements RedisStringCacheAdaptor {
     @Autowired
     private StringRedisTemplate redisTemplate;
 
-    @Value("${redis.server.key.prefix}")
-    private String keyPrefix;
+//    @Value("${redis.server.key.prefix}")
+//    private String keyPrefix;
 
     private String newKey(String key) {
-        return String.format("%s.%s", keyPrefix, key);
+        return key;//String.format("%s.%s", keyPrefix, key);
     }
 
     @Override
