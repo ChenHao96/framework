@@ -22,8 +22,8 @@ import com.github.chenhao96.utils.StringUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
-import redis.clients.jedis.commands.JedisClusterScriptingCommands;
 import redis.clients.jedis.commands.JedisCommands;
+import redis.clients.jedis.commands.ScriptingCommands;
 import redis.clients.jedis.params.SetParams;
 
 import javax.annotation.Resource;
@@ -113,8 +113,8 @@ public class DistributedLockServiceImpl implements DistributedLockService {
         if (StringUtil.isNotBlank(token)) {
             Long result = redisAdaptor.execute(connection -> {
                 Object nativeConnection = connection.getNativeConnection();
-                if (CommonsUtil.isInstanceProperty(JedisClusterScriptingCommands.class, nativeConnection)) {
-                    JedisClusterScriptingCommands commands = (JedisClusterScriptingCommands) nativeConnection;
+                if (CommonsUtil.isInstanceProperty(ScriptingCommands.class, nativeConnection)) {
+                    ScriptingCommands commands = (ScriptingCommands) nativeConnection;
                     return (Long) commands.eval(EXPIRE_LOCK_SCRIPT, Collections.singletonList(key), Arrays.asList(token, String.valueOf(expireTimeSeconds)));
                 }
 //                if (nativeConnection instanceof JedisCluster) {// 集群模式
@@ -136,8 +136,8 @@ public class DistributedLockServiceImpl implements DistributedLockService {
         if (StringUtil.isNotBlank(token)) {
             Long result = redisAdaptor.execute(connection -> {
                 Object nativeConnection = connection.getNativeConnection();
-                if (CommonsUtil.isInstanceProperty(JedisClusterScriptingCommands.class, nativeConnection)) {
-                    JedisClusterScriptingCommands commands = (JedisClusterScriptingCommands) nativeConnection;
+                if (CommonsUtil.isInstanceProperty(ScriptingCommands.class, nativeConnection)) {
+                    ScriptingCommands commands = (ScriptingCommands) nativeConnection;
                     return (Long) commands.eval(UNLOCK_SCRIPT, Collections.singletonList(key), Collections.singletonList(token));
                 }
 //                if (nativeConnection instanceof JedisCluster) {// 集群模式
