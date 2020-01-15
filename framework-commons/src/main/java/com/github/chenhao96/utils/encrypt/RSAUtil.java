@@ -63,7 +63,7 @@ public final class RSAUtil {
             PublicKey pubKey = keyFactory.generatePublic(new X509EncodedKeySpec(encodedKey));
             Signature signature = getSignature(signType);
             signature.initVerify(pubKey);
-            signature.update(content.getBytes(Charset.forName(CommonsUtil.SYSTEM_ENCODING)));
+            signature.update(content.getBytes(Charset.forName(CommonsUtil.DEFAULT_ENCODING)));
             return signature.verify(Base64.decodeBase64(sign));
         } catch (Exception e) {
             throw new RuntimeException(e);
@@ -77,7 +77,7 @@ public final class RSAUtil {
             PrivateKey privateK = keyFactory.generatePrivate(new PKCS8EncodedKeySpec(decodeKey));
             Signature signature = getSignature(signType);
             signature.initSign(privateK);
-            signature.update(content.getBytes(Charset.forName(CommonsUtil.SYSTEM_ENCODING)));
+            signature.update(content.getBytes(Charset.forName(CommonsUtil.DEFAULT_ENCODING)));
             return Base64.encodeBase64String(signature.sign());
         } catch (Exception e) {
             throw new RuntimeException(e);

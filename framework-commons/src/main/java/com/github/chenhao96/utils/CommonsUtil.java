@@ -23,7 +23,7 @@ import java.net.Socket;
 
 public final class CommonsUtil {
 
-    public static final String SYSTEM_ENCODING = System.getProperty("file.encoding");
+    public static final String DEFAULT_ENCODING = "UTF-8";
 
     private CommonsUtil() {
     }

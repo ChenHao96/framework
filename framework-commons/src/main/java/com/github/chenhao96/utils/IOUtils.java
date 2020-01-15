@@ -67,7 +67,7 @@ public class IOUtils {
     }
 
     public static String readStream2String(InputStream in) throws IOException {
-        return readStream2String(in, CommonsUtil.SYSTEM_ENCODING);
+        return readStream2String(in, CommonsUtil.DEFAULT_ENCODING);
     }
 
     public static byte[] readStream2ByteArray(InputStream in) throws IOException {

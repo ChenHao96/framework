@@ -44,7 +44,7 @@ public class AESUtils {
         try {
             SecretKeySpec e = getSecretKeySpec(password);
             Cipher cipher = Cipher.getInstance(ALGORITHM);
-            byte[] byteContent = content.getBytes(CommonsUtil.SYSTEM_ENCODING);
+            byte[] byteContent = content.getBytes(CommonsUtil.DEFAULT_ENCODING);
             cipher.init(Cipher.ENCRYPT_MODE, e);
             byte[] result = cipher.doFinal(byteContent);
             return new Base64().encodeToString(result);
@@ -71,7 +71,7 @@ public class AESUtils {
             Cipher cipher = Cipher.getInstance(ALGORITHM);
             cipher.init(Cipher.DECRYPT_MODE, e);
             byte[] result = cipher.doFinal(new Base64().decode(content));
-            return new String(result, CommonsUtil.SYSTEM_ENCODING);
+            return new String(result, CommonsUtil.DEFAULT_ENCODING);
         } catch (Exception e) {
             LOGGER.warn("string:{} decrypt fail", content, e);
             throw new IllegalStateException("字符串解密失败", e);

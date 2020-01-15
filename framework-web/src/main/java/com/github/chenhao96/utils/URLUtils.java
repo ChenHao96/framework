@@ -99,7 +99,7 @@ public final class URLUtils {
     }
 
     public static String updateUrl(String url, Map<String, String> param, String newFragment) {
-        return updateUrl(url, param, newFragment, CommonsUtil.SYSTEM_ENCODING);
+        return updateUrl(url, param, newFragment, CommonsUtil.DEFAULT_ENCODING);
     }
 
     public static String updateUrl(String url, Map<String, String> param, String newFragment, String charSet) {
@@ -209,6 +209,6 @@ public final class URLUtils {
     }
 
     public static String paramToQueryString(Map<String, String> params) throws UnsupportedEncodingException {
-        return paramToQueryString(params, CommonsUtil.SYSTEM_ENCODING);
+        return paramToQueryString(params, CommonsUtil.DEFAULT_ENCODING);
     }
 }

@@ -167,7 +167,7 @@ public class FileUploadUtil {
         FileInputStream fileInputStream = null;
         try {
             fileInputStream = new FileInputStream(file);
-            return IOUtils.readStream2String(fileInputStream, CommonsUtil.SYSTEM_ENCODING);
+            return IOUtils.readStream2String(fileInputStream, CommonsUtil.DEFAULT_ENCODING);
         } finally {
             CommonsUtil.safeClose(fileInputStream);
         }

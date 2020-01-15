@@ -49,7 +49,7 @@ public class HttpUtils {
 
     private String responseBody;
     private Map<String, Set<String>> cookies;
-    private String charSet = CommonsUtil.SYSTEM_ENCODING;
+    private String charSet = CommonsUtil.DEFAULT_ENCODING;
 
     public String getCharSet() {
         return charSet;
@@ -204,7 +204,7 @@ public class HttpUtils {
     }
 
     private static String getResponseCharSet(CloseableHttpResponse httpResponse) {
-        String charSet = CommonsUtil.SYSTEM_ENCODING;
+        String charSet = CommonsUtil.DEFAULT_ENCODING;
         Header contentType = httpResponse.getFirstHeader(CONTENT_TYPE_KEY);
         if (contentType != null) {
             String contextTypeValue = contentType.getValue();
