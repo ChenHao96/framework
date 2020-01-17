@@ -16,16 +16,20 @@
 
 package com.github.chenhao96.database.redis;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.redis.core.RedisCallback;
 import org.springframework.data.redis.core.StringRedisTemplate;
-import org.springframework.stereotype.Service;
 
-@Service
 public class RedisAdaptorImpl implements RedisAdaptor {
 
-    @Autowired
     private StringRedisTemplate redisTemplate;
+
+    public StringRedisTemplate getRedisTemplate() {
+        return redisTemplate;
+    }
+
+    public void setRedisTemplate(StringRedisTemplate redisTemplate) {
+        this.redisTemplate = redisTemplate;
+    }
 
     @Override
     public <T> T execute(RedisCallback<T> action) {

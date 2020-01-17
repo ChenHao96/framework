@@ -21,17 +21,14 @@ import com.github.chenhao96.utils.CommonsUtil;
 import com.github.chenhao96.utils.StringUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.stereotype.Service;
 import redis.clients.jedis.commands.JedisCommands;
 import redis.clients.jedis.commands.ScriptingCommands;
 import redis.clients.jedis.params.SetParams;
 
-import javax.annotation.Resource;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.UUID;
 
-@Service
 public class DistributedLockServiceImpl implements DistributedLockService {
 
     private static final long REPLY = 0L;
@@ -42,8 +39,15 @@ public class DistributedLockServiceImpl implements DistributedLockService {
     private static final String UNLOCK_SCRIPT = "  if redis.call(\"get\",KEYS[1]) == ARGV[1] then\n    return redis.call(\"del\",KEYS[1])\n  else\n        return 0\n  end\n";
     private static final String EXPIRE_LOCK_SCRIPT = "  if redis.call(\"get\",KEYS[1]) == ARGV[1] then\n    return redis.call(\"expire\",KEYS[1],ARGV[2])\n  else\n        return 0\n  end\n";
 
-    @Resource
     private RedisAdaptor redisAdaptor;
+
+    public RedisAdaptor getRedisAdaptor() {
+        return redisAdaptor;
+    }
+
+    public void setRedisAdaptor(RedisAdaptor redisAdaptor) {
+        this.redisAdaptor = redisAdaptor;
+    }
 
     public boolean tryLock(String businessCode, String uniqueKey) {
         return tryLock(businessCode, uniqueKey, LOCK_EXPIRE_TIME_SECOND);
