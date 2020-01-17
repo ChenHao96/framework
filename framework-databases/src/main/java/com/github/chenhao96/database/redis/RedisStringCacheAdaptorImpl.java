@@ -33,6 +33,8 @@ public class RedisStringCacheAdaptorImpl implements RedisStringCacheAdaptor {
 
     private StringRedisTemplate redisTemplate;
 
+    private String keyPrefix;
+
     public StringRedisTemplate getRedisTemplate() {
         return redisTemplate;
     }
@@ -41,84 +43,103 @@ public class RedisStringCacheAdaptorImpl implements RedisStringCacheAdaptor {
         this.redisTemplate = redisTemplate;
     }
 
+    public String getKeyPrefix() {
+        return keyPrefix;
+    }
+
+    public void setKeyPrefix(String keyPrefix) {
+        this.keyPrefix = keyPrefix;
+    }
+
+    private String newKey(String key) {
+        if (StringUtil.isEmpty(keyPrefix)) return key;
+        StringBuffer sb = new StringBuffer();
+        sb.append(keyPrefix);
+        if (keyPrefix.lastIndexOf('.') != keyPrefix.length() - 1) {
+            sb.append(".");
+        }
+        return sb.append(key).toString();
+    }
+
     @Override
     public boolean delete(String key) {
-        return redisTemplate.delete(key);
+        return redisTemplate.delete(newKey(key));
     }
 
     @Override
     public boolean exist(String key) {
-        return redisTemplate.hasKey(key);
+        return redisTemplate.hasKey(newKey(key));
     }
 
     @Override
     public Set<String> keys(String pattern) {
-        return redisTemplate.keys(pattern);
+        return redisTemplate.keys(newKey(pattern));
     }
 
     @Override
     public RedisDataType getKeyType(String key) {
-        DataType dataType = redisTemplate.boundValueOps(key).getType();
+        DataType dataType = redisTemplate.boundValueOps(newKey(key)).getType();
         return RedisDataType.fromCode(dataType.code());
     }
 
     @Override
     public Long getExpire(String key, TimeUnit timeUnit) {
-        return redisTemplate.getExpire(key, timeUnit);
+        return redisTemplate.getExpire(newKey(key), timeUnit);
     }
 
     @Override
     public void setExpire(String key, long duration) {
-        setExpire(key, duration, TimeUnit.MILLISECONDS);
+        setExpire(newKey(key), duration, TimeUnit.MILLISECONDS);
     }
 
     @Override
     public void setExpire(String key, Date date) {
-        redisTemplate.boundValueOps(key).expireAt(date);
+        redisTemplate.boundValueOps(newKey(key)).expireAt(date);
     }
 
     @Override
     public void setExpire(String key, long duration, TimeUnit timeUnit) {
-        redisTemplate.boundValueOps(key).expire(duration, timeUnit);
+        redisTemplate.boundValueOps(newKey(key)).expire(duration, timeUnit);
     }
 
     @Override
     public void set(String key, String value, Date date) {
-        BoundValueOperations<String, String> operations = redisTemplate.boundValueOps(key);
+        BoundValueOperations<String, String> operations = redisTemplate.boundValueOps(newKey(key));
         operations.set(value);
         operations.expireAt(date);
     }
 
     @Override
     public String get(String key) {
-        BoundValueOperations<String, String> operations = redisTemplate.boundValueOps(key);
+        BoundValueOperations<String, String> operations = redisTemplate.boundValueOps(newKey(key));
         return operations.get();
     }
 
     @Override
     public void set(String key, String value) {
-        BoundValueOperations<String, String> operations = redisTemplate.boundValueOps(key);
+        BoundValueOperations<String, String> operations = redisTemplate.boundValueOps(newKey(key));
         operations.set(value);
     }
 
     @Override
     public void set(String key, String value, long duration) {
-        set(key, value, duration, TimeUnit.MILLISECONDS);
+        set(newKey(key), value, duration, TimeUnit.MILLISECONDS);
     }
 
     @Override
     public void set(String key, String value, long duration, TimeUnit timeUnit) {
-        BoundValueOperations<String, String> operations = redisTemplate.boundValueOps(key);
+        BoundValueOperations<String, String> operations = redisTemplate.boundValueOps(newKey(key));
         operations.set(value, duration, timeUnit);
     }
 
     @Override
     public void increment(String key) {
-        increment(key, BigDecimal.ONE);
+        increment(newKey(key), BigDecimal.ONE);
     }
 
     @Override
     public void increment(String key, BigDecimal delta) {
+        key = newKey(key);
         if (StringUtil.isEmpty(key) || delta == null) return;
         BoundValueOperations<String, String> operations = redisTemplate.boundValueOps(key);
         operations.increment(delta.doubleValue());
@@ -126,11 +147,12 @@ public class RedisStringCacheAdaptorImpl implements RedisStringCacheAdaptor {
 
     @Override
     public void decrement(String key) {
-        decrement(key, BigDecimal.ONE);
+        decrement(newKey(key), BigDecimal.ONE);
     }
 
     @Override
     public void decrement(String key, BigDecimal delta) {
+        key = newKey(key);
         if (StringUtil.isEmpty(key) || delta == null) return;
         BoundValueOperations<String, String> operations = redisTemplate.boundValueOps(key);
         operations.increment(delta.multiply(BigDecimal.valueOf(-1)).doubleValue());
@@ -138,29 +160,30 @@ public class RedisStringCacheAdaptorImpl implements RedisStringCacheAdaptor {
 
     @Override
     public String hashGet(String key, String field) {
-        BoundHashOperations<String, String, String> operations = redisTemplate.boundHashOps(key);
+        BoundHashOperations<String, String, String> operations = redisTemplate.boundHashOps(newKey(key));
         return operations.get(field);
     }
 
     @Override
     public Map<String, String> hashGet(String key) {
-        BoundHashOperations<String, String, String> operations = redisTemplate.boundHashOps(key);
+        BoundHashOperations<String, String, String> operations = redisTemplate.boundHashOps(newKey(key));
         return operations.entries();
     }
 
     @Override
     public void hashSet(String key, String field, String value) {
-        BoundHashOperations<String, String, String> operations = redisTemplate.boundHashOps(key);
+        BoundHashOperations<String, String, String> operations = redisTemplate.boundHashOps(newKey(key));
         operations.put(field, value);
     }
 
     @Override
     public void hashIncrement(String key, String field) {
-        hashIncrement(key, field, BigDecimal.ONE);
+        hashIncrement(newKey(key), field, BigDecimal.ONE);
     }
 
     @Override
     public void hashIncrement(String key, String field, BigDecimal delta) {
+        key = newKey(key);
         if (StringUtil.isEmpty(key) || StringUtil.isEmpty(field) || delta == null) return;
         BoundHashOperations<String, String, String> operations = redisTemplate.boundHashOps(key);
         operations.increment(field, delta.doubleValue());
@@ -168,65 +191,70 @@ public class RedisStringCacheAdaptorImpl implements RedisStringCacheAdaptor {
 
     @Override
     public void hashDecrement(String key, String field) {
-        hashIncrement(key, field, BigDecimal.valueOf(-1));
+        hashIncrement(newKey(key), field, BigDecimal.valueOf(-1));
     }
 
     @Override
     public void hashDecrement(String key, String field, BigDecimal delta) {
         if (delta == null) return;
-        hashIncrement(key, field, delta.multiply(BigDecimal.valueOf(-1)));
+        hashIncrement(newKey(key), field, delta.multiply(BigDecimal.valueOf(-1)));
     }
 
     @Override
     public void hashSet(String key, Map<String, String> values) {
-        BoundHashOperations<String, String, String> operations = redisTemplate.boundHashOps(key);
+        BoundHashOperations<String, String, String> operations = redisTemplate.boundHashOps(newKey(key));
         operations.putAll(values);
     }
 
     @Override
     public Set<String> hashFields(String key) {
-        BoundHashOperations<String, String, String> operations = redisTemplate.boundHashOps(key);
+        BoundHashOperations<String, String, String> operations = redisTemplate.boundHashOps(newKey(key));
         return operations.keys();
     }
 
     @Override
     public boolean hashFieldExist(String key, String field) {
-        BoundHashOperations<String, String, String> operations = redisTemplate.boundHashOps(key);
+        BoundHashOperations<String, String, String> operations = redisTemplate.boundHashOps(newKey(key));
         return operations.hasKey(field);
     }
 
     @Override
     public void hashDelField(String key, String... fields) {
-        BoundHashOperations<String, String, String> operations = redisTemplate.boundHashOps(key);
+        BoundHashOperations<String, String, String> operations = redisTemplate.boundHashOps(newKey(key));
         operations.delete(fields);
     }
 
     @Override
     public void listLeftPush(String key, String value) {
+        key = newKey(key);
         if (StringUtil.isEmpty(key) || StringUtil.isEmpty(value)) return;
         redisTemplate.boundListOps(key).leftPush(value);
     }
 
     @Override
     public void listRightPush(String key, String value) {
+        key = newKey(key);
         if (StringUtil.isEmpty(key) || StringUtil.isEmpty(value)) return;
         redisTemplate.boundListOps(key).rightPush(value);
     }
 
     @Override
     public String listLeftPop(String key) {
+        key = newKey(key);
         if (StringUtil.isEmpty(key)) return null;
         return redisTemplate.boundListOps(key).leftPop();
     }
 
     @Override
     public String listRightPop(String key) {
+        key = newKey(key);
         if (StringUtil.isEmpty(key)) return null;
         return redisTemplate.boundListOps(key).rightPop();
     }
 
     @Override
     public long listSize(String key) {
+        key = newKey(key);
         if (StringUtil.isEmpty(key)) return 0;
         return redisTemplate.boundListOps(key).size();
     }
