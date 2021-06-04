@@ -15,7 +15,7 @@
 
     <properties>
         <javaee-api.version>8.0</javaee-api.version>
-        <httpclient.version>4.5.2</httpclient.version>
+        <httpclient.version>4.5.13</httpclient.version>
         <aliyun-sdk-oss.version>3.4.2</aliyun-sdk-oss.version>
     </properties>
 
